@@ -39,6 +39,27 @@
     <ClInclude Include="MainListView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StudentInfoDB.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="StudentInfo.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInfo.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInfoDB.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ZInfoEncrypt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZInfoDesc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -51,6 +72,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MainListView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StudentInfoDB.cpp">
+      <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInfoDB.cpp">
+      <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ZInfoEncrypt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZUtility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
