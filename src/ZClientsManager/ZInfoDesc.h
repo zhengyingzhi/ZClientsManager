@@ -24,8 +24,8 @@ const char* ZStuSexDesc(uint32_t aSex)
 {
 	switch (aSex)
 	{
-	case SSEX_Boy:    return "男生";
-	case SSEX_Girl:   return "女生";
+	case SSEX_Boy:    return "男";
+	case SSEX_Girl:   return "女";
 	default:
 		break;
 	}

@@ -13,8 +13,13 @@
 
 typedef struct tagZUserInfo
 {
-	char        UserName[32];
-	char        Password[24];
-	uint32_t    Role;
-	int32_t     Cipher;
+	char        UserName[32];           // 名字
+	char        Password[24];           // 密码
+	char        Telephone[16];          // 电话
+	uint32_t    Number;                 // 编号
+	uint32_t    Role;                   // 角色
+	int32_t     Cipher;                 // 加密方式
+	int32_t     Reserve1;               // 预留字段
+
+	char        Comment[256];           // 备注
 }ZUserInfo;

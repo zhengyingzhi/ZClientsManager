@@ -4,18 +4,22 @@
 #include <stdint.h>
 
 
-#define MAINLIST_COL_Number         0
-#define MAINLIST_COL_Name           1
-#define MAINLIST_COL_Telephone      2
-#define MAINLIST_COL_Country        3
-#define MAINLIST_COL_College        4
-#define MAINLIST_COL_Major          5
-#define MAINLIST_COL_Class          6
-#define MAINLIST_COL_LanguageScore  7
-#define MAINLIST_COL_Sex            8
-#define MAINLIST_COL_QQ             9
-#define MAINLIST_COL_Source         10
-#define MAINLIST_COL_Status         11
+#define MAINLIST_COL_Row            0           // 仅是列表编号
+#define MAINLIST_COL_Name           1           // 名字
+#define MAINLIST_COL_Telephone      2           // 电话
+#define MAINLIST_COL_Country        3           // 意向国家
+#define MAINLIST_COL_College        4           // 大学
+#define MAINLIST_COL_Major          5           // 专业
+#define MAINLIST_COL_Class          6           // 年级
+#define MAINLIST_COL_LangScore      7           // 分数
+#define MAINLIST_COL_Sex            8           // 性别
+#define MAINLIST_COL_QQ             9           // QQ
+#define MAINLIST_COL_Source         10          // 来源
+#define MAINLIST_COL_Status         11          // 状态
+#define MAINLIST_COL_InsertTime     12          // 插入时间
+#define MAINLIST_COL_UpdateTime     13          // 更新时间
+#define MAINLIST_COL_NextVisitTime  14          // 下次回访时间
+#define MAINLIST_COL_Important      15          // 重要级别
 
 #define ZSI_FLAG_None               0
 #define ZSI_FLAG_Backup             1	        // 备份数据标志
@@ -39,7 +43,8 @@ struct stZSumaryInfo
 {
 	int32_t         Version;                    // 版本
 	uint32_t        Count;                      // 总个数
-	char            Padding[56];
+	int32_t         Cipher;                     // 加密方式
+	char            Padding[52];
 };
 
 struct stZStudentInfo
@@ -53,6 +58,7 @@ struct stZStudentInfo
 	char            Country[64];                // 意向国家：可多个国家
 	char            Source[32];                 // 学生来源：活动/推荐等
 	char            Status[32];                 // 目前状态（由于用户自定义描述）
+	char            Recorder[32];               // 谁记录
 
 	uint32_t        Number;                     // 编号
 	float           LanguageScore;              // 托福/雅思分数

@@ -20,10 +20,10 @@ static char* ZSimpleEncrypt(char* apData)
 
 std::string ZInfoEncrypt::Encrypt(int aEncryptMethod, const char* key, const char* apRawData, int aRawLength)
 {
-	return "";
+	return std::string(apRawData);
 }
 
 std::string ZInfoEncrypt::DeEncrypt(int aEncryptMethod, const char* key, const char* apEncryptData, int aEncryptLength)
 {
-	return "";
+	return std::string(apEncryptData);
 }

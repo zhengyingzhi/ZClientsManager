@@ -3,6 +3,9 @@
 
 #include <afxcview.h>
 
+#include "StudentInfoDB.h"
+
+
 // CMainListView view
 
 class CMainListView : public CListView
