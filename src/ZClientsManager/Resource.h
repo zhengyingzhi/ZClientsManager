@@ -24,9 +24,9 @@
 #define IDS_CAPTION_IMAGE_TIP           234
 #define IDS_CAPTION_IMAGE_TEXT          235
 #define IDS_EDIT_MENU                   306
-#define IDD_INFO_DIALOG                 310
-#define IDD_DIALOG1                     312
-#define IDD_DIALOG2                     314
+#define IDD_DIALOG_STUINFO              310
+#define IDD_DIALOG_USERINFO             312
+#define IDD_DIALOG_LOGIN                314
 #define IDC_EDIT_NUMBER                 1000
 #define IDC_EDIT_COMMENT                1001
 #define IDC_COMBO_IMPORTANT             1002
@@ -36,14 +36,14 @@
 #define IDC_BTN_SAVE                    1005
 #define IDC_EDIT_COUNTRY                1006
 #define IDC_COMBO_ROLE                  1006
-#define IDC_BUTTON1                     1007
 #define IDC_EDIT_NAME                   1008
-#define IDC_EDIT1                       1008
+#define IDC_EDIT_User                   1008
 #define IDC_EDIT_MAJOR                  1009
-#define IDC_EDIT2                       1009
+#define IDC_EDIT_Password               1009
 #define IDC_EDIT_TELEPHONE              1010
-#define IDC_CHECK1                      1010
+#define IDC_CHK_MEMORY_PWD              1010
 #define IDC_EDIT_CLASS                  1011
+#define IDC_BUTTON1                     1011
 #define IDC_EDIT_LANGSCORE              1012
 #define IDC_EDIT_QQ                     1013
 #define IDC_EDIT_SOURCE                 1014
@@ -54,9 +54,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        316
+#define _APS_NEXT_RESOURCE_VALUE        317
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

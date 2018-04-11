@@ -8,6 +8,8 @@
 #include "ZClientsManager.h"
 #include "MainFrm.h"
 
+#include "ZLoginDlg.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -99,6 +101,31 @@ BOOL CZClientsManagerApp::InitInstance()
 	ttParams.m_bVislManagerTheme = TRUE;
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
+
+
+	CString lUserID, lPasswd;
+	ZLoginDlg lLoginDlg;
+	do 
+	{
+		if (IDCANCEL == lLoginDlg.DoModal())
+		{
+			return FALSE;
+		}
+
+		lUserID = lLoginDlg.GetUserID();
+		lPasswd = lLoginDlg.GetPasswd();
+
+		// TODO: verify from DB
+		if (lUserID == "Admin" && lPasswd == "123456")
+		{
+			// memory the logined user info
+			break;
+		}
+		else
+		{
+			AfxMessageBox(_T("用户名或密码错误"), MB_OK | MB_ICONWARNING);
+		}
+	} while (TRUE);
 
 	// 若要创建主窗口，此代码将创建新的框架窗口
 	// 对象，然后将其设置为应用程序的主窗口对象
