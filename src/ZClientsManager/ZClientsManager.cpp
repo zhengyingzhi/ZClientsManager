@@ -15,6 +15,7 @@
 #define new DEBUG_NEW
 #endif
 
+ZUserInfoDB* g_pUserDB = NULL;
 
 // CZClientsManagerApp
 
@@ -103,6 +104,12 @@ BOOL CZClientsManagerApp::InitInstance()
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
 
+	g_pUserDB = new ZUserInfoDBText();
+	g_pUserDB->Open(USERINFO_DB_DEFAULT_NAME, "127.0.0.1", 0);
+
+	ZUserQueryResult* lpQryRS;
+	ZUserInfo* lpUserInfo;
+
 	CString lUserID, lPasswd;
 	ZLoginDlg lLoginDlg;
 	do 
@@ -115,8 +122,16 @@ BOOL CZClientsManagerApp::InitInstance()
 		lUserID = lLoginDlg.GetUserID();
 		lPasswd = lLoginDlg.GetPasswd();
 
-		// TODO: verify from DB
-		if (lUserID == "Admin" && lPasswd == "123456")
+		lpQryRS = g_pUserDB->Query((char*)(LPCSTR)lUserID, false);
+		if (!lpQryRS)
+		{
+			AfxMessageBox(_T("未找到此用户信息"), MB_OK | MB_ICONWARNING);
+			continue;
+		}
+		lpUserInfo = ZUSER_QUERY_RS_BODY(lpQryRS);
+
+		if (lUserID.Compare(lpUserInfo->UserName) == 0 && 
+			lPasswd.Compare(lpUserInfo->Password) == 0)
 		{
 			// memory the logined user info
 			break;

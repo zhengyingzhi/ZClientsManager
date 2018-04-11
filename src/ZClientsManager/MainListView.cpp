@@ -89,6 +89,7 @@ CMainListView::~CMainListView()
 }
 
 BEGIN_MESSAGE_MAP(CMainListView, CListView)
+	ON_NOTIFY_REFLECT(NM_DBLCLK, &CMainListView::OnNMDblclk)
 END_MESSAGE_MAP()
 
 
@@ -117,4 +118,15 @@ void CMainListView::OnInitialUpdate()
 	CListView::OnInitialUpdate();
 
 	_InitMainListCtrl(m_list);
+}
+
+
+void CMainListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+	// TODO: Add your control notification handler code here
+
+	int lRow = pNMItemActivate->iItem;
+
+	*pResult = 0;
 }

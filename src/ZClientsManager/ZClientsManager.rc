@@ -74,14 +74,18 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\ZClientsManager.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+
 IDB_INFO                BITMAP                  "res\\info.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -114,17 +118,18 @@ END
 
 IDR_MAINFRAME MENU
 BEGIN
-    POPUP "文件(&F)"
+    POPUP "系统(&F)"
     BEGIN
-        MENUITEM "退出(&X)",                      ID_APP_EXIT
+        MENUITEM "退出(&X)",                      ID_32774
+        MENUITEM "管理用户(&M)",                    ID_EDIT_MANAGER
+        MENUITEM "修改密码(&U)",                    ID_EDIT_UPDATEPWD
     END
     POPUP "编辑(&E)"
     BEGIN
-        MENUITEM "撤消(&U)\tCtrl+Z",              ID_EDIT_UNDO
+        MENUITEM "插入(&I)\tCtrl+I",              ID_EDIT_INSERT
         MENUITEM SEPARATOR
-        MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
-        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "删除(&D)\tCtrl+D",              ID_EDIT_DELETE
+        MENUITEM "查找(&F)\tCtrl+F",              ID_EDIT_FIND
     END
     POPUP "视图(&V)"
     BEGIN
@@ -200,7 +205,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "编号",IDC_STATIC,10,13,17,8
     EDITTEXT        IDC_EDIT_NUMBER,29,11,77,14,ES_AUTOHSCROLL
-    LTEXT           "姓名",IDC_STATIC,125,13,17,8
+    LTEXT           "姓名",IDC_STATIC,123,14,17,8
     EDITTEXT        IDC_EDIT_NAME,143,12,77,14,ES_AUTOHSCROLL
     LTEXT           "电话",IDC_STATIC,234,13,17,8
     EDITTEXT        IDC_EDIT_TELEPHONE,254,10,77,14,ES_AUTOHSCROLL
@@ -224,7 +229,7 @@ BEGIN
     LTEXT           "来源",IDC_STATIC,10,92,17,8
     EDITTEXT        IDC_EDIT_SOURCE,29,90,116,14,ES_AUTOHSCROLL
     LTEXT           "状态",IDC_STATIC,191,92,17,8
-    EDITTEXT        IDC_EDIT1_STATUS,215,89,116,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_STATUS,215,89,116,14,ES_AUTOHSCROLL
     LTEXT           "备注",IDC_STATIC,10,128,17,8
     EDITTEXT        IDC_EDIT_COMMENT,7,138,325,112,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
     DEFPUSHBUTTON   "OK",IDOK,212,251,50,18
@@ -233,13 +238,13 @@ BEGIN
     LTEXT           "时间",IDC_STATIC,10,112,17,8
 END
 
-IDD_DIALOG_USERINFO DIALOGEX 0, 0, 341, 214
+IDD_DIALOG_USERINFO DIALOGEX 0, 0, 341, 264
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "傲睿用户信息"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,229,186,50,19
-    PUSHBUTTON      "取消",IDCANCEL,284,186,50,19
+    DEFPUSHBUTTON   "OK",IDOK,229,237,50,19
+    PUSHBUTTON      "取消",IDCANCEL,284,237,50,19
     LTEXT           "编号",IDC_STATIC,12,11,17,8
     EDITTEXT        IDC_EDIT_NUMBER,31,9,77,14,ES_AUTOHSCROLL
     LTEXT           "姓名",IDC_STATIC,127,11,17,8
@@ -249,12 +254,17 @@ BEGIN
     LTEXT           "QQ",IDC_STATIC,127,29,12,8
     EDITTEXT        IDC_EDIT_QQ,145,27,77,14,ES_AUTOHSCROLL
     LTEXT           "备注",IDC_STATIC,12,59,17,8
-    EDITTEXT        IDC_EDIT_COMMENT,9,68,325,112,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    EDITTEXT        IDC_EDIT_COMMENT,9,68,325,56,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
     LTEXT           "权限",IDC_STATIC,12,30,17,8
     COMBOBOX        IDC_COMBO_ROLE,32,28,76,50,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "保存",IDC_BTN_SAVE,170,186,50,19
+    PUSHBUTTON      "保存",IDC_BTN_SAVE,170,237,50,19
     LTEXT           "时间",IDC_STATIC,12,46,17,8
     EDITTEXT        IDC_EDIT_INSERTTIME,31,44,77,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_LIST_USERINFO,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,129,327,105
+    PUSHBUTTON      "查找",IDC_BTN_FIND,7,236,50,19
+    PUSHBUTTON      "修改密码",IDC_BTN_PASSWORD,63,237,50,18
+    LTEXT           "密码",IDC_STATIC,236,29,17,8
+    EDITTEXT        IDC_EDIT_Password,256,27,77,14,ES_AUTOHSCROLL
 END
 
 IDD_DIALOG_LOGIN DIALOGEX 0, 0, 215, 84
@@ -266,7 +276,7 @@ BEGIN
     LTEXT           "用户名",IDC_STATIC,12,12,25,8
     EDITTEXT        IDC_EDIT_User,46,9,104,14,ES_AUTOHSCROLL
     LTEXT           "密   码",IDC_STATIC,12,36,23,8
-    EDITTEXT        IDC_EDIT_Password,46,34,104,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_Password,46,34,104,14,ES_PASSWORD | ES_AUTOHSCROLL
     CONTROL         "记住密码",IDC_CHK_MEMORY_PWD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,104,59,48,11
 END
 
@@ -291,15 +301,15 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "080404B0"
+        BLOCK "080404b0"
         BEGIN
-            VALUE "CompanyName", "TODO: <公司名>"
-            VALUE "FileDescription", "ZClientsManager"
+            VALUE "CompanyName", "傲睿教育"
+            VALUE "FileDescription", "资源管理App"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "ZClientsManager.exe"
-            VALUE "LegalCopyright", "TODO:  (C) <公司名>。  保留所有权利。"
+            VALUE "LegalCopyright", "(C) <傲睿教育>。  保留所有权利。"
             VALUE "OriginalFilename", "ZClientsManager.exe"
-            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductName", "资源管理系统"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END
@@ -339,7 +349,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 334
         TOPMARGIN, 7
-        BOTTOMMARGIN, 207
+        BOTTOMMARGIN, 257
     END
 
     IDD_DIALOG_LOGIN, DIALOG
@@ -391,12 +401,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "ZClientsManager"
+    IDR_MAINFRAME           "傲睿国际教育"
 END
 
 STRINGTABLE
 BEGIN
-    AFX_IDS_APP_TITLE       "ZClientsManager"
+    AFX_IDS_APP_TITLE       "傲睿国际教育"
     AFX_IDS_IDLEMESSAGE     "就绪"
 END
 
@@ -432,13 +442,13 @@ BEGIN
     ID_EDIT_CLEAR           "清除所选内容\n清除"
     ID_EDIT_CLEAR_ALL       "清除全部内容\n全部清除"
     ID_EDIT_COPY            "复制所选内容，将其放入剪贴板\n复制"
-    ID_EDIT_CUT             "剪切所选内容，将其放入剪贴板\n剪切"
+    ID_EDIT_CUT             "插入一条新数据\n插入"
     ID_EDIT_FIND            "查找指定的文本\n查找"
     ID_EDIT_PASTE           "插入剪贴板内容\n粘贴"
     ID_EDIT_REPEAT          "重复上一操作\n重复"
     ID_EDIT_REPLACE         "用其他文本替换特定的文本\n替换"
     ID_EDIT_SELECT_ALL      "选定整个文档\n全选"
-    ID_EDIT_UNDO            "撤消上一操作\n撤消"
+    ID_EDIT_UNDO            "插入一条新记录\n插入"
     ID_EDIT_REDO            "重做上次撤消的操作\n重做"
 END
 
@@ -489,6 +499,13 @@ END
 STRINGTABLE
 BEGIN
     IDS_EDIT_MENU           "编辑"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_DELETE          "删除一条新记录\n删除"
+    ID_EDIT_MANAGER         "管理登录用户信息"
+    ID_EDIT_UPDATEPWD       "修改密码"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

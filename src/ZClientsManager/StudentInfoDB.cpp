@@ -9,7 +9,7 @@ using namespace std;
 
 static void ZQryResultCleanupEmpty(struct stQueryResult* apRS)
 {
-	(void)apRS;
+	free(apRS);
 }
 
 static void ZQryResultCleanup(struct stQueryResult* apRS)
@@ -75,10 +75,7 @@ ZStudentInfoDBText::~ZStudentInfoDBText()
 		free(m_pBuffer);
 	}
 
-	if (m_pResult)
-	{
-		free(m_pResult);
-	}
+	m_pResult->Cleanup(m_pResult);
 }
 
 int ZStudentInfoDBText::Open(const char* apName, const char* ip, uint16_t port)

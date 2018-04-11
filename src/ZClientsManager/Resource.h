@@ -36,6 +36,7 @@
 #define IDC_BTN_SAVE                    1005
 #define IDC_EDIT_COUNTRY                1006
 #define IDC_COMBO_ROLE                  1006
+#define IDC_BTN_FIND                    1007
 #define IDC_EDIT_NAME                   1008
 #define IDC_EDIT_User                   1008
 #define IDC_EDIT_MAJOR                  1009
@@ -44,19 +45,31 @@
 #define IDC_CHK_MEMORY_PWD              1010
 #define IDC_EDIT_CLASS                  1011
 #define IDC_BUTTON1                     1011
+#define IDC_BTN_PASSWORD                1011
 #define IDC_EDIT_LANGSCORE              1012
+#define IDC_LIST_USERINFO               1012
 #define IDC_EDIT_QQ                     1013
 #define IDC_EDIT_SOURCE                 1014
+#define IDC_EDIT_TELEPHONE2             1014
 #define IDC_EDIT1_STATUS                1017
+#define IDC_EDIT_STATUS                 1017
 #define IDC_RADIO_GIRL                  1018
+#define ID_EDIT_INSERT                  32771
+#define ID_EDIT_DELETE                  32772
+#define ID_EDIT_INSERT2                 32773
+#define ID_32774                        32774
+#define ID_32775                        32775
+#define ID_EDIT_MANAGER                 32776
+#define ID_32777                        32777
+#define ID_EDIT_UPDATEPWD               32778
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        317
-#define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1012
+#define _APS_NEXT_COMMAND_VALUE         32779
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

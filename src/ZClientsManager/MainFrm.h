@@ -54,6 +54,11 @@ protected:
 
 	BOOL CreateCaptionBar();
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
+public:
+	afx_msg void OnEditInsert();
+	afx_msg void OnEditFind();
+	afx_msg void OnEditDelete();
+	afx_msg void OnEditManager();
 };
 
 

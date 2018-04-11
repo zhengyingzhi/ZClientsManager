@@ -7,6 +7,10 @@
 
 #include "MainFrm.h"
 
+#include "ZStuInfoDlg.h"
+#include "ZUserInfoDlg.h"
+
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -27,6 +31,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_VIEW_CAPTION_BAR, &CMainFrame::OnViewCaptionBar)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_CAPTION_BAR, &CMainFrame::OnUpdateViewCaptionBar)
 	ON_COMMAND(ID_TOOLS_OPTIONS, &CMainFrame::OnOptions)
+	ON_COMMAND(ID_EDIT_INSERT, &CMainFrame::OnEditInsert)
+	ON_COMMAND(ID_EDIT_FIND, &CMainFrame::OnEditFind)
+	ON_COMMAND(ID_EDIT_DELETE, &CMainFrame::OnEditDelete)
+	ON_COMMAND(ID_EDIT_MANAGER, &CMainFrame::OnEditManager)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -315,4 +323,33 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 
 	return TRUE;
 	//return CFrameWndEx::OnCreateClient(lpcs, pContext);
+}
+
+
+void CMainFrame::OnEditInsert()
+{
+	ZStuInfoDlg lSIDlg;
+	lSIDlg.SetOperateType(ZOT_Insert);
+	lSIDlg.DoModal();
+}
+
+
+void CMainFrame::OnEditFind()
+{
+	// TODO: Add your command handler code here
+}
+
+
+void CMainFrame::OnEditDelete()
+{
+	ZStuInfoDlg lSIDlg;
+	lSIDlg.SetOperateType(ZOT_Delete);
+	lSIDlg.DoModal();
+}
+
+
+void CMainFrame::OnEditManager()
+{
+	ZUserInfoDlg lUIDlg;
+	lUIDlg.DoModal();
 }

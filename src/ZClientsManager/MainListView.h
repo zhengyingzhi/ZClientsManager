@@ -4,6 +4,8 @@
 #include <afxcview.h>
 
 #include "StudentInfoDB.h"
+#include "ZStuInfoDlg.h"
+#include "ZUserInfoDlg.h"
 
 
 // CMainListView view
@@ -31,6 +33,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual void OnInitialUpdate();
+	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
 };
 
 

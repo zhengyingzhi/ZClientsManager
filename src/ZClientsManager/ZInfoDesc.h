@@ -5,7 +5,7 @@
 
 
 /* User role desc */
-const char* ZUserRoleDesc(uint32_t aUserRole)
+inline const char* ZUserRoleDesc(uint32_t aUserRole)
 {
 	switch (aUserRole)
 	{
@@ -20,7 +20,7 @@ const char* ZUserRoleDesc(uint32_t aUserRole)
 }
 
 /* 性别 */
-const char* ZStuSexDesc(uint32_t aSex)
+inline const char* ZStuSexDesc(uint32_t aSex)
 {
 	switch (aSex)
 	{
@@ -33,7 +33,7 @@ const char* ZStuSexDesc(uint32_t aSex)
 }
 
 /* 重要级别 */
-const char* ZStuImportantDesc(uint32_t aImportant)
+inline const char* ZStuImportantDesc(uint32_t aImportant)
 {
 	switch (aImportant)
 	{
