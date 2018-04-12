@@ -208,7 +208,7 @@
     <ClInclude Include="UserInfoDB.h" />
     <ClInclude Include="ZClientsManager.h" />
     <ClInclude Include="ZCommon.h" />
-    <ClInclude Include="ZDBCommon.h" />
+    <ClInclude Include="ZDataBase.h" />
     <ClInclude Include="ZInfoDesc.h" />
     <ClInclude Include="ZInfoEncrypt.h" />
     <ClInclude Include="ZLoginDlg.h" />
@@ -229,7 +229,7 @@
     <ClCompile Include="StudentInfoDB.cpp" />
     <ClCompile Include="UserInfoDB.cpp" />
     <ClCompile Include="ZClientsManager.cpp" />
-    <ClCompile Include="ZDBCommon.cpp" />
+    <ClCompile Include="ZDataBase.cpp" />
     <ClCompile Include="ZInfoEncrypt.cpp" />
     <ClCompile Include="ZLoginDlg.cpp" />
     <ClCompile Include="ZStuInfoDlg.cpp" />

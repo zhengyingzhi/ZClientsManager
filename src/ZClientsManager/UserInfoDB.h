@@ -7,7 +7,7 @@
 #include <ZToolLib/ztl_shm.h>
 
 #include "UserInfo.h"
-#include "ZDBCommon.h"
+#include "ZDataBase.h"
 
 #define USERINFO_DB_DEFAULT_NAME    "UserInfo.db"
 #define USERINFO_DB_DEFAULT_SIZE    (256 * 1024)
@@ -15,47 +15,31 @@
 #define USERINFO_DB_ALIGNMENT       512
 
 
-class ZUserInfoDB
-{
-public:
-	virtual ~ZUserInfoDB(){}
+bool ZQueryCompareUserName(const void* apExpect, const void* apAcutal, int aExtend);
 
-	virtual int Open(const char* apName, const char* ip, uint16_t port) = 0;
-	virtual int Close() = 0;
-
-	/// insert data into data
-	virtual int Insert(ZUserInfo* apUserInfo) = 0;
-
-	virtual int Remove(ZUserInfo* apUserInfo) = 0;
-
-	/// query by user id
-	virtual ZQueryResult* Query(const char* apUserID, bool aIncludeDeleted) = 0;
-};
-
-
-class ZUserInfoDBText : public ZUserInfoDB
+class ZUserInfoDBText : public ZDataBase
 {
 public:
 	ZUserInfoDBText();
 	virtual ~ZUserInfoDBText();
 
-	virtual int Open(const char* apName, const char* ip, uint16_t port);
+	virtual int Open(const std::string& aDBName, const std::string& ip, uint16_t port);
 	virtual int Close();
 
-	/// insert data into data
-	virtual int Insert(ZUserInfo* apUserInfo);
+	virtual int Insert(void* apDataInfo, uint32_t aDataSize);
+	virtual int Update(void* apDataInfo, uint32_t aDataSize);
+	virtual int Delete(void* apDataInfo, uint32_t aDataSize);
 
-	virtual int Remove(ZUserInfo* apUserInfo);
+	virtual ZQueryResult* Query(void* apExpectInfo, ZQueryComparePtr apCompFunc, int aExtend);
 
-	/// query by user id
-	virtual ZQueryResult* Query(const char* apUserID, bool aIncludeDeleted);
+protected:
+	ZUserInfo* NextUserInfo(ZUserInfo* apCurStuInfo);
+	ZUserInfo* GetAvailUserInfo();
 
 protected:
 	char*       m_pBuffer;
 	uint32_t    m_BufSize;
 
 	ztl_shm_t*  m_pShmObj;
-
-	ZQueryResult* m_pResult;
 };
 

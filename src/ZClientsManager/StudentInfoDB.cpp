@@ -7,6 +7,95 @@
 using namespace std;
 
 
+bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (lpExpect->Name[0] && lpActual->Name[0])
+	{
+		// query by both
+		if (strcmp(lpExpect->Name, lpActual->Name) == 0 &&
+			strcmp(lpExpect->Telehone, lpActual->Telehone) == 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	else if (lpExpect->Name[0] && !lpExpect->Telehone[0])
+	{
+		// query by name
+		if (strcmp(lpExpect->Name, lpActual->Name) == 0)
+		{
+			return true;
+		}
+		return false;
+	}
+	else if (!lpExpect->Name[0] && lpExpect->Telehone[0])
+	{
+		// query by telephone
+		if (strcmp(lpExpect->Telehone, lpActual->Telehone) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ZQueryCompareCountry(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (strstr(lpActual->Country, lpExpect->Country))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (strcmp(lpActual->College, lpExpect->College))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (aExtend == CC_BiggerThan)
+	{
+		if (lpExpect->LanguageScore > lpActual->LanguageScore)
+			return true;
+	}
+	else if (aExtend == CC_SmallerThan)
+	{
+		if (lpExpect->LanguageScore < lpActual->LanguageScore)
+			return true;
+	}
+	else
+	{
+		if (lpExpect->LanguageScore == lpActual->LanguageScore)
+			return true;
+	}
+	return false;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 static void ZQryResultAssign(vector<ZStudentInfo*>& aStuVec, ZQueryResult* apQryRS)
 {
 	if (apQryRS->AllocedN < (uint32_t)aStuVec.size())
@@ -52,7 +141,7 @@ ZStudentInfoDBText::ZStudentInfoDBText()
 {
 	m_IncludeDeleted = 0;
 
-	m_pResult = ZQryRsAlloc(NULL, STUINFO_DB_DEFAULT_QRYN, 
+	m_pQryRs = ZQryRsAlloc(NULL, STUINFO_DB_DEFAULT_QRYN,
 		ztl_align(sizeof(ZQueryResult), STUINFO_DB_ALIGNMENT));
 }
 
@@ -60,23 +149,24 @@ ZStudentInfoDBText::~ZStudentInfoDBText()
 {
 	Close();
 
-	if (m_pResult)
-		ZQryRsDecrementAndFree(m_pResult);
+	if (m_pQryRs)
+		FreeQueryRs(m_pQryRs);
 
 	if (m_pShmObj)
 		ztl_shm_release(m_pShmObj);
 }
 
-int ZStudentInfoDBText::Open(const char* apName, const char* ip, uint16_t port)
+int ZStudentInfoDBText::Open(const std::string& aDBName, const std::string&  ip, uint16_t port)
 {
 	(void)ip;
 	(void)port;
-	if (!apName || apName[0] == '\0')
+	if (aDBName.empty())
 	{
 		return -1;
 	}
+	m_DBName = aDBName;
 
-	m_pShmObj = ztl_shm_create(apName, ztl_open_or_create, ztl_read_write, false);
+	m_pShmObj = ztl_shm_create(aDBName.c_str(), ztl_open_or_create, ztl_read_write, false);
 
 	if (m_pShmObj == NULL)
 	{
@@ -110,39 +200,46 @@ int ZStudentInfoDBText::Close()
 	return 0;
 }
 
-int ZStudentInfoDBText::Insert(ZStudentInfo* apStuInfo)
+int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 {
-	if (!apStuInfo->Name[0] || !apStuInfo->Telehone[0])
+	ZStudentInfo* lpStuInfo;
+	lpStuInfo = (ZStudentInfo*)apDataInfo;
+
+	if (!lpStuInfo->Name[0] || !lpStuInfo->Telehone[0])
 	{
 		return -1;
 	}
 
 	ZQueryResult* lpResult;
-	lpResult = QueryByName(apStuInfo->Name, apStuInfo->Telehone);
+	lpResult = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
 	if (lpResult)
 	{
 		// already exist
+
+		FreeQueryRs(lpResult);
 		return 1;
 	}
 
-	ZStudentInfo* lpSrcInfo;
-
-	lpSrcInfo = (ZStudentInfo*)m_pBuffer;
-	while (lpSrcInfo->Name[0])
+	ZStudentInfo* lpDstInfo;
+	lpDstInfo = GetAvailStudentInfo();
+	if (!lpDstInfo)
 	{
-		lpSrcInfo += ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
+		return -99;
 	}
 
-	memcpy(lpSrcInfo, apStuInfo, sizeof(ZStudentInfo));
+	memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
 	ztl_shm_flush_to_file(m_pShmObj, true, NULL, 0);
 
 	return 0;
 }
 
-int ZStudentInfoDBText::Update(ZStudentInfo* apStuInfo)
+int ZStudentInfoDBText::Update(void* apDataInfo, uint32_t aDataSize)
 {
 	ZQueryResult* lpResult;
-	lpResult = QueryByName(apStuInfo->Name, apStuInfo->Telehone);
+	ZStudentInfo* lpStuInfo;
+	lpStuInfo = (ZStudentInfo*)apDataInfo;
+
+	lpResult = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
 	if (!lpResult)
 	{
 		return -1;
@@ -150,131 +247,102 @@ int ZStudentInfoDBText::Update(ZStudentInfo* apStuInfo)
 
 	ZStudentInfo* lpDstInfo;
 	lpDstInfo = ZDB_QRY_RS_BODY(lpResult, ZStudentInfo);
-	memcpy(lpDstInfo, apStuInfo, sizeof(ZStudentInfo));
+	memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
 
+	FreeQueryRs(lpResult);
 	return 0;
 }
 
-ZQueryResult* ZStudentInfoDBText::QueryByName(const char* apName, const char* apTelephone)
+int ZStudentInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 {
-	bool lFind;
+	ZQueryResult* lpResult;
+	ZStudentInfo* lpStuInfo;
+	lpStuInfo = (ZStudentInfo*)apDataInfo;
+
+	lpResult = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
+	if (!lpResult)
+	{
+		return -1;
+	}
+
+	ZStudentInfo* lpDstInfo;
+	lpDstInfo = ZDB_QRY_RS_BODY(lpResult, ZStudentInfo);
+
+	// market as deleted
+	lpDstInfo->Flag |= ZSI_FLAG_Deleted;
+
+	FreeQueryRs(lpResult);
+	return 0;
+}
+
+ZQueryResult* ZStudentInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apCompFunc, int aExtend)
+{
+	ZQueryResult* lpQryRs;
 	ZStudentInfo* lpStuInfo;
 	vector<ZStudentInfo*> lVec;
 	lVec.reserve(128);
 
-	lFind = false;
-	lpStuInfo = (ZStudentInfo*)m_pBuffer;
-	while (lpStuInfo->Name[0])
+	lpStuInfo = NULL;
+	while ((lpStuInfo = NextStudentInfo(lpStuInfo)) != NULL)
 	{
-		if (apName == NULL || apTelephone == NULL)
+		if (apCompFunc(apExpectInfo, lpStuInfo, aExtend))
 		{
-			// 查询所有
-			lFind = true;
-			lVec.push_back(lpStuInfo);
-		}
-		else if (apName[0] == '\0' && strcmp(lpStuInfo->Telehone, apTelephone) == 0)
-		{
-			// 查询名字符合的
-			lFind = true;
-			lVec.push_back(lpStuInfo);
-		}
-		else if (strcmp(lpStuInfo->Name, apName) == 0 && apTelephone[0] == '\0')
-		{
-			// 查询电话符合的
-			lFind = true;
-			lVec.push_back(lpStuInfo);
-		}
-		else if (strcmp(lpStuInfo->Name, apName) == 0 &&
-			strcmp(lpStuInfo->Telehone, apTelephone) == 0)
-		{
-			// // 查询同时符合的
-			lFind = true;
-			lVec.push_back(lpStuInfo);
-			break;
-		}
+			if (lpStuInfo->Flag & ZSI_FLAG_Deleted) {
+				continue;
+			}
 
-		++lpStuInfo;
+			lVec.push_back(lpStuInfo);
+		}
 	}
 
-	if (!lFind)
+	if (lVec.empty())
 	{
 		return NULL;
 	}
 
-	ZQryResultAssign(lVec, m_pResult);
-	return m_pResult;
+	ZQryResultAssign(lVec, m_pQryRs);
+	lpQryRs = m_pQryRs;
+	m_pQryRs = NULL;
+	return lpQryRs;
 }
 
-ZQueryResult* ZStudentInfoDBText::QueryByCountry(const char* apCountry)
+
+ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo)
 {
-	if (apCountry == NULL || apCountry[0] == '\0')
+	uint32_t lOffset = ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
+	ZStudentInfo* lpNextInfo;
+
+	if (!apCurStuInfo)
 	{
-		return NULL;
+		lpNextInfo =(ZStudentInfo*)m_pBuffer;
+	}
+	else if ((char*)apCurStuInfo + lOffset > (m_pBuffer + m_BufSize))
+	{
+		lpNextInfo = NULL;
+	}
+	else
+	{
+		lpNextInfo = (ZStudentInfo*)((char*)apCurStuInfo + lOffset);
+		if (!lpNextInfo->Name[0])
+			lpNextInfo = NULL;
 	}
 
-	bool lFind;
-	ZStudentInfo* lpStuInfo;
-	vector<ZStudentInfo*> lVec;
-	lVec.reserve(32);
-
-	lFind = false;
-	lpStuInfo = (ZStudentInfo*)m_pBuffer;
-	while (lpStuInfo->Name[0])
-	{
-		if (strcmp(lpStuInfo->Country, apCountry) == 0)
-		{
-			lFind = true;
-			lVec.push_back(lpStuInfo);
-		}
-
-		++lpStuInfo;
-	}
-
-	if (!lFind)
-	{
-		return NULL;
-	}
-
-	ZQryResultAssign(lVec, m_pResult);
-	return m_pResult;
+	return lpNextInfo;
 }
 
-ZQueryResult* ZStudentInfoDBText::QueryByCollege(const char* apCollege)
+ZStudentInfo* ZStudentInfoDBText::GetAvailStudentInfo()
 {
-	if (apCollege == NULL || apCollege[0] == '\0')
+	uint32_t lOffset = ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
+	ZStudentInfo *lpCurInfo, *lpNextInfo;
+
+	lpCurInfo = NULL;
+	while ((lpCurInfo = NextStudentInfo(lpCurInfo)) != NULL)
 	{
-		return NULL;
+		lpNextInfo = lpCurInfo;
 	}
 
-	bool lFind;
-	ZStudentInfo* lpStuInfo;
-	vector<ZStudentInfo*> lVec;
-	lVec.reserve(32);
+	if (lpNextInfo->Name[0])
+		lpNextInfo = NULL;
 
-	lFind = false;
-	lpStuInfo = (ZStudentInfo*)m_pBuffer;
-	while (lpStuInfo->Name[0])
-	{
-		if (strstr(lpStuInfo->College, apCollege))
-		{
-			lFind = true;
-			lVec.push_back(lpStuInfo);
-		}
-
-		++lpStuInfo;
-	}
-
-	if (!lFind)
-	{
-		return NULL;
-	}
-
-	ZQryResultAssign(lVec, m_pResult);
-	return m_pResult;
+	return lpNextInfo;
 }
-
-ZQueryResult* ZStudentInfoDBText::QueryByScore(const char* apScore, ZCompareCond aCompareCond)
-{
-	return NULL;
-}
-

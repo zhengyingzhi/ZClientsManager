@@ -8,7 +8,7 @@
 #include "ZStuInfoDlg.h"
 #include "ZInfoDesc.h"
 
-extern ZStudentInfoDB* g_pStuDB;
+extern ZDataBase* g_pStuDB;
 
 // ZStuInfoDlg dialog
 
@@ -143,12 +143,12 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 		strcmp(m_StuInfo.Telehone, lStuInfo.Telehone) == 0)
 	{
 		// update
-		g_pStuDB->Update(&lStuInfo);
+		g_pStuDB->Update(&lStuInfo, sizeof(lStuInfo));
 	}
 	else
 	{
 		// insert
-		g_pStuDB->Insert(&lStuInfo);
+		g_pStuDB->Insert(&lStuInfo, sizeof(lStuInfo));
 	}
 
 }

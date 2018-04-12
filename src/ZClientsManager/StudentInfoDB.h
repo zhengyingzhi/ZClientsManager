@@ -7,7 +7,7 @@
 #include <ZToolLib/ztl_shm.h>
 
 #include "StudentInfo.h"
-#include "ZDBCommon.h"
+#include "ZDataBase.h"
 
 
 #define STUINFO_DB_DEFAULT_NAME     "StudentInfo.db"
@@ -21,7 +21,6 @@ typedef struct
 	const char* m_pTelephone;
 }ZQueryCondition;
 
-
 typedef enum
 {
 	CC_Equal = 0,
@@ -29,64 +28,36 @@ typedef enum
 	CC_SmallerThan = 2
 }ZCompareCond;
 
-class ZStudentInfoDB
-{
-public:
-	virtual ~ZStudentInfoDB() {}
 
-	virtual int Open(const char* apName, const char* ip, uint16_t port) = 0;
-	virtual int Close() = 0;
+/* some default compare functions */
+bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareCountry(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend);
 
-	/// insert data into db
-	virtual int Insert(ZStudentInfo* apStuInfo) = 0;
 
-	/// update data
-	virtual int Update(ZStudentInfo* apStuInfo) = 0;
-
-	/// query by name and telephone
-	virtual ZQueryResult* QueryByName(const char* apName, const char* apTelephone) = 0;
-
-	/// query by country
-	virtual ZQueryResult* QueryByCountry(const char* apCountry) {
-		return NULL;
-	}
-
-	/// query by collge
-	virtual ZQueryResult* QueryByCollege(const char* apCountry) {
-		return NULL;
-	}
-
-	/// query by score
-	virtual ZQueryResult* QueryByScore(const char* apScore, ZCompareCond aCompareCond) {
-		return NULL;
-	}
-
-protected:
-	bool m_IncludeDeleted;
-};
-
-/* db implement by text file */
-class ZStudentInfoDBText : public ZStudentInfoDB
+/* student info db implement by text file
+ */
+class ZStudentInfoDBText : public ZDataBase
 {
 public:
 	ZStudentInfoDBText();
 	virtual ~ZStudentInfoDBText();
 
-	virtual int Open(const char* apName, const char* ip, uint16_t port);
+public:
+	virtual int Open(const std::string& aDBName, const std::string& ip, uint16_t port);
 	virtual int Close();
 
-public:
-	virtual int Insert(ZStudentInfo* apStuInfo);
-	virtual int Update(ZStudentInfo* apStuInfo);
+	virtual int Insert(void* apDataInfo, uint32_t aDataSize);
+	virtual int Update(void* apDataInfo, uint32_t aDataSize);
+	virtual int Delete(void* apDataInfo, uint32_t aDataSize);
 
-	/// when apName & apTelephone is null, means query all
-	virtual ZQueryResult* QueryByName(const char* apName, const char* apTelephone) ;
+	virtual ZQueryResult* Query(void* apExpectInfo, ZQueryComparePtr apCompFunc, int aExtend);
 
-	virtual ZQueryResult* QueryByCountry(const char* apCountry);
-
-	virtual ZQueryResult* QueryByCollege(const char* apCollege);
-
-	virtual ZQueryResult* QueryByScore(const char* apScore, ZCompareCond aCompareCond);
+protected:
+	ZStudentInfo* NextStudentInfo(ZStudentInfo* apCurStuInfo);
+	ZStudentInfo* GetAvailStudentInfo();
 
 protected:
 	char*       m_pBuffer;
@@ -94,6 +65,7 @@ protected:
 
 	ztl_shm_t*  m_pShmObj;
 
-	ZQueryResult* m_pResult;
+protected:
+	bool m_IncludeDeleted;
 };
 

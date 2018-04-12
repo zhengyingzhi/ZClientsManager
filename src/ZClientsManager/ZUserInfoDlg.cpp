@@ -8,7 +8,7 @@
 #include "ZUserInfoDlg.h"
 #include "ZInfoDesc.h"
 
-extern ZUserInfoDB* g_pUserDB;
+extern ZDataBase* g_pUserDB;
 
 static void _InitUserListCtrl(CListCtrl& aList)
 {
@@ -81,7 +81,10 @@ BOOL ZUserInfoDlg::OnInitDialog()
 	// query db
 	ZUserInfo*      lpUserInfo;
 	ZQueryResult*   lpUserRs;
-	lpUserRs = g_pUserDB->Query("", false);
+
+	ZUserInfo lQryCond = {};
+	
+	lpUserRs = g_pUserDB->Query(&lQryCond, ZQueryCompareNothing, 0);
 	if (lpUserRs)
 	{
 		lpUserInfo = ZDB_QRY_RS_BODY(lpUserRs, ZUserInfo);
@@ -91,6 +94,8 @@ BOOL ZUserInfoDlg::OnInitDialog()
 			_UpdateUserListCtrl(i, lList, &lpUserInfo[i]);
 		}
 	}
+
+	g_pUserDB->FreeQueryRs(lpUserRs);
 
 	return TRUE;
 }
@@ -147,7 +152,7 @@ void ZUserInfoDlg::OnBnClickedBtnSave()
 	}
 
 	// update user info into db
-	if (0 != g_pUserDB->Insert(&lUserInfo))
+	if (0 != g_pUserDB->Insert(&lUserInfo, sizeof(lUserInfo)))
 	{
 		AfxMessageBox(_T("≤Â»Î ˝æ› ß∞‹"), MB_OK | MB_ICONWARNING);
 	}

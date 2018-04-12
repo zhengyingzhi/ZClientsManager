@@ -17,7 +17,7 @@
 #define new DEBUG_NEW
 #endif
 
-ZUserInfoDB*    g_pUserDB = NULL;
+ZDataBase*    g_pUserDB = NULL;
 
 // CZClientsManagerApp
 
@@ -234,7 +234,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	ZAppConfigs lAppConfigs = {};
 	ReadConfigs(lAppConfigs);
 
-	ZQueryResult*   lpQryRS;
+	ZQueryResult*   lpQryRS = NULL;
 	ZUserInfo*      lpUserInfo;
 
 	CString lUserID, lPasswd;
@@ -248,13 +248,19 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	{
 		if (IDCANCEL == lLoginDlg.DoModal())
 		{
+			if (lpQryRS)
+			{
+				g_pUserDB->FreeQueryRs(lpQryRS);
+			}
 			return FALSE;
 		}
 
 		lUserID = lLoginDlg.GetUserID();
 		lPasswd = lLoginDlg.GetPasswd();
 
-		lpQryRS = g_pUserDB->Query((char*)(LPCSTR)lUserID, false);
+		ZUserInfo lQryCond = {};
+		strncpy(lQryCond.UserName, (char*)(LPCSTR)lUserID, sizeof(lQryCond.UserName) - 1);
+		lpQryRS = g_pUserDB->Query(&lQryCond, ZQueryCompareUserName, 0);
 		if (!lpQryRS)
 		{
 			AfxMessageBox(_T("未找到此用户信息"), MB_OK | MB_ICONWARNING);
@@ -274,6 +280,10 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		}
 	} while (TRUE);
 
+	if (lpQryRS)
+	{
+		g_pUserDB->FreeQueryRs(lpQryRS);
+	}
 
 	if (lUserID.Compare(lAppConfigs.m_UserID) != 0)
 	{
