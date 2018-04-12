@@ -76,16 +76,17 @@ BOOL ZUserInfoDlg::OnInitDialog()
 	lpCombo->InsertString(0, _T("访问者"));
 	lpCombo->InsertString(0, _T("普通用户"));
 	lpCombo->InsertString(0, _T("普通管理员"));
+	lpCombo->SetCurSel(0);
 
 	// query db
-	ZUserInfo* lpUserInfo;
-	ZUserQueryResult* lpUserRs;
+	ZUserInfo*      lpUserInfo;
+	ZQueryResult*   lpUserRs;
 	lpUserRs = g_pUserDB->Query("", false);
 	if (lpUserRs)
 	{
-		lpUserInfo = ZUSER_QUERY_RS_BODY(lpUserRs);
+		lpUserInfo = ZDB_QRY_RS_BODY(lpUserRs, ZUserInfo);
 
-		for (uint32_t i = 0; i < lpUserRs->m_Count; ++i)
+		for (uint32_t i = 0; i < lpUserRs->Count; ++i)
 		{
 			_UpdateUserListCtrl(i, lList, &lpUserInfo[i]);
 		}

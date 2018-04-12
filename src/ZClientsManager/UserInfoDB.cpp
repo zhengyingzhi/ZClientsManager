@@ -5,30 +5,6 @@
 #include "UserInfoDB.h"
 
 
-static void ZUserQryResultCleanupEmpty(ZUserQueryResult* apRS)
-{
-	free(apRS);
-}
-
-static ZUserQueryResult* ZUserQryResultAlloc(ZUserQueryResult* apRS, uint32_t aNewAllocN)
-{
-	ZUserQueryResult* lpResult;
-
-	if (apRS == NULL)
-	{
-		lpResult = (ZUserQueryResult*)calloc(1, sizeof(ZUserQueryResult) + USERINFO_DB_DEFAULT_QRYN * sizeof(ZUserInfo));
-		lpResult->m_AllocedN = USERINFO_DB_DEFAULT_QRYN;
-		lpResult->Cleanup = ZUserQryResultCleanupEmpty;
-	}
-	else
-	{
-		lpResult = (ZUserQueryResult*)realloc(apRS, sizeof(ZUserQueryResult) + aNewAllocN * sizeof(ZUserInfo));
-		lpResult->m_AllocedN = aNewAllocN;
-		lpResult->Cleanup = ZUserQryResultCleanupEmpty;
-	}
-	return lpResult;
-}
-
 
 ZUserInfoDBText::ZUserInfoDBText()
 	: m_pBuffer(NULL)
@@ -36,13 +12,17 @@ ZUserInfoDBText::ZUserInfoDBText()
 	, m_pShmObj(NULL)
 	, m_pResult(NULL)
 {
-	m_pResult = ZUserQryResultAlloc(NULL, USERINFO_DB_DEFAULT_QRYN);
+	m_pResult = ZQryRsAlloc(NULL, USERINFO_DB_DEFAULT_QRYN, 
+		ztl_align(sizeof(ZUserInfo), USERINFO_DB_ALIGNMENT));
 }
 
 ZUserInfoDBText::~ZUserInfoDBText()
 {
 	if (m_pResult)
-		m_pResult->Cleanup(m_pResult);
+		ZQryRsDecrementAndFree(m_pResult);
+
+	if (m_pShmObj)
+		ztl_shm_release(m_pShmObj);
 }
 
 int ZUserInfoDBText::Open(const char* apName, const char* ip, uint16_t port)
@@ -88,7 +68,7 @@ int ZUserInfoDBText::Insert(ZUserInfo* apUserInfo)
 		return -1;
 	}
 
-	ZUserQueryResult* lpResult;
+	ZQueryResult* lpResult;
 	lpResult = Query(apUserInfo->UserName, false);
 	if (lpResult)
 	{
@@ -117,11 +97,11 @@ int ZUserInfoDBText::Remove(ZUserInfo* apUserInfo)
 		return -1;
 	}
 
-	ZUserQueryResult* lpResult = Query(apUserInfo->UserName, false);
+	ZQueryResult* lpResult = Query(apUserInfo->UserName, false);
 	if (lpResult)
 	{
 		ZUserInfo* lpUserInfo;
-		lpUserInfo = ZUSER_QUERY_RS_BODY(lpResult);
+		lpUserInfo = ZDB_QRY_RS_BODY(lpResult, ZUserInfo);
 
 		// market as deleted
 		lpUserInfo->Deleted = 1;
@@ -130,16 +110,20 @@ int ZUserInfoDBText::Remove(ZUserInfo* apUserInfo)
 	return 0;
 }
 
-ZUserQueryResult* ZUserInfoDBText::Query(const char* apUserID, bool aIncludeDeleted)
+ZQueryResult* ZUserInfoDBText::Query(const char* apUserID, bool aIncludeDeleted)
 {
 	ZUserInfo* lpSrcInfo;
 	ZUserInfo* lpDstInfo;
 
-	m_pResult->m_Count = 0;
+	m_pResult->Count = 0;
 
 	lpSrcInfo = (ZUserInfo*)m_pBuffer;
-	while (lpSrcInfo->UserName[0] && (char*)lpSrcInfo < (m_pBuffer + m_BufSize))
+	while ((char*)lpSrcInfo < (m_pBuffer + m_BufSize))
 	{
+		if (!lpSrcInfo->UserName[0]) {
+			break;
+		}
+
 		if (apUserID[0] != '\0' && strcmp(lpSrcInfo->UserName, apUserID) != 0)
 		{
 			lpSrcInfo += ztl_align(sizeof(ZUserInfo), USERINFO_DB_ALIGNMENT);
@@ -152,19 +136,20 @@ ZUserQueryResult* ZUserInfoDBText::Query(const char* apUserID, bool aIncludeDele
 			continue;
 		}
 
-		if (m_pResult->m_Count >= m_pResult->m_AllocedN)
+		if (m_pResult->Count >= m_pResult->AllocedN)
 		{
-			m_pResult = ZUserQryResultAlloc(m_pResult, USERINFO_DB_DEFAULT_QRYN + 128);
+			m_pResult = ZQryRsAlloc(m_pResult, USERINFO_DB_DEFAULT_QRYN + 128,
+				ztl_align(sizeof(ZUserInfo), USERINFO_DB_ALIGNMENT));
 		}
 
-		lpDstInfo = ZUSER_QUERY_RS_BODY(m_pResult);
-		memcpy(&lpDstInfo[m_pResult->m_Count], lpSrcInfo, sizeof(ZUserInfo));
-		m_pResult->m_Count++;
+		lpDstInfo = ZDB_QRY_RS_BODY(m_pResult, ZUserInfo);
+		memcpy(&lpDstInfo[m_pResult->Count], lpSrcInfo, sizeof(ZUserInfo));
+		m_pResult->Count++;
 
 		lpSrcInfo += ztl_align(sizeof(ZUserInfo), USERINFO_DB_ALIGNMENT);
 	}
 
-	if (m_pResult->m_Count == 0)
+	if (m_pResult->Count == 0)
 	{
 		return NULL;
 	}

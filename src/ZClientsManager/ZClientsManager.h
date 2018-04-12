@@ -12,6 +12,11 @@
 #include "StudentInfoDB.h"
 #include "UserInfoDB.h"
 
+#define ZAPP_CONFIG_NAME    "ZAppConfig.txt"
+typedef struct
+{
+	char    m_UserID[24];
+}ZAppConfigs;
 
 // CZClientsManagerApp:
 // 有关此类的实现，请参阅 ZClientsManager.cpp
@@ -29,6 +34,10 @@ public:
 	virtual int ExitInstance();
 
 // 实现
+
+public:
+	BOOL DoLoginDlg();
+	void ReadConfigs(ZAppConfigs& aAppConfigs);
 
 public:
 	BOOL  m_bHiColorIcons;

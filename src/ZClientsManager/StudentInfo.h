@@ -44,16 +44,16 @@ struct stZStudentInfo
 	char            Recorder[32];               // 谁记录
 
 	uint32_t        Number;                     // 编号
-	float           LanguageScore;              // 托福/雅思分数
+	uint32_t        LanguageScore;              // 托福/雅思分数(* 10)
 	uint32_t        Flag;                       // 数据标志
 	StuImportant    ImportantLevel;             // 重要级别
 	StudentSex      Sex;                        // 性别 1-boy 2-girl
 	uint32_t        Reserve1;                   // 预留字段1
 	uint32_t        Reserve2;                   // 预留字段2
 	uint32_t        Reserve3;                   // 预留字段3
-	uint64_t        InsertTime;                 // 录入时间
-	uint64_t        UpdateTime;                 // 更新时间
-	uint64_t        NextVisitTime;              // 下次回访时间
+	int64_t         InsertTime;                 // 录入时间
+	int64_t         UpdateTime;                 // 更新时间
+	int64_t         NextVisitTime;              // 下次回访时间
 
 	char            Comments[1024];             // 备注
 };

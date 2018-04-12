@@ -27,6 +27,22 @@ void ZLoginDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 
+BOOL ZLoginDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	if (!m_UserID.IsEmpty())
+	{
+		SetDlgItemText(IDC_EDIT_User, m_UserID);
+	}
+
+	// ÔÝÊ±½ûÓÃ
+	GetDlgItem(IDC_CHK_MEMORY_PWD)->EnableWindow(FALSE);
+
+	return TRUE;
+}
+
+
 BEGIN_MESSAGE_MAP(ZLoginDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &ZLoginDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
@@ -39,6 +55,11 @@ END_MESSAGE_MAP()
 CString ZLoginDlg::GetUserID()
 {
 	return m_UserID;
+}
+
+void ZLoginDlg::SetUserID(const CString& aUserID)
+{
+	m_UserID = aUserID;
 }
 
 CString ZLoginDlg::GetPasswd()

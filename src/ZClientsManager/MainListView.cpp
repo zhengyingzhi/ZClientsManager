@@ -9,7 +9,7 @@
 #include "ZUtility.h"
 
 /* database object */
-ZStudentInfoDB* g_pDB = NULL;
+ZStudentInfoDB* g_pStuDB = NULL;
 
 //////////////////////////////////////////////////////////////////////////
 // list control operates
@@ -118,6 +118,28 @@ void CMainListView::OnInitialUpdate()
 	CListView::OnInitialUpdate();
 
 	_InitMainListCtrl(m_list);
+
+	if (!g_pStuDB)
+	{
+		g_pStuDB = new ZStudentInfoDBText();
+		g_pStuDB->Open(STUINFO_DB_DEFAULT_NAME, "127.0.0.1", 0);
+	}
+
+	ZStudentInfo* lpUserInfo;
+	ZQueryResult* lpQryRs;
+
+	// query all when init
+	lpQryRs = g_pStuDB->QueryByName(NULL, NULL);
+	if (!lpQryRs)
+	{
+		return;
+	}
+
+	lpUserInfo = ZDB_QRY_RS_BODY(lpQryRs, ZStudentInfo);
+	for (uint32_t i = 0; i < lpQryRs->Count; ++i)
+	{
+		_UpdateMainListCtrl(0, m_list, &lpUserInfo[i]);
+	}
 }
 
 

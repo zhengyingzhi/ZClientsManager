@@ -7,19 +7,12 @@
 #include <ZToolLib/ztl_shm.h>
 
 #include "UserInfo.h"
+#include "ZDBCommon.h"
 
 #define USERINFO_DB_DEFAULT_NAME    "UserInfo.db"
 #define USERINFO_DB_DEFAULT_SIZE    (256 * 1024)
 #define USERINFO_DB_DEFAULT_QRYN    512
 #define USERINFO_DB_ALIGNMENT       512
-
-typedef struct stUserQueryResult
-{
-	void(*Cleanup)(struct stUserQueryResult* apRS);
-	uint32_t    m_AllocedN;
-	uint32_t    m_Count;
-}ZUserQueryResult;
-#define ZUSER_QUERY_RS_BODY(r)      (ZUserInfo*)(r + 1)
 
 
 class ZUserInfoDB
@@ -36,7 +29,7 @@ public:
 	virtual int Remove(ZUserInfo* apUserInfo) = 0;
 
 	/// query by user id
-	virtual ZUserQueryResult* Query(const char* apUserID, bool aIncludeDeleted) = 0;
+	virtual ZQueryResult* Query(const char* apUserID, bool aIncludeDeleted) = 0;
 };
 
 
@@ -55,7 +48,7 @@ public:
 	virtual int Remove(ZUserInfo* apUserInfo);
 
 	/// query by user id
-	virtual ZUserQueryResult* Query(const char* apUserID, bool aIncludeDeleted);
+	virtual ZQueryResult* Query(const char* apUserID, bool aIncludeDeleted);
 
 protected:
 	char*       m_pBuffer;
@@ -63,6 +56,6 @@ protected:
 
 	ztl_shm_t*  m_pShmObj;
 
-	ZUserQueryResult* m_pResult;
+	ZQueryResult* m_pResult;
 };
 

@@ -1,36 +1,26 @@
 #include "StdAfx.h"
 #include "StudentInfoDB.h"
+
+#include <ZToolLib/ztl_utils.h>
+
 #include <vector>
 using namespace std;
 
-#define DEFAULT_DB_BUFFER_SIZE  (8 * 1024 * 1024)
-#define DEFAULT_DB_QUERYED_N    256
-
-
-static void ZQryResultCleanupEmpty(struct stQueryResult* apRS)
-{
-	free(apRS);
-}
-
-static void ZQryResultCleanup(struct stQueryResult* apRS)
-{
-	free(apRS);
-}
 
 static void ZQryResultAssign(vector<ZStudentInfo*>& aStuVec, ZQueryResult* apQryRS)
 {
-	if (apQryRS->m_AllocedN < (uint32_t)aStuVec.size())
+	if (apQryRS->AllocedN < (uint32_t)aStuVec.size())
 	{
-		ZQryResultCleanup(apQryRS);
-		apQryRS = (ZQueryResult*)calloc(1, (aStuVec.size() + 128) * sizeof(ZQueryResult));
-		apQryRS->Cleanup = ZQryResultCleanupEmpty;
-		apQryRS->m_AllocedN = aStuVec.size() + 128;
+		ZQryRsAlloc(apQryRS, aStuVec.size() + 128, ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT));
 	}
 
-	apQryRS->m_Count = aStuVec.size();
+	ZStudentInfo* lpStuInfo;
+	lpStuInfo = ZDB_QRY_RS_BODY(apQryRS, ZStudentInfo);
+
+	apQryRS->Count = aStuVec.size();
 	for (size_t i = 0; i < aStuVec.size(); ++i)
 	{
-		memcpy(&apQryRS->m_StuInfo[i], aStuVec[i], sizeof(ZStudentInfo));
+		memcpy(&lpStuInfo[i], aStuVec[i], sizeof(ZStudentInfo));
 	}
 }
 
@@ -56,26 +46,25 @@ static bool QueryByCollegeFunc(ZStudentInfo* apStuInfo, const char* apCollege, c
 //////////////////////////////////////////////////////////////////////////
 
 ZStudentInfoDBText::ZStudentInfoDBText()
-	: m_fp(NULL)
-	, m_pBuffer(NULL)
+	: m_pBuffer(NULL)
 	, m_BufSize(0)
-	, m_BufPos(0)
+	, m_pShmObj(NULL)
 {
-	m_pResult = (ZQueryResult*)calloc(1, DEFAULT_DB_QUERYED_N * sizeof(ZQueryResult));
-	m_pResult->m_AllocedN = DEFAULT_DB_QUERYED_N;
-	m_pResult->Cleanup = ZQryResultCleanupEmpty;
+	m_IncludeDeleted = 0;
+
+	m_pResult = ZQryRsAlloc(NULL, STUINFO_DB_DEFAULT_QRYN, 
+		ztl_align(sizeof(ZQueryResult), STUINFO_DB_ALIGNMENT));
 }
 
 ZStudentInfoDBText::~ZStudentInfoDBText()
 {
 	Close();
 
-	if (m_pBuffer)
-	{
-		free(m_pBuffer);
-	}
+	if (m_pResult)
+		ZQryRsDecrementAndFree(m_pResult);
 
-	m_pResult->Cleanup(m_pResult);
+	if (m_pShmObj)
+		ztl_shm_release(m_pShmObj);
 }
 
 int ZStudentInfoDBText::Open(const char* apName, const char* ip, uint16_t port)
@@ -87,47 +76,81 @@ int ZStudentInfoDBText::Open(const char* apName, const char* ip, uint16_t port)
 		return -1;
 	}
 
-	m_fp = fopen(apName, "ab+");
-	if (m_fp == NULL)
+	m_pShmObj = ztl_shm_create(apName, ztl_open_or_create, ztl_read_write, false);
+
+	if (m_pShmObj == NULL)
 	{
+		TRACE(_T("ZStudentInfoDBText open userinfo db failed"));
+		return -1;
+	}
+
+	ztl_shm_truncate(m_pShmObj, STUINFO_DB_DEFAULT_SIZE);
+	ztl_shm_map_region(m_pShmObj, ztl_read_write);
+
+	m_pBuffer = (char*)ztl_shm_get_address(m_pShmObj);
+	if (m_pBuffer == NULL)
+	{
+		TRACE(_T("ZStudentInfoDBText map region userinfo db failed"));
 		return -2;
 	}
 
-	m_BufSize = DEFAULT_DB_BUFFER_SIZE;
-	m_pBuffer = (char*)malloc(m_BufSize);
-	memset(m_pBuffer, 0, m_BufSize);
-
-	Sync();
+	m_BufSize = STUINFO_DB_DEFAULT_SIZE;
 
 	return 0;
 }
 
 int ZStudentInfoDBText::Close()
 {
-	if (m_fp)
+	if (m_pShmObj)
 	{
-		fclose(m_fp);
-		m_fp = NULL;
+		ztl_shm_release(m_pShmObj);
+		m_pShmObj = NULL;
 	}
-
-	memset(m_pBuffer, 0, m_BufSize);
 
 	return 0;
 }
 
 int ZStudentInfoDBText::Insert(ZStudentInfo* apStuInfo)
 {
-	if (!m_fp)
+	if (!apStuInfo->Name[0] || !apStuInfo->Telehone[0])
 	{
 		return -1;
 	}
 
-	fseek(m_fp, 0, SEEK_END);
-	fwrite(apStuInfo, sizeof(ZStudentInfo), 1, m_fp);
-	fflush(m_fp);
+	ZQueryResult* lpResult;
+	lpResult = QueryByName(apStuInfo->Name, apStuInfo->Telehone);
+	if (lpResult)
+	{
+		// already exist
+		return 1;
+	}
 
-	memcpy(m_pBuffer + m_BufPos, apStuInfo, sizeof(ZStudentInfo));
-	m_BufPos += sizeof(ZStudentInfo);
+	ZStudentInfo* lpSrcInfo;
+
+	lpSrcInfo = (ZStudentInfo*)m_pBuffer;
+	while (lpSrcInfo->Name[0])
+	{
+		lpSrcInfo += ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
+	}
+
+	memcpy(lpSrcInfo, apStuInfo, sizeof(ZStudentInfo));
+	ztl_shm_flush_to_file(m_pShmObj, true, NULL, 0);
+
+	return 0;
+}
+
+int ZStudentInfoDBText::Update(ZStudentInfo* apStuInfo)
+{
+	ZQueryResult* lpResult;
+	lpResult = QueryByName(apStuInfo->Name, apStuInfo->Telehone);
+	if (!lpResult)
+	{
+		return -1;
+	}
+
+	ZStudentInfo* lpDstInfo;
+	lpDstInfo = ZDB_QRY_RS_BODY(lpResult, ZStudentInfo);
+	memcpy(lpDstInfo, apStuInfo, sizeof(ZStudentInfo));
 
 	return 0;
 }
@@ -255,17 +278,3 @@ ZQueryResult* ZStudentInfoDBText::QueryByScore(const char* apScore, ZCompareCond
 	return NULL;
 }
 
-void ZStudentInfoDBText::Sync()
-{
-	// todo: check file size firstly
-	uint32_t lFileSize = 0;
-	fseek(m_fp, 0, SEEK_END);
-	lFileSize = ftell(m_fp);
-
-	fseek(m_fp, 0, SEEK_SET);
-	m_BufPos = 0;
-	while (fread(m_pBuffer + m_BufPos, sizeof(ZStudentInfo), 1, m_fp))
-	{
-		m_BufPos += sizeof(ZStudentInfo);
-	}
-}

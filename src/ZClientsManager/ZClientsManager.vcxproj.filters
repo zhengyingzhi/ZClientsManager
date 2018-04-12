@@ -72,6 +72,12 @@
     <ClInclude Include="ZUserInfoDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ZDBCommon.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ZStuQryDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -105,6 +111,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ZUserInfoDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZDBCommon.cpp">
+      <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ZStuQryDlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,12 +10,14 @@
 
 #include "ZLoginDlg.h"
 
+#include <ZToolLib/ztl_config.h>
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-ZUserInfoDB* g_pUserDB = NULL;
+ZUserInfoDB*    g_pUserDB = NULL;
 
 // CZClientsManagerApp
 
@@ -103,44 +105,10 @@ BOOL CZClientsManagerApp::InitInstance()
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
 
-
-	g_pUserDB = new ZUserInfoDBText();
-	g_pUserDB->Open(USERINFO_DB_DEFAULT_NAME, "127.0.0.1", 0);
-
-	ZUserQueryResult* lpQryRS;
-	ZUserInfo* lpUserInfo;
-
-	CString lUserID, lPasswd;
-	ZLoginDlg lLoginDlg;
-	do 
+	if (!DoLoginDlg())
 	{
-		if (IDCANCEL == lLoginDlg.DoModal())
-		{
-			return FALSE;
-		}
-
-		lUserID = lLoginDlg.GetUserID();
-		lPasswd = lLoginDlg.GetPasswd();
-
-		lpQryRS = g_pUserDB->Query((char*)(LPCSTR)lUserID, false);
-		if (!lpQryRS)
-		{
-			AfxMessageBox(_T("未找到此用户信息"), MB_OK | MB_ICONWARNING);
-			continue;
-		}
-		lpUserInfo = ZUSER_QUERY_RS_BODY(lpQryRS);
-
-		if (lUserID.Compare(lpUserInfo->UserName) == 0 && 
-			lPasswd.Compare(lpUserInfo->Password) == 0)
-		{
-			// memory the logined user info
-			break;
-		}
-		else
-		{
-			AfxMessageBox(_T("用户名或密码错误"), MB_OK | MB_ICONWARNING);
-		}
-	} while (TRUE);
+		return FALSE;
+	}
 
 	// 若要创建主窗口，此代码将创建新的框架窗口
 	// 对象，然后将其设置为应用程序的主窗口对象
@@ -236,3 +204,89 @@ void CZClientsManagerApp::SaveCustomState()
 
 
 
+void CZClientsManagerApp::ReadConfigs(ZAppConfigs& aAppConfigs)
+{
+	ztl_config_t* zconf;
+	zconf = ztl_config_open(ZAPP_CONFIG_NAME, '#', '=');
+	if (!zconf)
+	{
+		return;
+	}
+
+	int lLength = 0;
+	char* lpOutUserID = nullptr;
+	if (ztl_config_read_str(zconf, "UserID", &lpOutUserID, &lLength))
+	{
+		strncpy(aAppConfigs.m_UserID, lpOutUserID, sizeof(aAppConfigs.m_UserID) - 1);
+	}
+
+	ztl_config_close(zconf);
+}
+
+BOOL CZClientsManagerApp::DoLoginDlg()
+{
+	if (g_pUserDB == NULL)
+	{
+		g_pUserDB = new ZUserInfoDBText();
+		g_pUserDB->Open(USERINFO_DB_DEFAULT_NAME, "127.0.0.1", 0);
+	}
+
+	ZAppConfigs lAppConfigs = {};
+	ReadConfigs(lAppConfigs);
+
+	ZQueryResult*   lpQryRS;
+	ZUserInfo*      lpUserInfo;
+
+	CString lUserID, lPasswd;
+	ZLoginDlg lLoginDlg;
+	if (lAppConfigs.m_UserID[0])
+	{
+		lLoginDlg.SetUserID(lAppConfigs.m_UserID);
+	}
+
+	do
+	{
+		if (IDCANCEL == lLoginDlg.DoModal())
+		{
+			return FALSE;
+		}
+
+		lUserID = lLoginDlg.GetUserID();
+		lPasswd = lLoginDlg.GetPasswd();
+
+		lpQryRS = g_pUserDB->Query((char*)(LPCSTR)lUserID, false);
+		if (!lpQryRS)
+		{
+			AfxMessageBox(_T("未找到此用户信息"), MB_OK | MB_ICONWARNING);
+			continue;
+		}
+		lpUserInfo = ZDB_QRY_RS_BODY(lpQryRS, ZUserInfo);
+
+		if (lUserID.Compare(lpUserInfo->UserName) == 0 &&
+			lPasswd.Compare(lpUserInfo->Password) == 0)
+		{
+			// memory the logined user info
+			break;
+		}
+		else
+		{
+			AfxMessageBox(_T("用户名或密码错误"), MB_OK | MB_ICONWARNING);
+		}
+	} while (TRUE);
+
+
+	if (lUserID.Compare(lAppConfigs.m_UserID) != 0)
+	{
+		char lConfBuffer[1024] = "";
+		sprintf(lConfBuffer, "UserID=%s", (char*)(LPCSTR)lUserID);
+		FILE* fp = fopen(ZAPP_CONFIG_NAME, "w");
+		if (fp)
+		{
+			fputs(lConfBuffer, fp);
+			fflush(fp);
+			fclose(fp);
+		}
+	}
+
+	return TRUE;
+}

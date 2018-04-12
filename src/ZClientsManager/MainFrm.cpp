@@ -26,6 +26,7 @@ const UINT uiLastUserToolBarId = uiFirstUserToolBarId + iMaxUserToolbars - 1;
 BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_WM_CREATE()
 	ON_WM_SETFOCUS()
+	ON_WM_CLOSE()
 	ON_COMMAND(ID_VIEW_CUSTOMIZE, &CMainFrame::OnViewCustomize)
 	ON_REGISTERED_MESSAGE(AFX_WM_CREATETOOLBAR, &CMainFrame::OnToolbarCreateNew)
 	ON_COMMAND(ID_VIEW_CAPTION_BAR, &CMainFrame::OnViewCaptionBar)
@@ -35,6 +36,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_EDIT_FIND, &CMainFrame::OnEditFind)
 	ON_COMMAND(ID_EDIT_DELETE, &CMainFrame::OnEditDelete)
 	ON_COMMAND(ID_EDIT_MANAGER, &CMainFrame::OnEditManager)
+	ON_COMMAND(ID_SYS_CLOSE, &CMainFrame::OnSysClose)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -158,6 +160,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CMFCToolBar::SetBasicCommands(lstBasicCommands);
 
 	return 0;
+}
+
+void CMainFrame::OnClose()
+{
+	if (IDYES != AfxMessageBox(_T("ÊÇ·ñÍË³ö"), MB_YESNO))
+	{
+		return;
+	}
+
+	// TODO: save data
+
+	CFrameWndEx::OnClose();
 }
 
 BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
@@ -336,7 +350,7 @@ void CMainFrame::OnEditInsert()
 
 void CMainFrame::OnEditFind()
 {
-	// TODO: Add your command handler code here
+	m_StuQryDlg.DoModal();
 }
 
 
@@ -348,8 +362,14 @@ void CMainFrame::OnEditDelete()
 }
 
 
+void CMainFrame::OnSysClose()
+{
+	OnClose();
+}
+
 void CMainFrame::OnEditManager()
 {
 	ZUserInfoDlg lUIDlg;
 	lUIDlg.DoModal();
 }
+

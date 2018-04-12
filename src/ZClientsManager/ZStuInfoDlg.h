@@ -45,6 +45,11 @@ public:
 
 	void SetStudentInfo(ZStudentInfo* apStuInfo);
 
+	void GetDlgItemValue(int nID, char aBuffer[], int aBufSize);
+	void GetDlgItemValue(int nID, int32_t& aValue);
+	void GetDlgItemValue(int nID, uint32_t& aValue);
+	void GetDlgItemValue(int nID, int64_t& aValue);
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 

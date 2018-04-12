@@ -5,6 +5,8 @@
 #pragma once
 #include "MainListView.h"
 
+#include "ZStuQryDlg.h"
+
 class CMainFrame : public CFrameWndEx
 {
 	
@@ -41,9 +43,13 @@ protected:  // 控件条嵌入成员
 	CMFCCaptionBar    m_wndCaptionBar;
 	CMainListView*    m_pMainView;
 
+protected:
+	ZStuQryDlg        m_StuQryDlg;
+
 // 生成的消息映射函数
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnClose();
 	afx_msg void OnSetFocus(CWnd *pOldWnd);
 	afx_msg void OnViewCustomize();
 	afx_msg LRESULT OnToolbarCreateNew(WPARAM wp, LPARAM lp);
@@ -59,6 +65,7 @@ public:
 	afx_msg void OnEditFind();
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditManager();
+	afx_msg void OnSysClose();
 };
 
 

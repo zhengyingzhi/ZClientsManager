@@ -21,8 +21,12 @@ public:
 	CString GetPasswd();
 	bool    IsRememberPasswd();
 
+	void SetUserID(const CString& aUserID);
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+
+	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()
 public:

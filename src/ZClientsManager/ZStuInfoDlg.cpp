@@ -8,6 +8,7 @@
 #include "ZStuInfoDlg.h"
 #include "ZInfoDesc.h"
 
+extern ZStudentInfoDB* g_pStuDB;
 
 // ZStuInfoDlg dialog
 
@@ -42,7 +43,11 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		SetDlgItemText(IDC_EDIT_CLASS, m_StuInfo.Class);
 		SetDlgItemText(IDC_EDIT_COUNTRY, m_StuInfo.Country);
 
-		lString.Format("%.1f", m_StuInfo.LanguageScore);
+		double lScore = (m_StuInfo.LanguageScore / 10);
+		if (m_StuInfo.LanguageScore > 2000)
+			lString.Format("%.0f", lScore);
+		else
+			lString.Format("%.1f", lScore);
 		SetDlgItemText(IDC_EDIT_LANGSCORE, lString);
 		SetDlgItemText(IDC_EDIT_QQ, m_StuInfo.QQ);
 		SetDlgItemText(IDC_COMBO_IMPORTANT, ZStuImportantDesc(m_StuInfo.ImportantLevel));
@@ -77,13 +82,73 @@ void ZStuInfoDlg::SetStudentInfo(ZStudentInfo* apStuInfo)
 	memcpy(&m_StuInfo, apStuInfo, sizeof(m_StuInfo));
 }
 
+void ZStuInfoDlg::GetDlgItemValue(int nID, char aBuffer[], int aBufSize)
+{
+	CString lString;
+	GetDlgItemText(nID, lString);
+	strncpy(aBuffer, (char*)(LPCSTR)lString, aBufSize - 1);
+}
+
+void ZStuInfoDlg::GetDlgItemValue(int nID, int32_t& aValue)
+{
+	CString lString;
+	GetDlgItemText(nID, lString);
+	aValue = atoi((char*)(LPCSTR)lString);
+}
+
+void ZStuInfoDlg::GetDlgItemValue(int nID, uint32_t& aValue)
+{
+	CString lString;
+	GetDlgItemText(nID, lString);
+	aValue = atoi((char*)(LPCSTR)lString);
+}
+
+void ZStuInfoDlg::GetDlgItemValue(int nID, int64_t& aValue)
+{
+	CString lString;
+	GetDlgItemText(nID, lString);
+	aValue = atoll((char*)(LPCSTR)lString);
+}
+
 void ZStuInfoDlg::OnBnClickedBtnSave()
 {
 	ZStudentInfo lStuInfo;
 	memset(&lStuInfo, 0, sizeof(lStuInfo));
 
-	CString lName, lString;
-	GetDlgItemText(IDC_EDIT_NAME, lName);
+	GetDlgItemValue(IDC_EDIT_NAME, lStuInfo.Name, sizeof(lStuInfo.Name));
+	GetDlgItemValue(IDC_EDIT_TELEPHONE, lStuInfo.Telehone, sizeof(lStuInfo.Telehone));
+	GetDlgItemValue(IDC_EDIT_QQ, lStuInfo.QQ, sizeof(lStuInfo.QQ));
+	GetDlgItemValue(IDC_EDIT_CLASS, lStuInfo.Class, sizeof(lStuInfo.Class));
+	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.College, sizeof(lStuInfo.College));
+	GetDlgItemValue(IDC_EDIT_MAJOR, lStuInfo.Major, sizeof(lStuInfo.Major));
+	GetDlgItemValue(IDC_EDIT_COUNTRY, lStuInfo.Country, sizeof(lStuInfo.Country));
+	GetDlgItemValue(IDC_EDIT_SOURCE, lStuInfo.Source, sizeof(lStuInfo.Source));
+	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));
+	GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
 
-	// todo: save into db
+	CString lString;
+	GetDlgItemText(IDC_EDIT_LANGSCORE, lString);
+	double lScore = atof((char*)(LPCSTR)lString);
+	lStuInfo.LanguageScore = uint32_t(lScore * 10);
+
+	CButton* lpBtn = (CButton*)GetDlgItem(IDC_RADIO_BOY);
+	lStuInfo.Sex = lpBtn->GetCheck() ? SSEX_Boy : SSEX_Girl;
+
+	if (memcpy(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
+	{
+		return;
+	}
+
+	if (strcmp(m_StuInfo.Name, lStuInfo.Name) == 0 &&
+		strcmp(m_StuInfo.Telehone, lStuInfo.Telehone) == 0)
+	{
+		// update
+		g_pStuDB->Update(&lStuInfo);
+	}
+	else
+	{
+		// insert
+		g_pStuDB->Insert(&lStuInfo);
+	}
+
 }

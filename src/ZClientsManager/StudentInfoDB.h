@@ -4,7 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ZToolLib/ztl_shm.h>
+
 #include "StudentInfo.h"
+#include "ZDBCommon.h"
+
+
+#define STUINFO_DB_DEFAULT_NAME     "StudentInfo.db"
+#define STUINFO_DB_DEFAULT_SIZE     (4 * 1024 * 1024)
+#define STUINFO_DB_DEFAULT_QRYN     512
+#define STUINFO_DB_ALIGNMENT        2048
 
 typedef struct 
 {
@@ -12,13 +21,6 @@ typedef struct
 	const char* m_pTelephone;
 }ZQueryCondition;
 
-typedef struct stQueryResult
-{
-	void(*Cleanup)(struct stQueryResult* apRS);
-	uint32_t m_AllocedN;
-	uint32_t m_Count;
-	ZStudentInfo m_StuInfo[1];
-}ZQueryResult;
 
 typedef enum
 {
@@ -35,8 +37,11 @@ public:
 	virtual int Open(const char* apName, const char* ip, uint16_t port) = 0;
 	virtual int Close() = 0;
 
-	/// insert data into data
+	/// insert data into db
 	virtual int Insert(ZStudentInfo* apStuInfo) = 0;
+
+	/// update data
+	virtual int Update(ZStudentInfo* apStuInfo) = 0;
 
 	/// query by name and telephone
 	virtual ZQueryResult* QueryByName(const char* apName, const char* apTelephone) = 0;
@@ -55,6 +60,9 @@ public:
 	virtual ZQueryResult* QueryByScore(const char* apScore, ZCompareCond aCompareCond) {
 		return NULL;
 	}
+
+protected:
+	bool m_IncludeDeleted;
 };
 
 /* db implement by text file */
@@ -69,6 +77,7 @@ public:
 
 public:
 	virtual int Insert(ZStudentInfo* apStuInfo);
+	virtual int Update(ZStudentInfo* apStuInfo);
 
 	/// when apName & apTelephone is null, means query all
 	virtual ZQueryResult* QueryByName(const char* apName, const char* apTelephone) ;
@@ -80,13 +89,10 @@ public:
 	virtual ZQueryResult* QueryByScore(const char* apScore, ZCompareCond aCompareCond);
 
 protected:
-	void Sync();
-
-protected:
-	FILE*       m_fp;
 	char*       m_pBuffer;
 	uint32_t    m_BufSize;
-	uint32_t    m_BufPos;
+
+	ztl_shm_t*  m_pShmObj;
 
 	ZQueryResult* m_pResult;
 };

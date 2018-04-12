@@ -208,10 +208,12 @@
     <ClInclude Include="UserInfoDB.h" />
     <ClInclude Include="ZClientsManager.h" />
     <ClInclude Include="ZCommon.h" />
+    <ClInclude Include="ZDBCommon.h" />
     <ClInclude Include="ZInfoDesc.h" />
     <ClInclude Include="ZInfoEncrypt.h" />
     <ClInclude Include="ZLoginDlg.h" />
     <ClInclude Include="ZStuInfoDlg.h" />
+    <ClInclude Include="ZStuQryDlg.h" />
     <ClInclude Include="ZUserInfoDlg.h" />
     <ClInclude Include="ZUtility.h" />
   </ItemGroup>
@@ -227,9 +229,11 @@
     <ClCompile Include="StudentInfoDB.cpp" />
     <ClCompile Include="UserInfoDB.cpp" />
     <ClCompile Include="ZClientsManager.cpp" />
+    <ClCompile Include="ZDBCommon.cpp" />
     <ClCompile Include="ZInfoEncrypt.cpp" />
     <ClCompile Include="ZLoginDlg.cpp" />
     <ClCompile Include="ZStuInfoDlg.cpp" />
+    <ClCompile Include="ZStuQryDlg.cpp" />
     <ClCompile Include="ZUserInfoDlg.cpp" />
     <ClCompile Include="ZUtility.cpp" />
   </ItemGroup>
