@@ -8,8 +8,6 @@
 #include "ZStuInfoDlg.h"
 #include "ZInfoDesc.h"
 
-extern ZDataBase* g_pStuDB;
-
 // ZStuInfoDlg dialog
 
 IMPLEMENT_DYNAMIC(ZStuInfoDlg, CDialogEx)
@@ -143,12 +141,12 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 		strcmp(m_StuInfo.Telehone, lStuInfo.Telehone) == 0)
 	{
 		// update
-		g_pStuDB->Update(&lStuInfo, sizeof(lStuInfo));
+		g_MemData.GetStuDB()->Update(&lStuInfo, sizeof(lStuInfo));
 	}
 	else
 	{
 		// insert
-		g_pStuDB->Insert(&lStuInfo, sizeof(lStuInfo));
+		g_MemData.GetStuDB()->Insert(&lStuInfo, sizeof(lStuInfo));
 	}
 
 }

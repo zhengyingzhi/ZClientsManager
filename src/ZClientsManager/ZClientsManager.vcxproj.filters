@@ -78,6 +78,9 @@
     <ClInclude Include="ZDataBase.h">
       <Filter>DataBase</Filter>
     </ClInclude>
+    <ClInclude Include="ZMemoryData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -118,6 +121,9 @@
     </ClCompile>
     <ClCompile Include="ZDataBase.cpp">
       <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ZMemoryData.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

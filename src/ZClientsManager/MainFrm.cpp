@@ -216,7 +216,8 @@ BOOL CMainFrame::CreateCaptionBar()
 	m_wndCaptionBar.SetImageToolTip(strTemp, strTemp2);
 
 	// temprary comment out by yizhe when create project
-	m_wndCaptionBar.ToggleAutoHide();
+	//m_wndCaptionBar.ToggleAutoHide();
+	m_wndCaptionBar.ShowWindow(SW_HIDE);
 
 	return TRUE;
 }

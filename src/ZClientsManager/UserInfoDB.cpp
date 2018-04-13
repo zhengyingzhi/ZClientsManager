@@ -161,7 +161,7 @@ int ZUserInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 		FreeQueryRs(lpResult);
 		return 1;
 	}
-
+	return 0;
 }
 
 ZQueryResult* ZUserInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apCompFunc, int aExtend)

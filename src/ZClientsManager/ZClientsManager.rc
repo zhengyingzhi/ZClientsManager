@@ -74,14 +74,18 @@ END
 // remains consistent on all systems.
 IDR_MAINFRAME           ICON                    "res\\ZClientsManager.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+
 IDB_INFO                BITMAP                  "res\\info.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -146,9 +150,11 @@ IDR_POPUP_EDIT MENU
 BEGIN
     POPUP "编辑"
     BEGIN
-        MENUITEM "剪切(&T)\tCtrl+X",              ID_EDIT_CUT
         MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
         MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
+        MENUITEM "修改(&M)\tCtrl+M",              ID_EDIT_MODIFY
+        MENUITEM SEPARATOR
+        MENUITEM "导出(&E)\tCtrl+E",              ID_EDIT_EXPORT
     END
 END
 
@@ -537,6 +543,8 @@ BEGIN
     ID_EDIT_DELETE          "删除一条新记录\n删除"
     ID_EDIT_MANAGER         "管理登录用户信息"
     ID_EDIT_UPDATEPWD       "修改密码"
+    ID_EDIT_MODIFY          "修改指定数据\n修改"
+    ID_EDIT_EXPORT          "导出数据到文件中"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

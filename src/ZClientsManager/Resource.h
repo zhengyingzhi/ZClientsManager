@@ -66,13 +66,16 @@
 #define ID_32777                        32777
 #define ID_EDIT_UPDATEPWD               32778
 #define ID_SYS_CLOSE                    32779
+#define ID_EDIT_REMOVE                  32780
+#define ID_EDIT_MODIFY                  32781
+#define ID_EDIT_EXPORT                  32782
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        319
-#define _APS_NEXT_COMMAND_VALUE         32780
+#define _APS_NEXT_COMMAND_VALUE         32783
 #define _APS_NEXT_CONTROL_VALUE         1016
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

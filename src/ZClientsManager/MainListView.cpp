@@ -8,8 +8,6 @@
 #include "ZInfoDesc.h"
 #include "ZUtility.h"
 
-/* database object */
-ZDataBase* g_pStuDB = NULL;
 
 //////////////////////////////////////////////////////////////////////////
 // list control operates
@@ -90,6 +88,8 @@ CMainListView::~CMainListView()
 
 BEGIN_MESSAGE_MAP(CMainListView, CListView)
 	ON_NOTIFY_REFLECT(NM_DBLCLK, &CMainListView::OnNMDblclk)
+	ON_NOTIFY_REFLECT(NM_RCLICK, &CMainListView::OnNMRClick)
+	ON_COMMAND(ID_EDIT_MODIFY, &CMainListView::OnEditModify)
 END_MESSAGE_MAP()
 
 
@@ -119,30 +119,24 @@ void CMainListView::OnInitialUpdate()
 
 	_InitMainListCtrl(m_list);
 
-	if (!g_pStuDB)
+	// query students data from db
+	if (g_MemData.GetStuDB() == NULL)
 	{
-		g_pStuDB = new ZStudentInfoDBText();
-		g_pStuDB->Open(STUINFO_DB_DEFAULT_NAME, "127.0.0.1", 0);
+		if (g_MemData.OpenStuDB(STUINFO_DB_DEFAULT_NAME, "127.0.0.1", 0) != 0)
+		{
+			AfxMessageBox(_T("打开学生数据库信息失败"), MB_OK | MB_ICONWARNING);
+			return;
+		}
 	}
 
-	ZStudentInfo* lpUserInfo;
-	ZQueryResult* lpQryRs;
-
-	// query all when init
-	ZStudentInfo lQryCond = {};
-	lpQryRs = g_pStuDB->Query(&lQryCond, ZQueryCompareNothing, 0);
-	if (!lpQryRs)
+	vector<ZStudentInfo*> lVec;
+	lVec = g_MemData.QueryAllStudents();
+	for (size_t i = 0; i < lVec.size(); ++i)
 	{
-		return;
+		ZStudentInfo* lpStuInfo = lVec[i];
+		_UpdateMainListCtrl(0, m_list, lpStuInfo);
 	}
 
-	lpUserInfo = ZDB_QRY_RS_BODY(lpQryRs, ZStudentInfo);
-	for (uint32_t i = 0; i < lpQryRs->Count; ++i)
-	{
-		_UpdateMainListCtrl(0, m_list, &lpUserInfo[i]);
-	}
-
-	g_pStuDB->FreeQueryRs(lpQryRs);
 }
 
 
@@ -154,4 +148,51 @@ void CMainListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 	int lRow = pNMItemActivate->iItem;
 
 	*pResult = 0;
+}
+
+
+void CMainListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	int lRow = pNMItemActivate->iItem;
+	if (lRow >= 0)
+	{
+		//定义下面要用到的 cmenu 对象
+		CMenu menu, *pSubMenu;
+
+		//装载自定义的右键菜单
+		menu.LoadMenu(IDR_POPUP_EDIT);
+
+		//获取第一个弹出菜单,所以第一个菜单必须有子 菜单
+		pSubMenu = menu.GetSubMenu(0);
+
+		//定义一个用于确定光标位置的位置
+		CPoint lPoint;
+
+		//获取当前光标的位置,以便使得菜单能够跟随光标
+		GetCursorPos(&lPoint);
+
+		//用 istat 存放当前选定的是第几项
+		//int istat = m_list.GetSelectionMark();
+
+		//获取当前项中的数据, 0代表是第 0列 // pString="您选择的项是 :"+pString ;//显示当前选择项
+		//CString pString = m_list.GetItemText(istat, 0);
+		// MessageBox(pString);//显示当前选中的路径
+
+		//在指定 位置显示弹出菜单
+		pSubMenu->TrackPopupMenu(TPM_LEFTALIGN, lPoint.x, lPoint.y, this);
+	}
+
+	*pResult = 0;
+}
+
+
+void CMainListView::OnEditModify()
+{
+	// TODO: 获取该行数据，并传入Dialog中，并做相应操作
+	int lRow = m_list.GetSelectionMark();
+
+	ZStuInfoDlg lSIDlg;
+	lSIDlg.DoModal();
 }

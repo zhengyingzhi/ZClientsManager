@@ -8,8 +8,6 @@
 #include "ZUserInfoDlg.h"
 #include "ZInfoDesc.h"
 
-extern ZDataBase* g_pUserDB;
-
 static void _InitUserListCtrl(CListCtrl& aList)
 {
 	DWORD dwStyle;
@@ -82,20 +80,13 @@ BOOL ZUserInfoDlg::OnInitDialog()
 	ZUserInfo*      lpUserInfo;
 	ZQueryResult*   lpUserRs;
 
-	ZUserInfo lQryCond = {};
-	
-	lpUserRs = g_pUserDB->Query(&lQryCond, ZQueryCompareNothing, 0);
-	if (lpUserRs)
+	vector<ZUserInfo*> lVec;
+	lVec = g_MemData.QueryAllUser();
+	for (size_t i = 0; i < lVec.size(); ++i)
 	{
-		lpUserInfo = ZDB_QRY_RS_BODY(lpUserRs, ZUserInfo);
-
-		for (uint32_t i = 0; i < lpUserRs->Count; ++i)
-		{
-			_UpdateUserListCtrl(i, lList, &lpUserInfo[i]);
-		}
+		lpUserInfo = lVec[i];
+		_UpdateUserListCtrl(i, lList, lpUserInfo);
 	}
-
-	g_pUserDB->FreeQueryRs(lpUserRs);
 
 	return TRUE;
 }
@@ -152,9 +143,9 @@ void ZUserInfoDlg::OnBnClickedBtnSave()
 	}
 
 	// update user info into db
-	if (0 != g_pUserDB->Insert(&lUserInfo, sizeof(lUserInfo)))
+	if (0 != g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo)))
 	{
-		AfxMessageBox(_T("插入数据失败"), MB_OK | MB_ICONWARNING);
+		AfxMessageBox(_T("插入账户数据失败"), MB_OK | MB_ICONWARNING);
 	}
 }
 

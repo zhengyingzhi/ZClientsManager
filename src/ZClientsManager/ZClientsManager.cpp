@@ -17,7 +17,7 @@
 #define new DEBUG_NEW
 #endif
 
-ZDataBase*    g_pUserDB = NULL;
+ZMemoryData g_MemData;
 
 // CZClientsManagerApp
 
@@ -122,9 +122,6 @@ BOOL CZClientsManagerApp::InitInstance()
 		NULL);
 
 
-
-
-
 	// 唯一的一个窗口已初始化，因此显示它并对其进行更新
 	pFrame->ShowWindow(SW_SHOW);
 	pFrame->UpdateWindow();
@@ -225,19 +222,21 @@ void CZClientsManagerApp::ReadConfigs(ZAppConfigs& aAppConfigs)
 
 BOOL CZClientsManagerApp::DoLoginDlg()
 {
-	if (g_pUserDB == NULL)
+	if (g_MemData.GetUserDB() == NULL)
 	{
-		g_pUserDB = new ZUserInfoDBText();
-		g_pUserDB->Open(USERINFO_DB_DEFAULT_NAME, "127.0.0.1", 0);
+		if (g_MemData.OpenUserDB(USERINFO_DB_DEFAULT_NAME, "127.0.0.1", 0) != 0)
+		{
+			AfxMessageBox(_T("打开账户信息数据库失败"), MB_OK | MB_ICONWARNING);
+			return FALSE;
+		}
 	}
 
 	ZAppConfigs lAppConfigs = {};
 	ReadConfigs(lAppConfigs);
 
-	ZQueryResult*   lpQryRS = NULL;
 	ZUserInfo*      lpUserInfo;
 
-	CString lUserID, lPasswd;
+	CString   lUserID, lPasswd;
 	ZLoginDlg lLoginDlg;
 	if (lAppConfigs.m_UserID[0])
 	{
@@ -248,10 +247,6 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	{
 		if (IDCANCEL == lLoginDlg.DoModal())
 		{
-			if (lpQryRS)
-			{
-				g_pUserDB->FreeQueryRs(lpQryRS);
-			}
 			return FALSE;
 		}
 
@@ -260,13 +255,15 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 
 		ZUserInfo lQryCond = {};
 		strncpy(lQryCond.UserName, (char*)(LPCSTR)lUserID, sizeof(lQryCond.UserName) - 1);
-		lpQryRS = g_pUserDB->Query(&lQryCond, ZQueryCompareUserName, 0);
-		if (!lpQryRS)
+
+		vector<ZUserInfo*> lVec;
+		lVec = g_MemData.QueryUserInfo(&lQryCond, ZQueryCompareUserName);
+		if (lVec.empty())
 		{
 			AfxMessageBox(_T("未找到此用户信息"), MB_OK | MB_ICONWARNING);
 			continue;
 		}
-		lpUserInfo = ZDB_QRY_RS_BODY(lpQryRS, ZUserInfo);
+		lpUserInfo = lVec[0];
 
 		if (lUserID.Compare(lpUserInfo->UserName) == 0 &&
 			lPasswd.Compare(lpUserInfo->Password) == 0)
@@ -279,11 +276,6 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			AfxMessageBox(_T("用户名或密码错误"), MB_OK | MB_ICONWARNING);
 		}
 	} while (TRUE);
-
-	if (lpQryRS)
-	{
-		g_pUserDB->FreeQueryRs(lpQryRS);
-	}
 
 	if (lUserID.Compare(lAppConfigs.m_UserID) != 0)
 	{

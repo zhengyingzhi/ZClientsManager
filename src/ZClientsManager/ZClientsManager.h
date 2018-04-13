@@ -9,8 +9,9 @@
 
 #include "resource.h"       // Ö÷·ûºÅ
 
-#include "StudentInfoDB.h"
-#include "UserInfoDB.h"
+#include "ZMemoryData.h"
+
+extern ZMemoryData g_MemData;
 
 #define ZAPP_CONFIG_NAME    "ZAppConfig.txt"
 typedef struct
