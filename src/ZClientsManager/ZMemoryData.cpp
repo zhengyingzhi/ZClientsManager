@@ -2,16 +2,18 @@
 
 ZMemoryData::ZMemoryData()
 	: m_pUserDB()
-	, m_pQryUserRs()
 	, m_pStuDB()
-	, m_pQryStuRs()
 {
+	m_Pool = ztl_create_pool(ZMD_DEFAULT_SIZE);
 }
 
 ZMemoryData::~ZMemoryData()
 {
 	CloseUserDB();
 	CloseStuDB();
+
+	if (m_Pool)
+		ztl_destroy_pool(m_Pool);
 }
 
 int ZMemoryData::OpenUserDB(const string& aDBName, const string& aServerIP, uint16_t aPort)
@@ -26,19 +28,34 @@ int ZMemoryData::OpenUserDB(const string& aDBName, const string& aServerIP, uint
 		return rv;
 	}
 
-	ZUserInfo lQryCond = {};
-	m_pQryUserRs = m_pUserDB->Query(&lQryCond, ZQueryCompareNothing, 0);
+	// query all when opened db
+	ZQueryResult*   lpQryRs;
+	ZUserInfo       lQryCond = {};
+	lpQryRs = m_pUserDB->Query(&lQryCond, ZQueryCompareNothing, 0);
+
+	if (lpQryRs)
+	{
+		ZUserInfo *lpSrcData, *lpDstData;
+		for (uint32_t i = 0; i < lpQryRs->RsCount(); ++i)
+		{
+			lpSrcData = lpQryRs->RsAtAsType<ZUserInfo>(i);
+			if (!lpSrcData)
+			{
+				continue;
+			}
+
+			lpDstData = (ZUserInfo*)ztl_pcalloc(m_Pool, sizeof(ZUserInfo));
+			memcpy(lpDstData, lpSrcData, sizeof(ZUserInfo));
+			m_CacheUserData.push_back(lpDstData);
+		}
+	}
+
+	m_pUserDB->FreeQueryRs(lpQryRs);
 	return 0;
 }
 
 int ZMemoryData::CloseUserDB()
 {
-	if (m_pQryUserRs)
-	{
-		m_pUserDB->FreeQueryRs(m_pQryUserRs);
-		m_pQryUserRs = NULL;
-	}
-
 	if (m_pUserDB)
 	{
 		m_pUserDB->Close();
@@ -51,19 +68,9 @@ int ZMemoryData::CloseUserDB()
 vector<ZUserInfo*> ZMemoryData::QueryAllUser()
 {
 	vector<ZUserInfo*> lVec;
-	lVec.reserve(128);
+	lVec.reserve(m_CacheUserData.size());
 
-	if (m_pQryUserRs)
-	{
-		ZUserInfo* lpUserInfo;
-		lpUserInfo = ZDB_QRY_RS_BODY(m_pQryUserRs, ZUserInfo);
-
-		for (uint32_t i = 0; i < m_pQryUserRs->Count; ++i)
-		{
-			lVec.push_back(lpUserInfo + i);
-		}
-	}
-
+	lVec.assign(m_CacheUserData.begin(), m_CacheUserData.end());
 	return lVec;
 }
 
@@ -71,19 +78,14 @@ vector<ZUserInfo*> ZMemoryData::QueryUserInfo(const ZUserInfo* apExpect, ZQueryC
 {
 	ZUserInfo* lpUserInfo;
 	vector<ZUserInfo*> lVec;
+	lVec.reserve(128);
 
-	if (m_pQryUserRs)
+	for (size_t i = 0; i < m_CacheUserData.size(); ++i)
 	{
-		lVec.reserve(m_pQryUserRs->Count);
-
-		lpUserInfo = ZDB_QRY_RS_BODY(m_pQryUserRs, ZUserInfo);
-
-		for (uint32_t i = 0; i < m_pQryUserRs->Count; ++i)
+		lpUserInfo = m_CacheUserData[i];
+		if (apCompFunc(apExpect, lpUserInfo, 0))
 		{
-			if (apCompFunc(apExpect, lpUserInfo + i, 0))
-			{
-				lVec.push_back(lpUserInfo + i);
-			}
+			lVec.push_back(lpUserInfo);
 		}
 	}
 
@@ -102,19 +104,30 @@ int ZMemoryData::OpenStuDB(const string& aDBName, const string& aServerIP, uint1
 		return rv;
 	}
 
-	ZStudentInfo lQryCond = {};
-	m_pQryStuRs = m_pStuDB->Query(&lQryCond, ZQueryCompareNothing, 0);
+	ZQueryResult*   lpQryRs;
+	ZStudentInfo    lQryCond = {};
+	lpQryRs = m_pStuDB->Query(&lQryCond, ZQueryCompareNothing, 0);
+	if (lpQryRs)
+	{
+		ZStudentInfo *lpSrcData, *lpDstData;
+		for (uint32_t i = 0; i < lpQryRs->RsCount(); ++i)
+		{
+			lpSrcData = lpQryRs->RsAtAsType<ZStudentInfo>(i);
+			if (!lpSrcData)
+			{
+				continue;
+			}
+
+			lpDstData = (ZStudentInfo*)ztl_pcalloc(m_Pool, sizeof(ZStudentInfo));
+			memcpy(lpDstData, lpSrcData, sizeof(ZStudentInfo));
+			m_CacheStuData.push_back(lpDstData);
+		}
+	}
 	return 0;
 }
 
 int ZMemoryData::CloseStuDB()
 {
-	if (m_pQryStuRs)
-	{
-		m_pStuDB->FreeQueryRs(m_pQryStuRs);
-		m_pQryStuRs = NULL;
-	}
-
 	if (m_pStuDB)
 	{
 		m_pStuDB->Close();
@@ -127,20 +140,9 @@ int ZMemoryData::CloseStuDB()
 vector<ZStudentInfo*> ZMemoryData::QueryAllStudents()
 {
 	vector<ZStudentInfo*> lVec;
+	lVec.reserve(m_CacheStuData.size());
 
-	if (m_pQryStuRs)
-	{
-		lVec.reserve(m_pQryStuRs->Count);
-
-		ZStudentInfo* lpStuInfo;
-		lpStuInfo = ZDB_QRY_RS_BODY(m_pQryStuRs, ZStudentInfo);
-
-		for (uint32_t i = 0; i < m_pQryStuRs->Count; ++i)
-		{
-			lVec.push_back(lpStuInfo + i);
-		}
-	}
-
+	lVec.assign(m_CacheStuData.begin(), m_CacheStuData.end());
 	return lVec;
 }
 
@@ -148,19 +150,14 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfo(const ZStudentInfo* apExpect, ZQ
 {
 	ZStudentInfo* lpStuInfo;
 	vector<ZStudentInfo*> lVec;
+	lVec.reserve(128);
 
-	if (m_pQryStuRs)
+	for (size_t i = 0; i < m_CacheStuData.size(); ++i)
 	{
-		lVec.reserve(m_pQryStuRs->Count);
-
-		lpStuInfo = ZDB_QRY_RS_BODY(m_pQryStuRs, ZStudentInfo);
-
-		for (uint32_t i = 0; i < m_pQryStuRs->Count; ++i)
+		lpStuInfo = m_CacheStuData[i];
+		if (apCompFunc(apExpect, lpStuInfo, aExtend))
 		{
-			if (apCompFunc(apExpect, lpStuInfo + i, aExtend))
-			{
-				lVec.push_back(lpStuInfo + i);
-			}
+			lVec.push_back(lpStuInfo);
 		}
 	}
 

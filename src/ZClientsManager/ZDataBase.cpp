@@ -2,43 +2,87 @@
 #include <windows.h>
 #include <ZToolLib/ztl_atomic.h>
 
-uint32_t ZQryRsIncrement(ZQueryResult* apQryRs)
-{
-	return ztl_atomic_add(&apQryRs->RefCount, 1);
-}
-
-uint32_t ZQryRsDecrement(ZQueryResult* apQryRs)
-{
-	uint32_t lNewValue = ztl_atomic_dec(&apQryRs->RefCount, 1);
-
-	return lNewValue;
-}
-
-
-static void _ZQryRsCleanup(struct stQueryResult* apRS)
-{
-	free(apRS);
-}
-
-ZQueryResult* ZQryRsAlloc(ZQueryResult* apOldRs, uint32_t aAllocN, uint32_t aBodyEntitySize)
-{
-	if (apOldRs) {
-		apOldRs = (ZQueryResult*)realloc(apOldRs, sizeof(ZQueryResult) + aAllocN * aBodyEntitySize);
-	}
-	else {
-		apOldRs = (ZQueryResult*)calloc(1, sizeof(ZQueryResult) + aAllocN * aBodyEntitySize);
-	}
-
-	apOldRs->RefCount = 1;
-	apOldRs->AllocedN = aAllocN;
-	apOldRs->EntitySize = aBodyEntitySize;
-
-	return apOldRs;
-}
-
 bool ZQueryCompareNothing(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	return true;
+}
+
+
+ZQueryResult::ZQueryResult()
+{
+	m_RefCount = 0;
+	m_RsVec.reserve(256);
+}
+
+ZQueryResult::~ZQueryResult()
+{}
+
+void ZQueryResult::Clear()
+{
+	m_RefCount = 0;
+	m_RsVec.clear();
+}
+
+uint32_t ZQueryResult::IncrementRef(uint32_t aAddVal)
+{
+	return ztl_atomic_add(&m_RefCount, 1);
+}
+
+uint32_t ZQueryResult::DecrementRef(uint32_t aDecVal)
+{
+	return ztl_atomic_dec(&m_RefCount, aDecVal);
+}
+
+void ZQueryResult::PushBack(void* apDBData)
+{
+	m_RsVec.push_back(apDBData);
+}
+
+void* ZQueryResult::RsAt(uint32_t aIndex)
+{
+	if (aIndex < m_RsVec.size()) {
+		return m_RsVec[aIndex];
+	}
+	return NULL;
+}
+
+uint32_t ZQueryResult::RsCount()
+{
+	return (uint32_t)m_RsVec.size();
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+ZDataBase::ZDataBase()
+	: m_DBName()
+	, m_DBServerIP()
+	, m_DBServerPort()
+	, m_pQryRs()
+{
+	m_pQryRs = new ZQueryResult();
+}
+
+ZDataBase::~ZDataBase()
+{
+	if (m_pQryRs) {
+		delete m_pQryRs;
+	}
+}
+
+ZQueryResult* ZDataBase::GetQueryRs()
+{
+	ZQueryResult* lpRetRs;
+	if (m_pQryRs) {
+		lpRetRs = m_pQryRs;
+		m_pQryRs = NULL;
+	}
+	else {
+		lpRetRs = new ZQueryResult();
+	}
+
+	lpRetRs->Clear();
+	return lpRetRs;
 }
 
 void ZDataBase::FreeQueryRs(ZQueryResult*& apQryRs)
@@ -48,11 +92,11 @@ void ZDataBase::FreeQueryRs(ZQueryResult*& apQryRs)
 	}
 
 	if (m_pQryRs) {
-		_ZQryRsCleanup(apQryRs);
+		delete apQryRs;
 	}
 	else {
 		m_pQryRs = apQryRs;
-		m_pQryRs->Count = 0;
+		m_pQryRs->Clear();
 	}
 	apQryRs = NULL;
 }

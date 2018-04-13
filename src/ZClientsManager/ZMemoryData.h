@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <ZToolLib/ztl_palloc.h>
 
 #include "UserInfoDB.h"
 #include "StudentInfoDB.h"
@@ -12,8 +12,8 @@ using namespace std;
 typedef vector<ZUserInfo*>      ZUserInfoContainer;
 typedef vector<ZStudentInfo*>   ZStuInfoContainer;
 
-/* 先将数据从数据库/网络上加载到该容器中,
- * 本地操作数据时，再从该容器中获取数据
+/* 先将数据从数据库/网络上加载到该缓存中,
+ * 本地操作数据时，再从该缓存中获取数据
  */
 class ZMemoryData
 {
@@ -38,10 +38,12 @@ public:
 	vector<ZStudentInfo*> QueryStuInfo(const ZStudentInfo* apExpect, ZQueryComparePtr apCompFunc, int aExtend);
 
 private:
-	ZDataBase*      m_pUserDB;
-	ZQueryResult*   m_pQryUserRs;
+	ztl_pool_t*             m_Pool;
 
-	ZDataBase*      m_pStuDB;
-	ZQueryResult*   m_pQryStuRs;
+	ZDataBase*              m_pUserDB;
+	vector<ZUserInfo*>      m_CacheUserData;
+
+	ZDataBase*              m_pStuDB;
+	vector<ZStudentInfo*>   m_CacheStuData;
 };
 

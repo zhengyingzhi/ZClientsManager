@@ -94,45 +94,14 @@ bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend)
 	return false;
 }
 
-//////////////////////////////////////////////////////////////////////////
-
-static void ZQryResultAssign(vector<ZStudentInfo*>& aStuVec, ZQueryResult* apQryRS)
-{
-	if (apQryRS->AllocedN < (uint32_t)aStuVec.size())
-	{
-		ZQryRsAlloc(apQryRS, aStuVec.size() + 128, ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT));
-	}
-
-	ZStudentInfo* lpStuInfo;
-	lpStuInfo = ZDB_QRY_RS_BODY(apQryRS, ZStudentInfo);
-
-	apQryRS->Count = aStuVec.size();
-	for (size_t i = 0; i < aStuVec.size(); ++i)
-	{
-		memcpy(&lpStuInfo[i], aStuVec[i], sizeof(ZStudentInfo));
-	}
-}
-
-#if 0
-typedef bool(*QueryCompareFunc)(ZStudentInfo* , const char* , const char* );
-
-static bool QueryByNameFunc(ZStudentInfo* apStuInfo, const char* apName, const char* apTelephone)
-{
-	return false;
-}
-
-static bool QueryByCountryFunc(ZStudentInfo* apStuInfo, const char* apCountry, const char* apReservce)
-{
-	return false;
-}
-
-static bool QueryByCollegeFunc(ZStudentInfo* apStuInfo, const char* apCollege, const char* apReservce)
-{
-	return false;
-}
-#endif//0
 
 //////////////////////////////////////////////////////////////////////////
+
+static uint32_t _ZStudentInfoBlockSize()
+{
+	uint32_t lBlockSize = ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
+	return lBlockSize;
+}
 
 ZStudentInfoDBText::ZStudentInfoDBText()
 	: m_pBuffer(NULL)
@@ -140,17 +109,11 @@ ZStudentInfoDBText::ZStudentInfoDBText()
 	, m_pShmObj(NULL)
 {
 	m_IncludeDeleted = 0;
-
-	m_pQryRs = ZQryRsAlloc(NULL, STUINFO_DB_DEFAULT_QRYN,
-		ztl_align(sizeof(ZQueryResult), STUINFO_DB_ALIGNMENT));
 }
 
 ZStudentInfoDBText::~ZStudentInfoDBText()
 {
 	Close();
-
-	if (m_pQryRs)
-		FreeQueryRs(m_pQryRs);
 
 	if (m_pShmObj)
 		ztl_shm_release(m_pShmObj);
@@ -202,6 +165,7 @@ int ZStudentInfoDBText::Close()
 
 int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 {
+	ZQueryResult* lpQryRs;
 	ZStudentInfo* lpStuInfo;
 	lpStuInfo = (ZStudentInfo*)apDataInfo;
 
@@ -210,13 +174,12 @@ int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 		return -1;
 	}
 
-	ZQueryResult* lpResult;
-	lpResult = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
-	if (lpResult)
+	lpQryRs = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
+	if (lpQryRs)
 	{
 		// already exist
 
-		FreeQueryRs(lpResult);
+		FreeQueryRs(lpQryRs);
 		return 1;
 	}
 
@@ -227,51 +190,59 @@ int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 		return -99;
 	}
 
+	// do write data and sync
 	memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
-	ztl_shm_flush_to_file(m_pShmObj, true, NULL, 0);
+	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
 
 	return 0;
 }
 
 int ZStudentInfoDBText::Update(void* apDataInfo, uint32_t aDataSize)
 {
-	ZQueryResult* lpResult;
+	ZQueryResult* lpQryRs;
 	ZStudentInfo* lpStuInfo;
 	lpStuInfo = (ZStudentInfo*)apDataInfo;
-
-	lpResult = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
-	if (!lpResult)
+	if (!lpStuInfo->Name[0] && !lpStuInfo->Telehone[0])
 	{
 		return -1;
 	}
 
+	lpQryRs = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
+	if (!lpQryRs)
+	{
+		return -2;
+	}
+
 	ZStudentInfo* lpDstInfo;
-	lpDstInfo = ZDB_QRY_RS_BODY(lpResult, ZStudentInfo);
+	lpDstInfo = lpQryRs->RsAtAsType<ZStudentInfo>(0);
+
+	// FIXME: update some fields
 	memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
 
-	FreeQueryRs(lpResult);
+	FreeQueryRs(lpQryRs);
 	return 0;
 }
 
 int ZStudentInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 {
-	ZQueryResult* lpResult;
+	ZQueryResult* lpQryRs;
 	ZStudentInfo* lpStuInfo;
 	lpStuInfo = (ZStudentInfo*)apDataInfo;
 
-	lpResult = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
-	if (!lpResult)
+	lpQryRs = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
+	if (!lpQryRs)
 	{
 		return -1;
 	}
 
 	ZStudentInfo* lpDstInfo;
-	lpDstInfo = ZDB_QRY_RS_BODY(lpResult, ZStudentInfo);
+	lpDstInfo = lpQryRs->RsAtAsType<ZStudentInfo>(0);
 
 	// market as deleted
 	lpDstInfo->Flag |= ZSI_FLAG_Deleted;
+	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
 
-	FreeQueryRs(lpResult);
+	FreeQueryRs(lpQryRs);
 	return 0;
 }
 
@@ -279,8 +250,8 @@ ZQueryResult* ZStudentInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apC
 {
 	ZQueryResult* lpQryRs;
 	ZStudentInfo* lpStuInfo;
-	vector<ZStudentInfo*> lVec;
-	lVec.reserve(128);
+
+	lpQryRs = GetQueryRs();
 
 	lpStuInfo = NULL;
 	while ((lpStuInfo = NextStudentInfo(lpStuInfo)) != NULL)
@@ -295,38 +266,40 @@ ZQueryResult* ZStudentInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apC
 				continue;
 			}
 
-			lVec.push_back(lpStuInfo);
+			lpQryRs->PushBack(lpStuInfo);
 		}
 	}
 
-	if (lVec.empty())
+	if (lpQryRs->RsCount() == 0)
 	{
+		FreeQueryRs(lpQryRs);
 		return NULL;
 	}
 
-	ZQryResultAssign(lVec, m_pQryRs);
-	lpQryRs = m_pQryRs;
-	m_pQryRs = NULL;
 	return lpQryRs;
 }
 
 
-ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo)
+ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo, bool aAutoExpand)
 {
-	uint32_t lOffset = ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
+	(void)aAutoExpand;
 	ZStudentInfo* lpNextInfo;
+	uint32_t lBlockSize = _ZStudentInfoBlockSize();
 
 	if (!apCurStuInfo)
 	{
+		// first
 		lpNextInfo = (ZStudentInfo*)m_pBuffer;
 	}
-	else if ((char*)apCurStuInfo + lOffset > (m_pBuffer + m_BufSize))
+	else if ((char*)apCurStuInfo + lBlockSize > (m_pBuffer + m_BufSize))
 	{
+		// memory out bound, FIXME: auto expand if need
 		lpNextInfo = NULL;
 	}
 	else
 	{
-		lpNextInfo = (ZStudentInfo*)((char*)apCurStuInfo + lOffset);
+		// next
+		lpNextInfo = (ZStudentInfo*)((char*)apCurStuInfo + lBlockSize);
 		if (!lpNextInfo->Name[0])
 			lpNextInfo = NULL;
 	}
@@ -336,7 +309,7 @@ ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo)
 
 ZStudentInfo* ZStudentInfoDBText::GetAvailStudentInfo()
 {
-	uint32_t lOffset = ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
+	uint32_t lBlockSize = _ZStudentInfoBlockSize();
 	ZStudentInfo *lpCurInfo, *lpNextInfo;
 
 	lpCurInfo = NULL;

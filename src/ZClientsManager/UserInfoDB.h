@@ -33,7 +33,7 @@ public:
 	virtual ZQueryResult* Query(void* apExpectInfo, ZQueryComparePtr apCompFunc, int aExtend);
 
 protected:
-	ZUserInfo* NextUserInfo(ZUserInfo* apCurStuInfo);
+	ZUserInfo* NextUserInfo(ZUserInfo* apCurStuInfo, bool aAutoExpand = false);
 	ZUserInfo* GetAvailUserInfo();
 
 protected:

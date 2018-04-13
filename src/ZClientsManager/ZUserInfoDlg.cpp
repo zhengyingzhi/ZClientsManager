@@ -77,8 +77,7 @@ BOOL ZUserInfoDlg::OnInitDialog()
 	lpCombo->SetCurSel(0);
 
 	// query db
-	ZUserInfo*      lpUserInfo;
-	ZQueryResult*   lpUserRs;
+	ZUserInfo* lpUserInfo;
 
 	vector<ZUserInfo*> lVec;
 	lVec = g_MemData.QueryAllUser();

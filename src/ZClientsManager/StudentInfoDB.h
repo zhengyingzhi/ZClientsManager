@@ -56,7 +56,7 @@ public:
 	virtual ZQueryResult* Query(void* apExpectInfo, ZQueryComparePtr apCompFunc, int aExtend);
 
 protected:
-	ZStudentInfo* NextStudentInfo(ZStudentInfo* apCurStuInfo);
+	ZStudentInfo* NextStudentInfo(ZStudentInfo* apCurStuInfo, bool aAutoExpand = false);
 	ZStudentInfo* GetAvailStudentInfo();
 
 protected:
