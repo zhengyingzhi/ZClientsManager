@@ -341,6 +341,15 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 }
 
 
+
+void CMainFrame::UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec)
+{
+	if (m_pMainView && aStuVec.size())
+	{
+		m_pMainView->UpdateStuToListView(aStuVec);
+	}
+}
+
 void CMainFrame::OnEditInsert()
 {
 	ZStuInfoDlg lSIDlg;

@@ -26,6 +26,9 @@ public:
 #endif
 #endif
 
+public:
+	void UpdateStuToListView(vector<ZStudentInfo*>& aStuVec);
+
 protected:
 	CListCtrl& m_list;
 

@@ -243,6 +243,12 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		lLoginDlg.SetUserID(lAppConfigs.m_UserID);
 	}
 
+#if defined(DEBUG) || defined(_DEBUG)
+	lPasswd = _T("123456");
+	lLoginDlg.SetPassword(lPasswd);
+#endif // DEBUG
+
+
 	do
 	{
 		if (IDCANCEL == lLoginDlg.DoModal())

@@ -46,6 +46,9 @@ protected:  // 控件条嵌入成员
 protected:
 	ZStuQryDlg        m_StuQryDlg;
 
+public:
+	void UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec);
+
 // 生成的消息映射函数
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

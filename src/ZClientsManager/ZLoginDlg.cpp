@@ -14,7 +14,7 @@ IMPLEMENT_DYNAMIC(ZLoginDlg, CDialogEx)
 ZLoginDlg::ZLoginDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_DIALOG_LOGIN, pParent)
 {
-
+	m_RememberPasswd = FALSE;
 }
 
 ZLoginDlg::~ZLoginDlg()
@@ -35,9 +35,12 @@ BOOL ZLoginDlg::OnInitDialog()
 	{
 		SetDlgItemText(IDC_EDIT_User, m_UserID);
 	}
+	if (!m_Passwd.IsEmpty())
+	{
+		SetDlgItemText(IDC_EDIT_Password, m_Passwd);
+	}
 
-	// ÔÝÊ±½ûÓÃ
-	GetDlgItem(IDC_CHK_MEMORY_PWD)->EnableWindow(FALSE);
+	GetDlgItem(IDC_CHK_MEMORY_PWD)->EnableWindow(m_RememberPasswd);
 
 	return TRUE;
 }
@@ -62,14 +65,24 @@ void ZLoginDlg::SetUserID(const CString& aUserID)
 	m_UserID = aUserID;
 }
 
+void ZLoginDlg::SetPassword(const CString& aPassword)
+{
+	m_Passwd = aPassword;
+}
+
+void ZLoginDlg::SetRememberPwd(BOOL aOn)
+{
+	m_RememberPasswd = aOn;
+}
+
 CString ZLoginDlg::GetPasswd()
 {
 	return m_Passwd;
 }
 
-bool ZLoginDlg::IsRememberPasswd()
+BOOL ZLoginDlg::IsRememberPasswd()
 {
-	return m_RememberPasswd == 1 ? true : false;
+	return m_RememberPasswd;
 }
 
 void ZLoginDlg::OnBnClickedOk()

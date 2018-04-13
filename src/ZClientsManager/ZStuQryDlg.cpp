@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "ZClientsManager.h"
+#include "MainFrm.h"
 #include "ZStuQryDlg.h"
 #include "afxdialogex.h"
 
@@ -14,6 +15,7 @@ IMPLEMENT_DYNAMIC(ZStuQryDlg, CDialogEx)
 ZStuQryDlg::ZStuQryDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_DIALOG_QUERY, pParent)
 {
+	m_pMainFrame = NULL;
 	memset(&m_StuInfo, 0, sizeof(m_StuInfo));
 }
 
@@ -51,6 +53,10 @@ END_MESSAGE_MAP()
 // ZStuQryDlg message handlers
 
 
+void ZStuQryDlg::SetMainFrame(CMainFrame* apMainFrame)
+{
+	m_pMainFrame = apMainFrame;
+}
 
 void ZStuQryDlg::SetStuInfo(const ZStudentInfo& aStuInfo)
 {
@@ -59,7 +65,25 @@ void ZStuQryDlg::SetStuInfo(const ZStudentInfo& aStuInfo)
 
 void ZStuQryDlg::OnBnClickedBtnQuery()
 {
-	// TODO: Add your control notification handler code here
+	ZStudentInfo lStuInfo = {};
+
+	CString lString;
+	GetDlgItemText(IDC_EDIT_NAME, lString);
+	strncpy(lStuInfo.Name, (char*)(LPCSTR)lString, sizeof(lStuInfo.Name) - 1);
+
+	vector<ZStudentInfo*> lVec;
+	lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareUserName, 0);
+	if (lVec.empty())
+	{
+		AfxMessageBox(_T("未查询到相关数据"), MB_OK);
+	}
+	else
+	{
+		if (m_pMainFrame)
+			m_pMainFrame->UpdateStuToMainListView(lVec);
+		CDialogEx::OnOK();
+	}
+
 }
 
 

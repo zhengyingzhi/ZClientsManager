@@ -19,9 +19,11 @@ public:
 public:
 	CString GetUserID();
 	CString GetPasswd();
-	bool    IsRememberPasswd();
+	BOOL    IsRememberPasswd();
 
 	void SetUserID(const CString& aUserID);
+	void SetPassword(const CString& aPassword);
+	void SetRememberPwd(BOOL aOn);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -34,5 +36,5 @@ public:
 
 	CString m_UserID;
 	CString m_Passwd;
-	int     m_RememberPasswd;
+	BOOL    m_RememberPasswd;
 };

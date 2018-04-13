@@ -14,12 +14,12 @@
 #define MAINLIST_COL_LangScore      7           // 分数
 #define MAINLIST_COL_Sex            8           // 性别
 #define MAINLIST_COL_QQ             9           // QQ
-#define MAINLIST_COL_Source         10          // 来源
-#define MAINLIST_COL_Status         11          // 状态
-#define MAINLIST_COL_InsertTime     12          // 插入时间
-#define MAINLIST_COL_UpdateTime     13          // 更新时间
-#define MAINLIST_COL_NextVisitTime  14          // 下次回访时间
-#define MAINLIST_COL_Important      15          // 重要级别
+#define MAINLIST_COL_Status         10          // 状态
+#define MAINLIST_COL_Important      11          // 重要级别
+#define MAINLIST_COL_NextVisitTime  12          // 下次回访时间
+#define MAINLIST_COL_InsertTime     13          // 插入时间
+#define MAINLIST_COL_UpdateTime     14          // 更新时间
+#define MAINLIST_COL_Source         15          // 来源
 
 
 // ZStuInfoDlg dialog

@@ -21,20 +21,20 @@ static void _InitMainListCtrl(CListCtrl& aList)
 
 	aList.InsertColumn(MAINLIST_COL_Row,        _T("编号"),     LVCFMT_LEFT, 40);
 	aList.InsertColumn(MAINLIST_COL_Name,       _T("姓名"),     LVCFMT_LEFT, 60);
-	aList.InsertColumn(MAINLIST_COL_Telephone,  _T("电话"),     LVCFMT_LEFT, 80);
+	aList.InsertColumn(MAINLIST_COL_Telephone,  _T("电话"),     LVCFMT_LEFT, 100);
 	aList.InsertColumn(MAINLIST_COL_Country,    _T("意向国家"), LVCFMT_LEFT, 80);
-	aList.InsertColumn(MAINLIST_COL_College,    _T("学校"),     LVCFMT_LEFT, 80);
-	aList.InsertColumn(MAINLIST_COL_Major,      _T("专业"),     LVCFMT_LEFT, 100);
+	aList.InsertColumn(MAINLIST_COL_College,    _T("学校"),     LVCFMT_LEFT, 110);
+	aList.InsertColumn(MAINLIST_COL_Major,      _T("专业"),     LVCFMT_LEFT, 140);
 	aList.InsertColumn(MAINLIST_COL_Class,      _T("年级"),     LVCFMT_LEFT, 60);
 	aList.InsertColumn(MAINLIST_COL_LangScore,  _T("语言成绩"), LVCFMT_LEFT, 60);
 	aList.InsertColumn(MAINLIST_COL_Sex,        _T("性别"),     LVCFMT_LEFT, 40);
 	aList.InsertColumn(MAINLIST_COL_QQ,         _T("QQ"),       LVCFMT_LEFT, 80);
-	aList.InsertColumn(MAINLIST_COL_Source,     _T("来源"),     LVCFMT_LEFT, 80);
-	aList.InsertColumn(MAINLIST_COL_Status,     _T("状态"),     LVCFMT_LEFT, 80);
+	aList.InsertColumn(MAINLIST_COL_Status,     _T("状态"),     LVCFMT_LEFT, 100);
+	aList.InsertColumn(MAINLIST_COL_Important,  _T("重要级别"), LVCFMT_LEFT, 60);
+	aList.InsertColumn(MAINLIST_COL_NextVisitTime, _T("回访时间"), LVCFMT_LEFT, 120);
 	aList.InsertColumn(MAINLIST_COL_InsertTime, _T("插入时间"), LVCFMT_LEFT, 120);
 	aList.InsertColumn(MAINLIST_COL_UpdateTime, _T("更新时间"), LVCFMT_LEFT, 120);
-	aList.InsertColumn(MAINLIST_COL_NextVisitTime, _T("回访时间"), LVCFMT_LEFT, 120);
-	aList.InsertColumn(MAINLIST_COL_Important,  _T("重要级别"), LVCFMT_LEFT, 80);
+	aList.InsertColumn(MAINLIST_COL_Source,     _T("来源"),     LVCFMT_LEFT, 160);
 }
 
 static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuInfo)
@@ -47,7 +47,7 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 
 	aList.InsertItem(aRow, _T(""));
 
-	lString.Format("%d", aRow);
+	lString.Format("%d", aRow + 1);
 	aList.SetItemText(aRow, MAINLIST_COL_Row,      lString);
 	aList.SetItemText(aRow, MAINLIST_COL_Name,     apStuInfo->Name);
 	aList.SetItemText(aRow, MAINLIST_COL_Telephone,apStuInfo->Telehone);
@@ -56,18 +56,18 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 	aList.SetItemText(aRow, MAINLIST_COL_Major,    apStuInfo->Major);
 	aList.SetItemText(aRow, MAINLIST_COL_Class,    apStuInfo->Class);
 
-	lString.Format("%.1lf", apStuInfo->LanguageScore);
+	lString.Format("%.1lf", double(apStuInfo->LanguageScore / 10.0));
 	aList.SetItemText(aRow, MAINLIST_COL_LangScore, lString);
 
 	aList.SetItemText(aRow, MAINLIST_COL_Sex,      ZStuSexDesc(apStuInfo->Sex));
 	aList.SetItemText(aRow, MAINLIST_COL_QQ,       apStuInfo->QQ);
-	aList.SetItemText(aRow, MAINLIST_COL_Source,   apStuInfo->Source);
 	aList.SetItemText(aRow, MAINLIST_COL_Status,   apStuInfo->Status);
+	aList.SetItemText(aRow, MAINLIST_COL_Important, ZStuImportantDesc(apStuInfo->ImportantLevel));
+	aList.SetItemText(aRow, MAINLIST_COL_NextVisitTime, ZConvDateTimeStr(apStuInfo->NextVisitTime).c_str());
 
 	aList.SetItemText(aRow, MAINLIST_COL_InsertTime, ZConvDateTimeStr(apStuInfo->InsertTime).c_str());
 	aList.SetItemText(aRow, MAINLIST_COL_UpdateTime, ZConvDateTimeStr(apStuInfo->UpdateTime).c_str());
-	aList.SetItemText(aRow, MAINLIST_COL_NextVisitTime, ZConvDateTimeStr(apStuInfo->NextVisitTime).c_str());
-	aList.SetItemText(aRow, MAINLIST_COL_Important, ZStuImportantDesc(apStuInfo->ImportantLevel));
+	aList.SetItemText(aRow, MAINLIST_COL_Source,   apStuInfo->Source);
 
 }
 
@@ -139,6 +139,17 @@ void CMainListView::OnInitialUpdate()
 
 }
 
+
+
+void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec)
+{
+	m_list.DeleteAllItems();
+
+	for (size_t i = 0; i < aStuVec.size(); ++i)
+	{
+		_UpdateMainListCtrl(i, m_list, aStuVec[i]);
+	}
+}
 
 void CMainListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {

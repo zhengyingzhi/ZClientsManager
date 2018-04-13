@@ -285,6 +285,10 @@ ZQueryResult* ZStudentInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apC
 	lpStuInfo = NULL;
 	while ((lpStuInfo = NextStudentInfo(lpStuInfo)) != NULL)
 	{
+		if (!lpStuInfo->Name[0]) {
+			continue;
+		}
+
 		if (apCompFunc(apExpectInfo, lpStuInfo, aExtend))
 		{
 			if (lpStuInfo->Flag & ZSI_FLAG_Deleted) {
@@ -314,7 +318,7 @@ ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo)
 
 	if (!apCurStuInfo)
 	{
-		lpNextInfo =(ZStudentInfo*)m_pBuffer;
+		lpNextInfo = (ZStudentInfo*)m_pBuffer;
 	}
 	else if ((char*)apCurStuInfo + lOffset > (m_pBuffer + m_BufSize))
 	{

@@ -4,6 +4,8 @@
 
 // ZStuQryDlg dialog
 
+class CMainFrame;
+
 class ZStuQryDlg : public CDialogEx
 {
 	DECLARE_DYNAMIC(ZStuQryDlg)
@@ -19,8 +21,10 @@ public:
 
 public:
 	void SetStuInfo(const ZStudentInfo& aStuInfo);
+	void SetMainFrame(CMainFrame* apMainFrame);
 
 public:
+	CMainFrame*    m_pMainFrame;
 	ZStudentInfo   m_StuInfo;
 
 protected:

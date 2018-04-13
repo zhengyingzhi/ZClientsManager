@@ -132,7 +132,7 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	CButton* lpBtn = (CButton*)GetDlgItem(IDC_RADIO_BOY);
 	lStuInfo.Sex = lpBtn->GetCheck() ? SSEX_Boy : SSEX_Girl;
 
-	if (memcpy(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
+	if (memcmp(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
 	{
 		return;
 	}
