@@ -72,7 +72,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "res\\ZClientsManager.ico"
+IDI_ICON_AORUIAPP       ICON                    "res\\AoruiApp.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

@@ -63,10 +63,6 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-	SetIcon(hIcon, TRUE);
-	SetIcon(hIcon, FALSE);
-
 	BOOL bNameValid;
 
 	if (!m_wndMenuBar.Create(this))
@@ -162,6 +158,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lstBasicCommands.AddTail(ID_VIEW_TOOLBAR);
 
 	CMFCToolBar::SetBasicCommands(lstBasicCommands);
+
+	HICON hIcon = AfxGetApp()->LoadIcon(IDI_ICON_AORUIAPP);
+	SetIcon(hIcon, TRUE);
+	SetIcon(hIcon, FALSE);
 
 	return 0;
 }

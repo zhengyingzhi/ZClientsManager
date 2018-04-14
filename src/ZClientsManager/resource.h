@@ -29,6 +29,7 @@
 #define IDD_DIALOG_LOGIN                314
 #define IDD_DIALOG_QUERY                317
 #define IDD_DIALOG_CONFIRM              319
+#define IDI_ICON_AORUIAPP               127
 #define IDC_EDIT_NUMBER                 1000
 #define IDC_EDIT_COMMENT                1001
 #define IDC_COMBO_IMPORTANT             1002
@@ -53,10 +54,8 @@
 #define IDC_LIST_USERINFO               1012
 #define IDC_EDIT_QQ                     1013
 #define IDC_EDIT_SOURCE                 1014
-#define IDC_EDIT_TELEPHONE2             1014
 #define IDC_BTN_CLEAR                   1015
 #define IDC_EDIT_YESNO                  1016
-#define IDC_EDIT1_STATUS                1017
 #define IDC_EDIT_STATUS                 1017
 #define IDC_RADIO_GIRL                  1018
 #define ID_EDIT_INSERT                  32771
@@ -79,7 +78,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        322
+#define _APS_NEXT_RESOURCE_VALUE        329
 #define _APS_NEXT_COMMAND_VALUE         32786
 #define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           310
