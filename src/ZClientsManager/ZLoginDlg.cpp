@@ -42,6 +42,10 @@ BOOL ZLoginDlg::OnInitDialog()
 
 	GetDlgItem(IDC_CHK_MEMORY_PWD)->EnableWindow(m_RememberPasswd);
 
+	HICON hIcon = AfxGetApp()->LoadIcon(IDI_ICON_AORUIAPP);
+	SetIcon(hIcon, TRUE);
+	SetIcon(hIcon, FALSE);
+
 	return TRUE;
 }
 

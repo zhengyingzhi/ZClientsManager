@@ -41,6 +41,10 @@ public:
 	void ReadConfigs(ZAppConfigs& aAppConfigs);
 
 public:
+	CString GetLoginUserID() { return m_LoginUser; }
+	CString m_LoginUser;
+
+public:
 	BOOL  m_bHiColorIcons;
 
 	virtual void PreLoadState();

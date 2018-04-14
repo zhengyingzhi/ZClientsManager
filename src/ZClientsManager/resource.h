@@ -12,6 +12,7 @@
 #define IDS_TOOLBAR_STANDARD            124
 #define IDS_TOOLBAR_CUSTOMIZE           125
 #define ID_VIEW_CUSTOMIZE               126
+#define IDI_ICON_AORUIAPP               127
 #define IDR_MAINFRAME                   128
 #define IDR_MAINFRAME_256               129
 #define IDR_ZClientsManagerTYPE         130
@@ -29,7 +30,8 @@
 #define IDD_DIALOG_LOGIN                314
 #define IDD_DIALOG_QUERY                317
 #define IDD_DIALOG_CONFIRM              319
-#define IDI_ICON_AORUIAPP               127
+#define IDI_ICON_AORUIBIG               329
+#define IDB_BITMAP_AORUI                330
 #define IDC_EDIT_NUMBER                 1000
 #define IDC_EDIT_COMMENT                1001
 #define IDC_COMBO_IMPORTANT             1002
@@ -78,7 +80,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        329
+#define _APS_NEXT_RESOURCE_VALUE        331
 #define _APS_NEXT_COMMAND_VALUE         32786
 #define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           310

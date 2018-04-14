@@ -159,6 +159,12 @@
     <Image Include="res\AoruiApp.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\AoruiAppBig.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\AoruiBitmap.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ZClientsManager.rc2">

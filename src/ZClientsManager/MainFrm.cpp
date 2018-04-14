@@ -163,6 +163,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	SetIcon(hIcon, TRUE);
 	SetIcon(hIcon, FALSE);
 
+	CString lTitle;
+	lTitle.Format(_T("傲睿国际教育 - %s"), theApp.GetLoginUserID());
+	SetWindowText(lTitle);
+
 	return 0;
 }
 

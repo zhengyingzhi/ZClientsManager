@@ -249,6 +249,8 @@
   <ItemGroup>
     <Image Include="res\aorui2.bmp" />
     <Image Include="res\AoruiApp.ico" />
+    <Image Include="res\AoruiAppBig.ico" />
+    <Image Include="res\AoruiBitmap.bmp" />
     <Image Include="res\info.bmp" />
     <Image Include="res\Toolbar.bmp" />
     <Image Include="res\Toolbar256.bmp" />

@@ -275,6 +275,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			lPasswd.Compare(lpUserInfo->Password) == 0)
 		{
 			// memory the logined user info
+			m_LoginUser = lUserID;
 			break;
 		}
 		else

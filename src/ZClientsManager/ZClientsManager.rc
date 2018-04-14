@@ -74,6 +74,8 @@ END
 // remains consistent on all systems.
 IDI_ICON_AORUIAPP       ICON                    "res\\AoruiApp.ico"
 
+IDI_ICON_AORUIBIG       ICON                    "res\\AoruiAppBig.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -86,7 +88,7 @@ IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
 
 IDB_INFO                BITMAP                  "res\\info.bmp"
 
-IDB_BMP_AORUI2          BITMAP                  "res\\aorui2.bmp"
+IDB_BITMAP_AORUI        BITMAP                  "res\\AoruiBitmap.bmp"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -272,15 +274,15 @@ BEGIN
     EDITTEXT        IDC_EDIT_Password,256,27,77,14,ES_AUTOHSCROLL
 END
 
-IDD_DIALOG_LOGIN DIALOGEX 0, 0, 215, 84
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_DIALOG_LOGIN DIALOGEX 0, 0, 167, 82
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "傲睿国际教育-登录"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
+FONT 10, "宋体", 400, 0, 0x86
 BEGIN
     DEFPUSHBUTTON   "登录",IDOK,46,54,50,20
     LTEXT           "用户名",IDC_STATIC,12,12,25,8
     EDITTEXT        IDC_EDIT_User,46,9,104,14,ES_AUTOHSCROLL
-    LTEXT           "密   码",IDC_STATIC,12,36,23,8
+    LTEXT           "密  码",IDC_STATIC,12,36,23,8
     EDITTEXT        IDC_EDIT_Password,46,34,104,14,ES_PASSWORD | ES_AUTOHSCROLL
     CONTROL         "记住密码",IDC_CHK_MEMORY_PWD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,104,59,48,11
 END
@@ -395,9 +397,9 @@ BEGIN
     IDD_DIALOG_LOGIN, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 208
+        RIGHTMARGIN, 160
         TOPMARGIN, 7
-        BOTTOMMARGIN, 77
+        BOTTOMMARGIN, 75
     END
 
     IDD_DIALOG_QUERY, DIALOG
