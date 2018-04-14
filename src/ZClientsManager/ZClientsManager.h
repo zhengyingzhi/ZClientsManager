@@ -11,7 +11,10 @@
 
 #include "ZMemoryData.h"
 
+class CMainFrame;
+
 extern ZMemoryData g_MemData;
+extern CMainFrame* g_pMainFrame;
 
 #define ZAPP_CONFIG_NAME    "ZAppConfig.txt"
 typedef struct

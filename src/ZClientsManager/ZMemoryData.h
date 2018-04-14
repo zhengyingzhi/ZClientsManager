@@ -29,6 +29,8 @@ public:
 	vector<ZUserInfo*> QueryAllUser();
 	vector<ZUserInfo*> QueryUserInfo(const ZUserInfo* apExpect, ZQueryComparePtr apCompFunc);
 
+	void AddUserInfo(const ZUserInfo* apUserInfo);
+
 public:
 	int OpenStuDB(const string& aDBName, const string& aServerIP, uint16_t aPort);
 	int CloseStuDB();
@@ -36,6 +38,8 @@ public:
 
 	vector<ZStudentInfo*> QueryAllStudents();
 	vector<ZStudentInfo*> QueryStuInfo(const ZStudentInfo* apExpect, ZQueryComparePtr apCompFunc, int aExtend);
+
+	void AddStuInfo(const ZStudentInfo* apStuInfo);
 
 private:
 	ztl_pool_t*             m_Pool;

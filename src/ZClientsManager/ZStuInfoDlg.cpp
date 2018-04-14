@@ -5,6 +5,8 @@
 #include "afxdialogex.h"
 
 #include "ZClientsManager.h"
+#include "MainFrm.h"
+
 #include "ZStuInfoDlg.h"
 #include "ZInfoDesc.h"
 
@@ -137,10 +139,11 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 
 	if (memcmp(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
 	{
+		AfxMessageBox(_T("未更新任何数据"), MB_OK | MB_ICONWARNING);
 		return;
 	}
 
-	DWORD lRet;
+	DWORD lRet = 0;
 	if (m_OperateType == ZOT_Update) {
 		lRet = AfxMessageBox(_T("确定更新数据?"), MB_YESNO);
 	}
@@ -152,12 +155,28 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 		strcmp(m_StuInfo.Telehone, lStuInfo.Telehone) == 0)
 	{
 		// update
-		g_MemData.GetStuDB()->Update(&lStuInfo, sizeof(lStuInfo));
+		lRet = g_MemData.GetStuDB()->Update(&lStuInfo, sizeof(lStuInfo));
+		if (lRet != 0)
+		{
+			AfxMessageBox(_T("插入学生信息数据失败"), MB_OK | MB_ICONWARNING);
+			return;
+		}
 	}
 	else
 	{
 		// insert
-		g_MemData.GetStuDB()->Insert(&lStuInfo, sizeof(lStuInfo));
+		lRet = g_MemData.GetStuDB()->Insert(&lStuInfo, sizeof(lStuInfo));
+		if (lRet != 0)
+		{
+			AfxMessageBox(_T("插入学生信息数据失败"), MB_OK | MB_ICONWARNING);
+			return;
+		}
 	}
+	memcpy(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo));
 
+	vector<ZStudentInfo*> lVec;
+	lVec.push_back(&m_StuInfo);
+	g_pMainFrame->UpdateStuToMainListView(lVec, TRUE);
+
+	g_MemData.AddStuInfo(&m_StuInfo);
 }

@@ -169,16 +169,24 @@ int ZUserInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 
 ZQueryResult* ZUserInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apCompFunc, int aExtend)
 {
-	ZUserInfo*    lpSrcInfo;
+	ZUserInfo*    lpDBInfo;
 	ZQueryResult* lpQryRs = GetQueryRs();
 
-	lpSrcInfo = NULL;
-	while ((lpSrcInfo = NextUserInfo(lpSrcInfo)) != NULL)
+	lpDBInfo = NULL;
+	while ((lpDBInfo = NextUserInfo(lpDBInfo)) != NULL)
 	{
-		if (lpSrcInfo->Deleted)
-			continue;
+		if (!lpDBInfo->UserName[0]) {
+			break;
+		}
 
-		lpQryRs->PushBack(lpSrcInfo);
+		if (lpDBInfo->Deleted) {
+			continue;
+		}
+
+		if (apCompFunc(apExpectInfo, lpDBInfo, 0))
+		{
+			lpQryRs->PushBack(lpDBInfo);
+		}
 	}
 
 	if (lpQryRs->RsCount() == 0)
@@ -212,8 +220,6 @@ ZUserInfo* ZUserInfoDBText::NextUserInfo(ZUserInfo* apCurUserInfo, bool aAutoExp
 	{
 		// next
 		lpNextInfo = (ZUserInfo*)((char*)apCurUserInfo + lBlockSize);
-		if (!lpNextInfo->UserName[0])
-			lpNextInfo = NULL;
 	}
 
 	return lpNextInfo;
@@ -221,18 +227,16 @@ ZUserInfo* ZUserInfoDBText::NextUserInfo(ZUserInfo* apCurUserInfo, bool aAutoExp
 
 ZUserInfo* ZUserInfoDBText::GetAvailUserInfo()
 {
-	ZUserInfo *lpCurInfo, *lpNextInfo;
+	ZUserInfo* lpCurInfo;
 	uint32_t   lBlockSize = _ZUserInfoBlockSize();
 
 	lpCurInfo = NULL;
 	while ((lpCurInfo = NextUserInfo(lpCurInfo)) != NULL)
 	{
-		lpNextInfo = lpCurInfo;
+		if (!lpCurInfo->UserName[0])
+			break;
 	}
 
-	if (lpNextInfo->UserName[0])
-		lpNextInfo = NULL;
-
-	return lpNextInfo;
+	return lpCurInfo;
 }
 

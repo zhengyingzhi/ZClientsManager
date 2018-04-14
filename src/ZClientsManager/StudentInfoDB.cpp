@@ -43,6 +43,20 @@ bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aEx
 	return false;
 }
 
+bool ZQueryCompareStuQQ(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (strcmp(lpActual->QQ, lpExpect->QQ))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool ZQueryCompareCountry(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	(void)aExtend;
@@ -63,7 +77,7 @@ bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExten
 	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
 	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
 
-	if (strcmp(lpActual->College, lpExpect->College))
+	if (strstr(lpActual->College, lpExpect->College))
 	{
 		return true;
 	}
@@ -94,6 +108,33 @@ bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend)
 	return false;
 }
 
+bool ZQueryCompareStatus(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (strstr(lpActual->Status, lpExpect->Status))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (strstr(lpActual->Source, lpExpect->Source))
+	{
+		return true;
+	}
+
+	return false;
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -257,15 +298,15 @@ ZQueryResult* ZStudentInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apC
 	while ((lpStuInfo = NextStudentInfo(lpStuInfo)) != NULL)
 	{
 		if (!lpStuInfo->Name[0]) {
+			break;
+		}
+
+		if (lpStuInfo->Flag & ZSI_FLAG_Deleted) {
 			continue;
 		}
 
 		if (apCompFunc(apExpectInfo, lpStuInfo, aExtend))
 		{
-			if (lpStuInfo->Flag & ZSI_FLAG_Deleted) {
-				continue;
-			}
-
 			lpQryRs->PushBack(lpStuInfo);
 		}
 	}
@@ -300,8 +341,6 @@ ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo, bo
 	{
 		// next
 		lpNextInfo = (ZStudentInfo*)((char*)apCurStuInfo + lBlockSize);
-		if (!lpNextInfo->Name[0])
-			lpNextInfo = NULL;
 	}
 
 	return lpNextInfo;
@@ -310,16 +349,14 @@ ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo, bo
 ZStudentInfo* ZStudentInfoDBText::GetAvailStudentInfo()
 {
 	uint32_t lBlockSize = _ZStudentInfoBlockSize();
-	ZStudentInfo *lpCurInfo, *lpNextInfo;
+	ZStudentInfo *lpCurInfo;
 
 	lpCurInfo = NULL;
 	while ((lpCurInfo = NextStudentInfo(lpCurInfo)) != NULL)
 	{
-		lpNextInfo = lpCurInfo;
+		if (!lpCurInfo->Name[0])
+			break;
 	}
 
-	if (lpNextInfo->Name[0])
-		lpNextInfo = NULL;
-
-	return lpNextInfo;
+	return lpCurInfo;
 }

@@ -92,6 +92,14 @@ vector<ZUserInfo*> ZMemoryData::QueryUserInfo(const ZUserInfo* apExpect, ZQueryC
 	return lVec;
 }
 
+void ZMemoryData::AddUserInfo(const ZUserInfo* apUserInfo)
+{
+	ZUserInfo* lpDstData;
+	lpDstData = (ZUserInfo*)ztl_pcalloc(m_Pool, sizeof(ZUserInfo));
+	memcpy(lpDstData, apUserInfo, sizeof(ZUserInfo));
+	m_CacheUserData.push_back(lpDstData);
+}
+
 
 int ZMemoryData::OpenStuDB(const string& aDBName, const string& aServerIP, uint16_t aPort)
 {
@@ -162,5 +170,14 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfo(const ZStudentInfo* apExpect, ZQ
 	}
 
 	return lVec;
+}
+
+
+void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
+{
+	ZStudentInfo* lpDstData;
+	lpDstData = (ZStudentInfo*)ztl_pcalloc(m_Pool, sizeof(ZStudentInfo));
+	memcpy(lpDstData, apStuInfo, sizeof(ZStudentInfo));
+	m_CacheStuData.push_back(lpDstData);
 }
 

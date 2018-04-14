@@ -16,6 +16,7 @@
 #endif
 
 // CMainFrame
+CMainFrame* g_pMainFrame = NULL;
 
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWndEx)
 
@@ -178,6 +179,8 @@ void CMainFrame::OnClose()
 	}
 
 	// TODO: save data
+	g_MemData.CloseUserDB();
+	g_MemData.CloseStuDB();
 
 	CFrameWndEx::OnClose();
 }
@@ -350,14 +353,16 @@ BOOL CMainFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext)
 
 
 
-void CMainFrame::UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec)
+// 更新学生信息到ListView中
+void CMainFrame::UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec, BOOL aAppend)
 {
 	if (m_pMainView && aStuVec.size())
 	{
-		m_pMainView->UpdateStuToListView(aStuVec);
+		m_pMainView->UpdateStuToListView(aStuVec, aAppend);
 	}
 }
 
+// 学生信息插入事件
 void CMainFrame::OnEditInsert()
 {
 	ZStuInfoDlg lSIDlg;
@@ -366,12 +371,14 @@ void CMainFrame::OnEditInsert()
 }
 
 
+// 学生信息编辑事件
 void CMainFrame::OnEditFind()
 {
 	m_StuQryDlg.DoModal();
 }
 
 
+// 学生信息删除事件
 void CMainFrame::OnEditDelete()
 {
 	ZStuInfoDlg lSIDlg;
@@ -380,11 +387,14 @@ void CMainFrame::OnEditDelete()
 }
 
 
+// 系统关闭事件
 void CMainFrame::OnSysClose()
 {
 	OnClose();
 }
 
+
+// 账户管理事件
 void CMainFrame::OnEditManager()
 {
 	ZUserInfoDlg lUIDlg;

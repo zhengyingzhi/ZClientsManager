@@ -144,13 +144,17 @@ void CMainListView::OnInitialUpdate()
 
 
 
-void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec)
+void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec, BOOL aAppend)
 {
-	m_list.DeleteAllItems();
+	if (!aAppend) {
+		m_list.DeleteAllItems();
+	}
+	int lRowOff = m_list.GetItemCount();
 
 	for (size_t i = 0; i < aStuVec.size(); ++i)
 	{
-		_UpdateMainListCtrl(i, m_list, aStuVec[i]);
+		//_UpdateMainListCtrl(lRowOff + i, m_list, aStuVec[i]);
+		_UpdateMainListCtrl(lRowOff + i, m_list, aStuVec[aStuVec.size() - i - 1]);
 	}
 }
 
@@ -250,5 +254,5 @@ void CMainListView::OnEditResetmain()
 	// 重置主界面查询结果
 	vector<ZStudentInfo*> lVec;
 	lVec = g_MemData.QueryAllStudents();
-	UpdateStuToListView(lVec);
+	UpdateStuToListView(lVec, FALSE);
 }

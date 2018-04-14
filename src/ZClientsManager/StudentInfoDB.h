@@ -31,10 +31,13 @@ typedef enum
 
 /* some default compare functions */
 bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareStuQQ(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareCountry(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareStatus(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend);
 
 
 /* student info db implement by text file

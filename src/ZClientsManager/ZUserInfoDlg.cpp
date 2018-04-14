@@ -26,6 +26,9 @@ static void _InitUserListCtrl(CListCtrl& aList)
 
 static void _UpdateUserListCtrl(int aRow, CListCtrl& aList, ZUserInfo* apUserInfo)
 {
+	if (!apUserInfo)
+		return;
+
 	CString lString;
 	if (aRow == -1)
 	{
@@ -80,15 +83,7 @@ BOOL ZUserInfoDlg::OnInitDialog()
 	lpCombo->SetCurSel(0);
 
 	// query db
-	ZUserInfo* lpUserInfo;
-
-	vector<ZUserInfo*> lVec;
-	lVec = g_MemData.QueryAllUser();
-	for (size_t i = 0; i < lVec.size(); ++i)
-	{
-		lpUserInfo = lVec[i];
-		_UpdateUserListCtrl(i, lList, lpUserInfo);
-	}
+	OnBnClickedBtnReset();
 
 	return TRUE;
 }
@@ -98,6 +93,8 @@ BEGIN_MESSAGE_MAP(ZUserInfoDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_SAVE, &ZUserInfoDlg::OnBnClickedBtnSave)
 	ON_BN_CLICKED(IDC_BTN_PASSWORD, &ZUserInfoDlg::OnBnClickedBtnPassword)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_USERINFO, &ZUserInfoDlg::OnNMClickListUserinfo)
+	ON_BN_CLICKED(IDC_BTN_FIND, &ZUserInfoDlg::OnBnClickedBtnFind)
+	ON_BN_CLICKED(IDC_BTN_RESET, &ZUserInfoDlg::OnBnClickedBtnReset)
 END_MESSAGE_MAP()
 
 
@@ -148,7 +145,12 @@ void ZUserInfoDlg::OnBnClickedBtnSave()
 	if (0 != g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo)))
 	{
 		AfxMessageBox(_T("插入账户数据失败"), MB_OK | MB_ICONWARNING);
+		return;
 	}
+
+	_UpdateUserListCtrl(-1, m_UserList, &lUserInfo);
+
+	g_MemData.AddUserInfo(&lUserInfo);
 }
 
 
@@ -194,4 +196,52 @@ void ZUserInfoDlg::OnNMClickListUserinfo(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	*pResult = 0;
+}
+
+
+void ZUserInfoDlg::OnBnClickedBtnFind()
+{
+	CString lName, lTelephone;
+	GetDlgItemText(IDC_EDIT_NAME, lName);
+	GetDlgItemText(IDC_EDIT_TELEPHONE, lTelephone);
+
+	if (lName.IsEmpty() && lTelephone.IsEmpty())
+	{
+		AfxMessageBox(_T("请输入姓名或电话"), MB_OK | MB_ICONWARNING);
+		return;
+	}
+
+	ZUserInfo lQryCond = {};
+	if (!lName.IsEmpty())
+		strncpy(lQryCond.UserName, (char*)(LPCSTR)lName, sizeof(lQryCond.UserName) - 1);
+	if (!lTelephone.IsEmpty())
+		strncpy(lQryCond.Telephone, (char*)(LPCSTR)lTelephone, sizeof(lQryCond.Telephone) - 1);
+
+	vector<ZUserInfo*> lVec;
+	lVec = g_MemData.QueryUserInfo(&lQryCond, ZQueryCompareUserName);
+	if (lVec.empty())
+	{
+		AfxMessageBox(_T("未查询到相关账户信息"), MB_OK | MB_ICONWARNING);
+		return;
+	}
+
+	UpdateUserInfoToDlg(lVec);
+}
+
+void ZUserInfoDlg::UpdateUserInfoToDlg(vector<ZUserInfo*>& aVec)
+{
+	m_UserList.DeleteAllItems();
+	for (size_t i = 0; i < aVec.size(); ++i)
+	{
+		_UpdateUserListCtrl(i, m_UserList, aVec[i]);
+	}
+}
+
+
+
+void ZUserInfoDlg::OnBnClickedBtnReset()
+{
+	vector<ZUserInfo*> lVec;
+	lVec = g_MemData.QueryAllUser();
+	UpdateUserInfoToDlg(lVec);
 }

@@ -47,7 +47,7 @@ protected:
 	ZStuQryDlg        m_StuQryDlg;
 
 public:
-	void UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec);
+	void UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec, BOOL aAppend);
 
 // 生成的消息映射函数
 protected:

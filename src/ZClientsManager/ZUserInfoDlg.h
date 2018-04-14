@@ -32,9 +32,12 @@ public:
 #endif
 
 	ZEnumOperateType    m_OperateType;   // ²Ù×÷ÀàÐÍ
+	CListCtrl m_UserList;
 
 public:
 	void SetOperateType(ZEnumOperateType aOperateType) { m_OperateType = aOperateType; }
+
+	void UpdateUserInfoToDlg(vector<ZUserInfo*>& aVec);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -46,5 +49,6 @@ public:
 	afx_msg void OnBnClickedBtnSave();
 	afx_msg void OnBnClickedBtnPassword();
 	afx_msg void OnNMClickListUserinfo(NMHDR *pNMHDR, LRESULT *pResult);
-	CListCtrl m_UserList;
+	afx_msg void OnBnClickedBtnFind();
+	afx_msg void OnBnClickedBtnReset();
 };

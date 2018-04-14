@@ -67,12 +67,34 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 {
 	ZStudentInfo lStuInfo = {};
 
-	CString lString;
-	GetDlgItemText(IDC_EDIT_NAME, lString);
-	strncpy(lStuInfo.Name, (char*)(LPCSTR)lString, sizeof(lStuInfo.Name) - 1);
+	CString lName, lTelephone, lCollge, lQQ, lStatus, lSource;
+	GetDlgItemText(IDC_EDIT_NAME, lName);
+	GetDlgItemText(IDC_EDIT_TELEPHONE, lTelephone);
+	GetDlgItemText(IDC_EDIT_COLLEGE, lCollge);
+	GetDlgItemText(IDC_EDIT_QQ, lQQ);
+	GetDlgItemText(IDC_EDIT_STATUS, lStatus);
+	GetDlgItemText(IDC_EDIT_SOURCE, lSource);
+	strncpy(lStuInfo.Name, (char*)(LPCSTR)lName, sizeof(lStuInfo.Name) - 1);
+	strncpy(lStuInfo.Telehone, (char*)(LPCSTR)lTelephone, sizeof(lStuInfo.Telehone) - 1);
+	strncpy(lStuInfo.College, (char*)(LPCSTR)lCollge, sizeof(lStuInfo.College) - 1);
+	strncpy(lStuInfo.QQ, (char*)(LPCSTR)lQQ, sizeof(lStuInfo.QQ) - 1);
+	strncpy(lStuInfo.Status, (char*)(LPCSTR)lStatus, sizeof(lStuInfo.Status) - 1);
+	strncpy(lStuInfo.Source, (char*)(LPCSTR)lSource, sizeof(lStuInfo.Source) - 1);
 
 	vector<ZStudentInfo*> lVec;
-	lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareUserName, 0);
+	if (!lName.IsEmpty() || !lTelephone.IsEmpty())
+		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareNameAndTel, 0);
+	else if (!lCollge.IsEmpty())
+		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareCollege, 0);
+	else if (!lQQ.IsEmpty())
+		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareStuQQ, 0);
+	else if (!lStatus.IsEmpty())
+		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareStatus, 0);
+	else if (!lSource.IsEmpty())
+		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareSource, 0);
+
+	// todo: 支持按录入时间查询
+
 	if (lVec.empty())
 	{
 		AfxMessageBox(_T("未查询到相关数据"), MB_OK);
@@ -80,7 +102,7 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 	else
 	{
 		if (m_pMainFrame)
-			m_pMainFrame->UpdateStuToMainListView(lVec);
+			m_pMainFrame->UpdateStuToMainListView(lVec, FALSE);
 		CDialogEx::OnOK();
 	}
 
