@@ -63,6 +63,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CFrameWndEx::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+	HICON hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	SetIcon(hIcon, TRUE);
+	SetIcon(hIcon, FALSE);
+
 	BOOL bNameValid;
 
 	if (!m_wndMenuBar.Create(this))

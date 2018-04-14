@@ -77,6 +77,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\objs\$(ProjectName)\$(Configuration)\</IntDir>
+    <TargetName>傲睿学生资源管理</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -87,6 +88,7 @@
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\objs\$(ProjectName)\$(Configuration)\</IntDir>
+    <TargetName>傲睿学生资源管理</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -245,6 +247,9 @@
     <ResourceCompile Include="ZClientsManager.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\aorui.ico" />
+    <Image Include="res\aorui2.bmp" />
+    <Image Include="res\icon1.ico" />
     <Image Include="res\info.bmp" />
     <Image Include="res\Toolbar.bmp" />
     <Image Include="res\Toolbar256.bmp" />

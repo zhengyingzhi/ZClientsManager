@@ -86,6 +86,8 @@ IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
 
 IDB_INFO                BITMAP                  "res\\info.bmp"
 
+IDB_BMP_AORUI2          BITMAP                  "res\\aorui2.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

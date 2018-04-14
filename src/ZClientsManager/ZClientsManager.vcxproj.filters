@@ -81,6 +81,9 @@
     <ClInclude Include="ZMemoryData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ZConfirmDlg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -125,6 +128,9 @@
     <ClCompile Include="ZMemoryData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ZConfirmDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ZClientsManager.rc">
@@ -145,6 +151,15 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\Toolbar256.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\aorui2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\icon1.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\aorui.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
