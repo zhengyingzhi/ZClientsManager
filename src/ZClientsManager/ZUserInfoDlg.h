@@ -2,16 +2,18 @@
 
 #include "UserInfoDB.h"
 #include "ZCommon.h"
+#include "afxcmn.h"
 
 
 #define USERLIST_COL_Row            0           // 仅是列表编号
 #define USERLIST_COL_Name           1           // 名字
 #define USERLIST_COL_Password       2           // 密码
 #define USERLIST_COL_Telephone      3           // 电话
-#define USERLIST_COL_Role           4           // 权限
-#define USERLIST_COL_InsertTime     5           // 插入时间
-#define USERLIST_COL_UpdateTime     6           // 更新时间
-#define USERLIST_COL_Status         7           // 状态（是否已删除）
+#define USERLIST_COL_QQ             4           // QQ
+#define USERLIST_COL_Role           5           // 权限
+#define USERLIST_COL_InsertTime     6           // 插入时间
+#define USERLIST_COL_UpdateTime     7           // 更新时间
+#define USERLIST_COL_Status         8           // 状态（是否已删除）
 
 
 // ZUserInfoDlg dialog
@@ -44,4 +46,5 @@ public:
 	afx_msg void OnBnClickedBtnSave();
 	afx_msg void OnBnClickedBtnPassword();
 	afx_msg void OnNMClickListUserinfo(NMHDR *pNMHDR, LRESULT *pResult);
+	CListCtrl m_UserList;
 };

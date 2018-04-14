@@ -20,6 +20,7 @@ static void _InitUserListCtrl(CListCtrl& aList)
 	aList.InsertColumn(USERLIST_COL_Name,       _T("姓名"),     LVCFMT_LEFT, 60);
 	aList.InsertColumn(USERLIST_COL_Password,   _T("密码"),     LVCFMT_LEFT, 80);
 	aList.InsertColumn(USERLIST_COL_Telephone,  _T("电话"),     LVCFMT_LEFT, 80);
+	aList.InsertColumn(USERLIST_COL_QQ,         _T("QQ"),       LVCFMT_LEFT, 80);
 	aList.InsertColumn(USERLIST_COL_Role,       _T("角色"),     LVCFMT_LEFT, 80);
 }
 
@@ -33,11 +34,12 @@ static void _UpdateUserListCtrl(int aRow, CListCtrl& aList, ZUserInfo* apUserInf
 
 	aList.InsertItem(aRow, _T(""));
 
-	lString.Format("%d", aRow);
+	lString.Format("%d", aRow + 1);
 	aList.SetItemText(aRow, USERLIST_COL_Row,      lString);
 	aList.SetItemText(aRow, USERLIST_COL_Name,     apUserInfo->UserName);
 	aList.SetItemText(aRow, USERLIST_COL_Password, apUserInfo->Password);
 	aList.SetItemText(aRow, USERLIST_COL_Telephone,apUserInfo->Telephone);
+	aList.SetItemText(aRow, USERLIST_COL_QQ,       apUserInfo->QQ);
 	aList.SetItemText(aRow, USERLIST_COL_Role,     ZUserRoleDesc(apUserInfo->Role));
 	
 }
@@ -60,6 +62,7 @@ ZUserInfoDlg::~ZUserInfoDlg()
 void ZUserInfoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_LIST_USERINFO, m_UserList);
 }
 
 BOOL ZUserInfoDlg::OnInitDialog()
@@ -162,7 +165,32 @@ void ZUserInfoDlg::OnNMClickListUserinfo(NMHDR *pNMHDR, LRESULT *pResult)
 	int lRow = pNMItemActivate->iItem;
 	if (lRow >= 0)
 	{
-		//
+		CString lName, lPassword, lTelephone, lQQ, lRole, lString;
+
+		lName = m_UserList.GetItemText(lRow, USERLIST_COL_Name);
+		lTelephone = m_UserList.GetItemText(lRow, USERLIST_COL_Telephone);
+		lPassword = m_UserList.GetItemText(lRow, USERLIST_COL_Password);
+		lQQ = m_UserList.GetItemText(lRow, USERLIST_COL_QQ);
+		lRole = m_UserList.GetItemText(lRow, USERLIST_COL_Role);
+
+		CComboBox* lpCombo = (CComboBox*)GetDlgItem(IDC_COMBO_ROLE);
+		if (lRole == _T("超级管理员")) {
+			lpCombo->SetCurSel(3);
+		}
+		else if (lRole == _T("访问者")) {
+			lpCombo->SetCurSel(2);
+		}
+		else if (lRole == _T("普通用户")) {
+			lpCombo->SetCurSel(1);
+		}
+		else {
+			lpCombo->SetCurSel(0);
+		}
+
+		SetDlgItemText(IDC_EDIT_NAME, lName);
+		SetDlgItemText(IDC_EDIT_Password, lPassword);
+		SetDlgItemText(IDC_EDIT_TELEPHONE, lTelephone);
+		SetDlgItemText(IDC_EDIT_QQ, lQQ);
 	}
 
 	*pResult = 0;

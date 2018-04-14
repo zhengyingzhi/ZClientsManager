@@ -31,6 +31,8 @@ public:
 
 protected:
 	CListCtrl& m_list;
+	int m_Row;
+	int m_Col;
 
 protected:
 	DECLARE_MESSAGE_MAP()
@@ -39,6 +41,8 @@ public:
 	afx_msg void OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult);
 	afx_msg void OnEditModify();
+	afx_msg void OnEditDelete();
+	afx_msg void OnEditResetmain();
 };
 
 

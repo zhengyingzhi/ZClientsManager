@@ -38,7 +38,7 @@ BOOL ZStuQryDlg::OnInitDialog()
 	}
 	if (m_StuInfo.Telehone)
 	{
-		SetDlgItemText(IDC_EDIT_NAME, m_StuInfo.Telehone);
+		SetDlgItemText(IDC_EDIT_TELEPHONE, m_StuInfo.Telehone);
 	}
 
 	return TRUE;
@@ -89,5 +89,7 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 
 void ZStuQryDlg::OnBnClickedBtnClear()
 {
-	// TODO: Add your control notification handler code here
+	SetDlgItemText(IDC_EDIT_NAME, "");
+	SetDlgItemText(IDC_EDIT_TELEPHONE, "");
+	SetDlgItemText(IDC_EDIT_COUNTRY, "");
 }

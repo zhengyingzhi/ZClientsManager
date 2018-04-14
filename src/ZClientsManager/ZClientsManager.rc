@@ -126,10 +126,12 @@ BEGIN
     END
     POPUP "编辑(&E)"
     BEGIN
-        MENUITEM "插入(&I)\tCtrl+I",              ID_EDIT_INSERT
+        MENUITEM "插入(&I)\tCtrl+I",              ID_EDIT_INSERT, HELP
         MENUITEM SEPARATOR
-        MENUITEM "删除(&D)\tCtrl+D",              ID_EDIT_DELETE
-        MENUITEM "查找(&F)\tCtrl+F",              ID_EDIT_FIND
+        MENUITEM "删除(&D)\tCtrl+D",              ID_EDIT_DELETE, HELP
+        MENUITEM "查找(&F)\tCtrl+F",              ID_EDIT_FIND, HELP
+        MENUITEM SEPARATOR
+        MENUITEM "重置主界面",                       ID_EDIT_RESETMAIN, HELP
     END
     POPUP "视图(&V)"
     BEGIN
@@ -150,11 +152,12 @@ IDR_POPUP_EDIT MENU
 BEGIN
     POPUP "编辑"
     BEGIN
-        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY
-        MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE
-        MENUITEM "修改(&M)\tCtrl+M",              ID_EDIT_MODIFY
+        MENUITEM "复制(&C)\tCtrl+C",              ID_EDIT_COPY, HELP
+        MENUITEM "粘贴(&P)\tCtrl+V",              ID_EDIT_PASTE, INACTIVE
+        MENUITEM "删除(&D)\tCtrl+D",              ID_EDIT_DELETE, HELP
+        MENUITEM "修改(&M)\tCtrl+M",              ID_EDIT_MODIFY, HELP
         MENUITEM SEPARATOR
-        MENUITEM "导出(&E)\tCtrl+E",              ID_EDIT_EXPORT
+        MENUITEM "导出(&E)\tCtrl+E",              ID_EDIT_EXPORT, HELP
     END
 END
 
@@ -304,6 +307,17 @@ BEGIN
     PUSHBUTTON      "清空",IDC_BTN_CLEAR,7,134,50,26
 END
 
+IDD_DIALOG_CONFIRM DIALOGEX 0, 0, 175, 68
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "确认删除"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确认",IDOK,64,47,50,14
+    PUSHBUTTON      "取消",IDCANCEL,118,47,50,14
+    EDITTEXT        IDC_EDIT_YESNO,7,28,161,14,ES_AUTOHSCROLL
+    LTEXT           "输入 'yes' 确认：",IDC_STATIC,7,14,161,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -391,6 +405,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 160
     END
+
+    IDD_DIALOG_CONFIRM, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 168
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 61
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -421,6 +443,11 @@ BEGIN
 END
 
 IDD_DIALOG_QUERY AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DIALOG_CONFIRM AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -480,7 +507,7 @@ BEGIN
     ID_EDIT_CLEAR_ALL       "清除全部内容\n全部清除"
     ID_EDIT_COPY            "复制所选内容，将其放入剪贴板\n复制"
     ID_EDIT_CUT             "插入一条新数据\n插入"
-    ID_EDIT_FIND            "查找指定的文本\n查找"
+    ID_EDIT_FIND            "查找学生资源\n查找"
     ID_EDIT_PASTE           "插入剪贴板内容\n粘贴"
     ID_EDIT_REPEAT          "重复上一操作\n重复"
     ID_EDIT_REPLACE         "用其他文本替换特定的文本\n替换"
@@ -540,11 +567,17 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_EDIT_DELETE          "删除一条新记录\n删除"
+    ID_EDIT_INSERT          "插入一条新数据"
+    ID_EDIT_DELETE          "仅从表格中删除一条新记录\n删除"
     ID_EDIT_MANAGER         "管理登录用户信息"
     ID_EDIT_UPDATEPWD       "修改密码"
     ID_EDIT_MODIFY          "修改指定数据\n修改"
-    ID_EDIT_EXPORT          "导出数据到文件中"
+    ID_EDIT_EXPORT          "将指定数据导出到数据文件中"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_RESETMAIN       "重置恢复主界面状态为显示所有资源信息"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

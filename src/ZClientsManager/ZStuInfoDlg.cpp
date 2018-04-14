@@ -34,6 +34,9 @@ BOOL ZStuInfoDlg::OnInitDialog()
 	CString lString;
 	if (m_StuInfo.Name[0])
 	{
+		//lString.Format(_T("傲睿国际教育 - %s"), m_StuInfo.Name);
+		//SetWindowText(lString);
+
 		SetDlgItemText(IDC_EDIT_NAME, m_StuInfo.Name);
 		SetDlgItemText(IDC_EDIT_TELEPHONE, m_StuInfo.Telehone);
 		SetDlgItemText(IDC_EDIT_COLLEGE, m_StuInfo.College);
@@ -134,6 +137,14 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 
 	if (memcmp(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
 	{
+		return;
+	}
+
+	DWORD lRet;
+	if (m_OperateType == ZOT_Update) {
+		lRet = AfxMessageBox(_T("确定更新数据?"), MB_YESNO);
+	}
+	if (IDNO == lRet) {
 		return;
 	}
 

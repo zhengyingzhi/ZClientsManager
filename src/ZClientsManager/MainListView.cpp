@@ -79,7 +79,8 @@ IMPLEMENT_DYNCREATE(CMainListView, CListView)
 CMainListView::CMainListView()
 	: m_list(GetListCtrl())
 {
-
+	m_Row = -1;
+	m_Col = -1;
 }
 
 CMainListView::~CMainListView()
@@ -90,6 +91,8 @@ BEGIN_MESSAGE_MAP(CMainListView, CListView)
 	ON_NOTIFY_REFLECT(NM_DBLCLK, &CMainListView::OnNMDblclk)
 	ON_NOTIFY_REFLECT(NM_RCLICK, &CMainListView::OnNMRClick)
 	ON_COMMAND(ID_EDIT_MODIFY, &CMainListView::OnEditModify)
+	ON_COMMAND(ID_EDIT_DELETE, &CMainListView::OnEditDelete)
+	ON_COMMAND(ID_EDIT_RESETMAIN, &CMainListView::OnEditResetmain)
 END_MESSAGE_MAP()
 
 
@@ -154,9 +157,12 @@ void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec)
 void CMainListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: Add your control notification handler code here
 
-	int lRow = pNMItemActivate->iItem;
+	m_Row = pNMItemActivate->iItem;
+	m_Col = pNMItemActivate->iSubItem;
+
+	// 双击时弹出该学生信息的对话框
+	OnEditModify();
 
 	*pResult = 0;
 }
@@ -166,8 +172,10 @@ void CMainListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 
-	int lRow = pNMItemActivate->iItem;
-	if (lRow >= 0)
+	m_Row = pNMItemActivate->iItem;
+	m_Col = pNMItemActivate->iSubItem;
+
+	if (m_Row >= 0 || 1)
 	{
 		//定义下面要用到的 cmenu 对象
 		CMenu menu, *pSubMenu;
@@ -184,13 +192,6 @@ void CMainListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 		//获取当前光标的位置,以便使得菜单能够跟随光标
 		GetCursorPos(&lPoint);
 
-		//用 istat 存放当前选定的是第几项
-		//int istat = m_list.GetSelectionMark();
-
-		//获取当前项中的数据, 0代表是第 0列 // pString="您选择的项是 :"+pString ;//显示当前选择项
-		//CString pString = m_list.GetItemText(istat, 0);
-		// MessageBox(pString);//显示当前选中的路径
-
 		//在指定 位置显示弹出菜单
 		pSubMenu->TrackPopupMenu(TPM_LEFTALIGN, lPoint.x, lPoint.y, this);
 	}
@@ -201,9 +202,53 @@ void CMainListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 
 void CMainListView::OnEditModify()
 {
-	// TODO: 获取该行数据，并传入Dialog中，并做相应操作
-	int lRow = m_list.GetSelectionMark();
+	// 获取该行数据，并传入Dialog中，并做相应操作
+	int lRow = m_Row;
+	//lRow = m_list.GetSelectionMark();
+	if (lRow < 0) {
+		return;
+	}
 
-	ZStuInfoDlg lSIDlg;
-	lSIDlg.DoModal();
+	CString lName, lTelephone;
+	lName = m_list.GetItemText(lRow, MAINLIST_COL_Name);
+	lTelephone = m_list.GetItemText(lRow, MAINLIST_COL_Telephone);
+
+	ZStudentInfo lQryCond = {};
+	strncpy(lQryCond.Name, (char*)(LPCSTR)lName, sizeof(lQryCond.Name));
+	strncpy(lQryCond.Telehone, (char*)(LPCSTR)lTelephone, sizeof(lQryCond.Telehone));
+
+	vector<ZStudentInfo*> lVec;
+	lVec = g_MemData.QueryStuInfo(&lQryCond, ZQueryCompareNameAndTel, 0);
+	if (!lVec.empty())
+	{
+		ZStuInfoDlg lSIDlg;
+		lSIDlg.SetStudentInfo(lVec[0]);
+
+		lSIDlg.DoModal();
+	}
+}
+
+
+void CMainListView::OnEditDelete()
+{
+	// 从主界面上删除指定行数据
+	POSITION pos;
+	while (pos = m_list.GetFirstSelectedItemPosition())
+	{
+		int lSelItem = m_list.GetNextSelectedItem(pos);
+		if (lSelItem >= 0 && lSelItem < m_list.GetItemCount())
+		{
+			m_list.DeleteItem(lSelItem);
+		}
+
+	}
+}
+
+
+void CMainListView::OnEditResetmain()
+{
+	// 重置主界面查询结果
+	vector<ZStudentInfo*> lVec;
+	lVec = g_MemData.QueryAllStudents();
+	UpdateStuToListView(lVec);
 }
