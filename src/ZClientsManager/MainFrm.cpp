@@ -116,6 +116,27 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 	m_wndStatusBar.SetIndicators(indicators, sizeof(indicators)/sizeof(UINT));
 
+	// 添加自定义ComboBox到工具栏上
+	// 获取Combo的位置
+	int index = 0;
+	RECT rect;
+	while (m_wndToolBar.GetItemID(index) != ID_BUTTON_Combo)
+		index++;
+
+	// 设置ComboBox属性，并显示到工具栏上
+	m_wndToolBar.SetButtonInfo(index, ID_BUTTON_Combo, TBBS_SEPARATOR, 60);
+	m_wndToolBar.GetItemRect(index, &rect);
+	rect.left += 60;
+	rect.top  += 20;
+	rect.right += 160;
+	rect.bottom += 100;
+	m_comboBox.Create(CBS_DROPDOWN | WS_VISIBLE | WS_TABSTOP | CBS_AUTOHSCROLL, rect,
+		&m_wndToolBar, ID_BUTTON_Combo);
+	m_comboBox.InsertString(0, "");
+	m_comboBox.SetCurSel(0);
+	m_comboBox.ShowWindow(SW_SHOW);
+
+
 	// TODO: 如果您不希望工具栏和菜单栏可停靠，请删除这五行
 	m_wndMenuBar.EnableDocking(CBRS_ALIGN_ANY);
 	m_wndToolBar.EnableDocking(CBRS_ALIGN_ANY);
@@ -407,26 +428,57 @@ void CMainFrame::OnEditManager()
 }
 
 
-
+// 工具栏 - 添加
 void CMainFrame::OnButtonAdd()
 {
 	OnEditInsert();
 }
 
-
+// 工具栏 - 删除
 void CMainFrame::OnButtonDel()
 {
 	OnEditDelete();
 }
 
-
+// 工具栏 - 修改
 void CMainFrame::OnButtonModify()
 {
 	m_pMainView->OnEditModify();
 }
 
-
+// 工具栏 - 查找
 void CMainFrame::OnButtonFind()
 {
-	OnEditFind();
+	// get search content
+	CString lContent;
+	m_comboBox.GetWindowText(lContent);
+
+	if (lContent.IsEmpty())
+	{
+		OnEditFind();
+	}
+	else
+	{
+		// try add one search condition to combobox
+		if (m_comboBox.GetCount() > 10) {
+			m_comboBox.DeleteString(10);
+		}
+
+		CString lString;
+		int i;
+		for (i = 0; i < m_comboBox.GetCount(); ++i)
+		{
+			lString.Empty();
+			m_comboBox.GetLBText(i, lString);
+			if (lString == lContent)
+				break;
+		}
+
+		if (i == m_comboBox.GetCount())
+		{
+			m_comboBox.InsertString(0, lContent);
+		}
+
+		// todo: 模糊查询搜索条件
+	}
 }

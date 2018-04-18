@@ -43,6 +43,9 @@ protected:  // 控件条嵌入成员
 	CMFCCaptionBar    m_wndCaptionBar;
 	CMainListView*    m_pMainView;
 
+	CMFCToolBarComboBoxButton* m_pComboButton;
+	CComboBox m_comboBox;
+
 protected:
 	ZStuQryDlg        m_StuQryDlg;
 

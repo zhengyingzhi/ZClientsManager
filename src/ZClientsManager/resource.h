@@ -81,13 +81,23 @@
 #define ID_BUTTON_Del                   32790
 #define ID_BUTTON_Modify                32791
 #define ID_BUTTON_Find                  32792
+#define ID_BUTTON_Combo                 32793
+#define ID_BUTTON32794                  32794
+#define ID_BUTTON32795                  32795
+#define ID_BUTTON32796                  32796
+#define ID_BUTTON32797                  32797
+#define ID_BUTTON32798                  32798
+#define ID_BUTTON32799                  32799
+#define ID_BUTTON32800                  32800
+#define ID_BUTTON32801                  32801
+#define ID_BUTTON32802                  32802
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        337
-#define _APS_NEXT_COMMAND_VALUE         32793
+#define _APS_NEXT_COMMAND_VALUE         32803
 #define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
