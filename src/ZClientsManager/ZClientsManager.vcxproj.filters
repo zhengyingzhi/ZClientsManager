@@ -16,6 +16,9 @@
     <Filter Include="DataBase">
       <UniqueIdentifier>{0e5300ff-97ff-49ad-bce0-8d6cc8628ed8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{e1623f24-a152-4058-bce6-056ee5da34b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -84,6 +87,9 @@
     <ClInclude Include="ZConfirmDlg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ZNetwork.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -130,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="ZConfirmDlg.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZNetwork.cpp">
+      <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

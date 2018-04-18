@@ -128,35 +128,35 @@ END
 // Menu
 //
 
-IDR_MAINFRAME MENU
+IDR_MAINFRAME MENUEX
 BEGIN
-    POPUP "系统(&F)"
+    POPUP "系统(&F)",                         65535,MFT_STRING,MFS_ENABLED
     BEGIN
-        MENUITEM "退出(&X)",                      ID_SYS_CLOSE
-        MENUITEM "管理用户(&M)",                    ID_EDIT_MANAGER
-        MENUITEM "修改密码(&U)",                    ID_EDIT_UPDATEPWD
+        MENUITEM "退出(&X)",                      ID_SYS_CLOSE,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
+        MENUITEM "管理用户(&M)",                    ID_EDIT_MANAGER,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
+        MENUITEM "修改密码(&U)",                    ID_EDIT_UPDATEPWD,MFT_STRING,MFS_ENABLED
     END
-    POPUP "编辑(&E)"
+    POPUP "编辑(&E)",                         65535,MFT_STRING,MFS_ENABLED
     BEGIN
-        MENUITEM "插入(&I)\tCtrl+I",              ID_EDIT_INSERT, HELP
-        MENUITEM SEPARATOR
-        MENUITEM "删除(&D)\tCtrl+D",              ID_EDIT_DELETE, HELP
-        MENUITEM "查找(&F)\tCtrl+F",              ID_EDIT_FIND, HELP
-        MENUITEM SEPARATOR
-        MENUITEM "重置主界面",                       ID_EDIT_RESETMAIN, HELP
+        MENUITEM "插入(&I)\tCtrl+I",              ID_EDIT_INSERT,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "删除(&D)\tCtrl+D",              ID_EDIT_DELETE,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
+        MENUITEM "查找(&F)\tCtrl+F",              ID_EDIT_FIND,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "重置主界面",                       ID_EDIT_RESETMAIN,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
     END
-    POPUP "视图(&V)"
+    POPUP "视图(&V)",                         65535,MFT_STRING,MFS_ENABLED
     BEGIN
-        POPUP "工具栏和停靠窗口(&T)"
+        POPUP "工具栏和停靠窗口(&T)",                   65535,MFT_STRING,MFS_ENABLED
         BEGIN
-            MENUITEM "<占位符>",                       ID_VIEW_TOOLBAR
+            MENUITEM "<占位符>",                       ID_VIEW_TOOLBAR,MFT_STRING,MFS_ENABLED
         END
-        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR
-        MENUITEM "标题栏(&C)",                     ID_VIEW_CAPTION_BAR
+        MENUITEM "状态栏(&S)",                     ID_VIEW_STATUS_BAR,MFT_STRING,MFS_ENABLED
+        MENUITEM "标题栏(&C)",                     ID_VIEW_CAPTION_BAR,MFT_STRING,MFS_ENABLED
     END
-    POPUP "帮助(&H)"
+    POPUP "帮助(&H)",                         65535,MFT_STRING,MFS_ENABLED
     BEGIN
-        MENUITEM "关于 ZClientsManager(&A)...",   ID_APP_ABOUT
+        MENUITEM "关于 傲睿国际教育(&A)...",            ID_APP_ABOUT,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
     END
 END
 
@@ -585,6 +585,7 @@ BEGIN
     ID_EDIT_DELETE          "仅从表格中删除一条新记录\n删除"
     ID_EDIT_MANAGER         "管理登录用户信息"
     ID_EDIT_UPDATEPWD       "修改密码"
+    ID_SYS_CLOSE            "退出系统"
     ID_EDIT_MODIFY          "修改指定数据\n修改"
     ID_EDIT_EXPORT          "将指定数据导出到数据文件中"
 END
