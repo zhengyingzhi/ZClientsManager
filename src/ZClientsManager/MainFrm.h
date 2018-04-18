@@ -69,6 +69,10 @@ public:
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditManager();
 	afx_msg void OnSysClose();
+	afx_msg void OnButtonAdd();
+	afx_msg void OnButtonDel();
+	afx_msg void OnButtonModify();
+	afx_msg void OnButtonFind();
 };
 
 

@@ -32,6 +32,7 @@
 #define IDD_DIALOG_CONFIRM              319
 #define IDI_ICON_AORUIBIG               329
 #define IDB_BITMAP_AORUI                330
+#define IDR_TOOLBAR_My                  334
 #define IDC_EDIT_NUMBER                 1000
 #define IDC_EDIT_COMMENT                1001
 #define IDC_COMBO_IMPORTANT             1002
@@ -76,13 +77,17 @@
 #define ID_Menu                         32783
 #define ID_32784                        32784
 #define ID_EDIT_RESETMAIN               32785
+#define ID_BUTTON_Add                   32789
+#define ID_BUTTON_Del                   32790
+#define ID_BUTTON_Modify                32791
+#define ID_BUTTON_Find                  32792
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        331
-#define _APS_NEXT_COMMAND_VALUE         32786
+#define _APS_NEXT_RESOURCE_VALUE        337
+#define _APS_NEXT_COMMAND_VALUE         32793
 #define _APS_NEXT_CONTROL_VALUE         1018
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

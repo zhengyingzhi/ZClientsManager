@@ -38,6 +38,10 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_EDIT_DELETE, &CMainFrame::OnEditDelete)
 	ON_COMMAND(ID_EDIT_MANAGER, &CMainFrame::OnEditManager)
 	ON_COMMAND(ID_SYS_CLOSE, &CMainFrame::OnSysClose)
+	ON_COMMAND(ID_BUTTON_Add, &CMainFrame::OnButtonAdd)
+	ON_COMMAND(ID_BUTTON_Del, &CMainFrame::OnButtonDel)
+	ON_COMMAND(ID_BUTTON_Modify, &CMainFrame::OnButtonModify)
+	ON_COMMAND(ID_BUTTON_Find, &CMainFrame::OnButtonFind)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -85,7 +89,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//}
 
 	if (!m_wndToolBar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP | CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC) ||
-		!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MAINFRAME_256 : IDR_MAINFRAME))
+		//!m_wndToolBar.LoadToolBar(theApp.m_bHiColorIcons ? IDR_MAINFRAME_256 : IDR_MAINFRAME))
+		!m_wndToolBar.LoadToolBar(IDR_TOOLBAR_My))
 	{
 		TRACE0("未能创建工具栏\n");
 		return -1;      // 未能创建
@@ -142,7 +147,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		// 加载用户定义的工具栏图像
 		if (m_UserImages.Load(_T(".\\UserImages.bmp")))
 		{
-			CMFCToolBar::SetUserImages(&m_UserImages);
+			//CMFCToolBar::SetUserImages(&m_UserImages);
 		}
 	}
 
@@ -401,3 +406,27 @@ void CMainFrame::OnEditManager()
 	lUIDlg.DoModal();
 }
 
+
+
+void CMainFrame::OnButtonAdd()
+{
+	OnEditInsert();
+}
+
+
+void CMainFrame::OnButtonDel()
+{
+	OnEditDelete();
+}
+
+
+void CMainFrame::OnButtonModify()
+{
+	m_pMainView->OnEditModify();
+}
+
+
+void CMainFrame::OnButtonFind()
+{
+	OnEditFind();
+}

@@ -73,9 +73,7 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_AORUIAPP       ICON                    "res\\AoruiApp.ico"
-
 IDI_ICON_AORUIBIG       ICON                    "res\\AoruiAppBig.ico"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -83,13 +81,10 @@ IDI_ICON_AORUIBIG       ICON                    "res\\AoruiAppBig.ico"
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
-
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
-
 IDB_INFO                BITMAP                  "res\\info.bmp"
-
 IDB_BITMAP_AORUI        BITMAP                  "res\\AoruiBitmap.bmp"
-
+IDR_TOOLBAR_My          BITMAP                  "F:\\MyProjects\\ZClientsManager\\src\\ZClientsManager\\res\\toolbar1.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -112,6 +107,14 @@ BEGIN
     BUTTON      ID_EDIT_PASTE
     SEPARATOR
     BUTTON      ID_APP_ABOUT
+END
+
+IDR_TOOLBAR_My TOOLBAR 32, 30
+BEGIN
+    BUTTON      ID_BUTTON_Add
+    BUTTON      ID_BUTTON_Del
+    BUTTON      ID_BUTTON_Modify
+    BUTTON      ID_BUTTON_Find
 END
 
 
@@ -584,6 +587,10 @@ END
 STRINGTABLE
 BEGIN
     ID_EDIT_RESETMAIN       "重置恢复主界面状态为显示所有资源信息"
+    ID_BUTTON_Add           "添加一个学生资源信息\n添加"
+    ID_BUTTON_Del           "仅界面上删除学生资源\n删除"
+    ID_BUTTON_Modify        "修改一个学生资源信息\n修改"
+    ID_BUTTON_Find          "查找学生资源信息\n查找"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

@@ -165,6 +165,15 @@
     <Image Include="res\AoruiBitmap.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\zclientmanager.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\toolbar1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\zclientmanager.60.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ZClientsManager.rc2">
