@@ -19,6 +19,8 @@ public:
 
 	int Append(void* apData, uint32_t aDataSize);
 
+	bool AddUsed(uint32_t aUsedSize);
+
 public:
 	char* GetRawBegin() {
 		return (char*)(this + 1);
@@ -37,7 +39,7 @@ public:
 	}
 
 public:
-	static ZNetMessage* Alloc(uint32_t aMsgSize);
+	static ZNetMessage* Alloc(uint32_t aAllocSize);
 	static void Release(ZNetMessage* apMessage);
 
 	static ZNetMessage* Clone(ZNetMessage* apMessage);
@@ -49,18 +51,29 @@ public:
 };
 
 
-#define ZCOMM_DEFAULT_SIZE	2048
-
-
 typedef void(*ZOnNetMessagePtr)(void* apUserData, ZNetMessage* apMessage);
 
+
+#define ZCOMM_DEFAULT_SIZE		2048
+#define ZCOMM_DEFAULT_SO_BUFSZ	(4 * 1024 * 1024)
+
+#define ZNET_DEFAULT_PORT		40594
+#define ZNET_DEFAULT_ANYIP		"0.0.0.0"
+#define ZNET_DEFAULT_GROUPIP	"229.5.9.4"
+
+#define ZNET_TYPE_TCP			0
+#define ZNET_TYPE_UDP			1
 class ZNetConfig
 {
 public:
 	uint32_t	m_Type;			// 0:udp 1:tcp
-	uint16_t	m_ServerPort;	// default is 40594
-	uint32_t	m_ServerAddr;
-	uint32_t	m_GroupAddr;	// default group ip 229.5.9.4
+	uint32_t	m_IsBroadcast;	// is udp broadcast
+	uint32_t	m_PeerAddr;		// for sender peer inet address
+	uint16_t	m_PeerPort;		// for sender peer port default is 40594
+	uint16_t	m_BindPort;		// for receiver bind port
+	uint32_t	m_BindAddr;		// for receiver 
+
+	uint32_t	m_GroupAddr;	// for receiver, default group ip 229.5.9.4
 
 	void*				m_pUserData;
 	ZOnNetMessagePtr	m_pFunc;
@@ -83,7 +96,6 @@ public:
 
 protected:
 	ZNetConfig			m_NetConf;
-	sockhandle_t		m_Sock;
 };
 
 /* 基于UDP的通信封装
@@ -106,7 +118,8 @@ protected:
 	virtual void Run();
 
 protected:
-	int32_t				m_Running;
+	volatile int32_t	m_Running;
 	unique_ptr<thread>	m_pIOThread;
 	sockhandle_t		m_Sender;
+	sockhandle_t		m_Recver;
 };

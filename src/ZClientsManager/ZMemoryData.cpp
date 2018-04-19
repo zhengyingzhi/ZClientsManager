@@ -1,5 +1,7 @@
 #include "ZMemoryData.h"
 
+extern ZNetCommBase*	g_pNetComm;
+
 ZMemoryData::ZMemoryData()
 	: m_pUserDB()
 	, m_pStuDB()
@@ -175,9 +177,28 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfo(const ZStudentInfo* apExpect, ZQ
 
 void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 {
+	int rv;
+
 	ZStudentInfo* lpDstData;
 	lpDstData = (ZStudentInfo*)ztl_pcalloc(m_Pool, sizeof(ZStudentInfo));
 	memcpy(lpDstData, apStuInfo, sizeof(ZStudentInfo));
 	m_CacheStuData.push_back(lpDstData);
+
+	if (g_pNetComm)
+	{
+		// make a net message packet, and send out
+		ZNetMessage* lpMessage;
+		lpMessage = ZNetProtocol::MakeNetMessage(ZNET_T_Publish, apStuInfo, sizeof(ZStudentInfo));
+
+		rv = g_pNetComm->DirectSend(lpMessage->GetRawBegin(), lpMessage->Size());
+		if (rv < 0)
+		{
+			char lErrorMsg[512] = "";
+			sprintf(lErrorMsg, "DirectSend failed %d", get_errno());
+			OutputDebugString(lErrorMsg);
+		}
+
+		ZNetMessage::Release(lpMessage);
+	}
 }
 

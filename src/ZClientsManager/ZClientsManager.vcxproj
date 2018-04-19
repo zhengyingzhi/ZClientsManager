@@ -216,6 +216,7 @@
     <ClInclude Include="ZInfoEncrypt.h" />
     <ClInclude Include="ZLoginDlg.h" />
     <ClInclude Include="ZMemoryData.h" />
+    <ClInclude Include="ZNetProtocol.h" />
     <ClInclude Include="ZNetwork.h" />
     <ClInclude Include="ZStuInfoDlg.h" />
     <ClInclude Include="ZStuQryDlg.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="ZInfoEncrypt.cpp" />
     <ClCompile Include="ZLoginDlg.cpp" />
     <ClCompile Include="ZMemoryData.cpp" />
+    <ClCompile Include="ZNetProtocol.cpp" />
     <ClCompile Include="ZNetwork.cpp" />
     <ClCompile Include="ZStuInfoDlg.cpp" />
     <ClCompile Include="ZStuQryDlg.cpp" />

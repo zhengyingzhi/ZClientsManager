@@ -13,8 +13,9 @@
 
 class CMainFrame;
 
-extern ZMemoryData g_MemData;
-extern CMainFrame* g_pMainFrame;
+extern ZMemoryData		g_MemData;
+extern ZNetCommBase*	g_pNetComm;
+extern CMainFrame*		g_pMainFrame;
 
 #define ZAPP_CONFIG_NAME    "ZAppConfig.txt"
 typedef struct

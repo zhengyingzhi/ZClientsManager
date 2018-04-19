@@ -29,10 +29,20 @@ int ZNetMessage::Append(void* apData, uint32_t aDataSize)
 	return 0;
 }
 
-ZNetMessage* ZNetMessage::Alloc(uint32_t aMsgSize)
+bool ZNetMessage::AddUsed(uint32_t aUsedSize)
+{
+	if (m_Size + aUsedSize > m_Capacity) {
+		return false;
+	}
+
+	m_Size += aUsedSize;
+	return true;
+}
+
+ZNetMessage* ZNetMessage::Alloc(uint32_t aAllocSize)
 {
 	ZNetMessage* lpRet;
-	uint32_t lCapacity = ztl_align(aMsgSize, 64);
+	uint32_t lCapacity = ztl_align(aAllocSize, 64);
 
 	char* lpRaw = new char[lCapacity + sizeof(ZNetMessage) + 4];
 	memset(lpRaw, 0, lCapacity);
@@ -65,16 +75,10 @@ ZNetMessage* ZNetMessage::Clone(ZNetMessage* apMessage)
 //////////////////////////////////////////////////////////////////////////
 ZNetCommBase::ZNetCommBase()
 	: m_NetConf()
-	, m_Sock(INVALID_SOCKET)
 {}
 
 ZNetCommBase::~ZNetCommBase()
 {
-	if (m_Sock != INVALID_SOCKET)
-	{
-		close_socket(m_Sock);
-	}
-
 }
 
 
@@ -82,6 +86,7 @@ ZUdpComm::ZUdpComm()
 	: m_Running(0)
 	, m_pIOThread()
 	, m_Sender(INVALID_SOCKET)
+	, m_Recver(INVALID_SOCKET)
 {}
 
 ZUdpComm::~ZUdpComm()
@@ -90,44 +95,88 @@ ZUdpComm::~ZUdpComm()
 	{
 		close_socket(m_Sender);
 	}
+
+	if (m_Recver != INVALID_SOCKET)
+	{
+		close_socket(m_Recver);
+	}
 }
 
 int ZUdpComm::Init(const ZNetConfig& aNetConf)
 {
 	m_NetConf = aNetConf;
 
-	// receiver
-	m_Sock = create_socket(SOCK_DGRAM);
-	set_reuseaddr(m_Sock, true);
-	set_rcv_buffsize(m_Sock, 4 * 1024 * 1024);
-
-	set_multicase_interface(m_Sock, "");
-	enable_multicast_loopback(m_Sock, false);
-	set_multicast_ttl(m_Sender, 4);
-
+	int rv;
 	char lMultiIP[32] = "";
 	inetaddr_to_string(lMultiIP, sizeof(lMultiIP), aNetConf.m_GroupAddr);
-	if (0 != join_multicast(m_Sock, lMultiIP, ""))
-	{
-		char lErrorMsg[512] = "";
-		sprintf(lErrorMsg, "receiver join_multicast failed:%d", get_errno());
-		OutputDebugString(lErrorMsg);
 
-		return -1;
+	// receiver
+	if (aNetConf.m_BindAddr > 0 || aNetConf.m_BindPort > 0)
+	{
+		m_Recver = create_socket(SOCK_DGRAM);
+		set_reuseaddr(m_Recver, true);
+		set_rcv_buffsize(m_Recver, ZCOMM_DEFAULT_SO_BUFSZ);
+
+		// bind
+		struct sockaddr_in laddr;
+		memset(&laddr, 0, sizeof laddr);
+		make_sockaddr(&laddr, ZNET_DEFAULT_ANYIP, aNetConf.m_BindPort);
+		if ((rv = ::bind(m_Recver, (struct sockaddr*)&laddr, sizeof laddr)) < 0)
+		{
+			char lErrorMsg[512] = "";
+			sprintf(lErrorMsg, "ZUdpComm init error %d", get_errno());
+			OutputDebugString(lErrorMsg);
+
+			close_socket(m_Recver);
+			m_Recver = INVALID_SOCKET;
+			return rv;
+		}
+		
+		if (aNetConf.m_GroupAddr > 0)
+		{
+			set_multicase_interface(m_Recver, ZNET_DEFAULT_ANYIP);
+			enable_multicast_loopback(m_Recver, false);
+			set_multicast_ttl(m_Sender, 4);
+
+			if (0 != join_multicast(m_Recver, lMultiIP, ZNET_DEFAULT_ANYIP))
+			{
+				char lErrorMsg[512] = "";
+				sprintf(lErrorMsg, "receiver join_multicast failed:%d", get_errno());
+				OutputDebugString(lErrorMsg);
+
+				close_socket(m_Recver);
+				m_Recver = INVALID_SOCKET;
+				return -1;
+			}
+		}
 	}
-
+	
 	// sender
-	m_Sender = create_socket(SOCK_DGRAM);
-	enable_multicast_loopback(m_Sender, false);
-	set_multicast_ttl(m_Sender, 4);
-	inetaddr_to_string(lMultiIP, sizeof(lMultiIP), aNetConf.m_GroupAddr);
-	if (0 != join_multicast(m_Sender, lMultiIP, ""))
+	if (aNetConf.m_GroupAddr > 0)
 	{
-		char lErrorMsg[512] = "";
-		sprintf(lErrorMsg, "sender join_multicast failed:%d", get_errno());
-		OutputDebugString(lErrorMsg);
+		m_Sender = create_socket(SOCK_DGRAM);
+		set_snd_buffsize(m_Sender, ZCOMM_DEFAULT_SO_BUFSZ);
 
-		return -2;
+		if (aNetConf.m_IsBroadcast)
+		{
+			set_broadcast(m_Sender, true);
+		}
+		else
+		{
+			//enable_multicast_loopback(m_Sender, false);
+			set_multicast_ttl(m_Sender, 4);
+			inetaddr_to_string(lMultiIP, sizeof(lMultiIP), aNetConf.m_GroupAddr);
+			if (0 != join_multicast(m_Sender, lMultiIP, ZNET_DEFAULT_ANYIP))
+			{
+				char lErrorMsg[512] = "";
+				sprintf(lErrorMsg, "sender join_multicast failed:%d", get_errno());
+				OutputDebugString(lErrorMsg);
+
+				close_socket(m_Sender);
+				m_Sender = INVALID_SOCKET;
+				return -2;
+			}
+		}
 	}
 
 	return 0;
@@ -137,6 +186,11 @@ int ZUdpComm::Start()
 {
 	if (m_Running) {
 		return -1;
+	}
+
+	// not init receiver
+	if (m_Recver == INVALID_SOCKET) {
+		return -2;
 	}
 
 	m_Running = 1;
@@ -151,6 +205,13 @@ int ZUdpComm::Stop()
 	}
 
 	m_Running = 0;
+
+	if (m_Recver != INVALID_SOCKET)
+	{
+		close_socket(m_Recver);
+		m_Recver = INVALID_SOCKET;
+	}
+
 	if (m_pIOThread)
 	{
 		m_pIOThread->join();
@@ -160,8 +221,12 @@ int ZUdpComm::Stop()
 
 int ZUdpComm::DirectRecv(char* apRawBuf, uint32_t* apBytesRecv)
 {
+	if (m_Recver == INVALID_SOCKET) {
+		return -2;
+	}
+
 	struct sockaddr_in lPeerAddr = {};
-	int rv = udp_recv(m_Sock, apRawBuf, *apBytesRecv, (sockaddr_in*)&lPeerAddr, 100);
+	int rv = udp_recv(m_Recver, apRawBuf, *apBytesRecv, (sockaddr_in*)&lPeerAddr, 100);
 	if (rv > 0)
 	{
 		*apBytesRecv = rv;
@@ -179,10 +244,17 @@ int ZUdpComm::DirectRecv(char* apRawBuf, uint32_t* apBytesRecv)
 
 int ZUdpComm::DirectSend(const char* apRawData, uint32_t aRawSize)
 {
+	if (m_Sender == INVALID_SOCKET) {
+		return -1;
+	}
+
 	struct sockaddr_in lToAddr = {};
 	lToAddr.sin_family = AF_INET;
-	lToAddr.sin_port = htons(m_NetConf.m_ServerPort);
-	lToAddr.sin_addr.s_addr = m_NetConf.m_GroupAddr;
+	lToAddr.sin_port = htons(m_NetConf.m_PeerPort);
+	if (m_NetConf.m_GroupAddr > 0)
+		lToAddr.sin_addr.s_addr = m_NetConf.m_GroupAddr;
+	else
+		lToAddr.sin_addr.s_addr = m_NetConf.m_PeerAddr;
 	return udp_send(m_Sender, apRawData, aRawSize, &lToAddr);
 }
 

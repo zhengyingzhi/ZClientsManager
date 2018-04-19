@@ -5,6 +5,8 @@
 #include "UserInfoDB.h"
 #include "StudentInfoDB.h"
 
+#include "ZNetProtocol.h"
+
 using namespace std;
 
 #define ZMD_DEFAULT_SIZE    (16 * 1024)

@@ -17,7 +17,8 @@
 #define new DEBUG_NEW
 #endif
 
-ZMemoryData g_MemData;
+ZMemoryData		g_MemData;
+ZNetCommBase*	g_pNetComm = NULL;
 
 // CZClientsManagerApp
 
@@ -104,6 +105,9 @@ BOOL CZClientsManagerApp::InitInstance()
 	ttParams.m_bVislManagerTheme = TRUE;
 	theApp.GetTooltipManager()->SetTooltipParams(AFX_TOOLTIP_TYPE_ALL,
 		RUNTIME_CLASS(CMFCToolTipCtrl), &ttParams);
+
+	// load netlib
+	net_init();
 
 	if (!DoLoginDlg())
 	{
@@ -230,6 +234,27 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			AfxMessageBox(_T("打开账户信息数据库失败"), MB_OK | MB_ICONWARNING);
 			return FALSE;
 		}
+	}
+
+	if (g_pNetComm == NULL)
+	{
+		ZNetConfig lNetConf;
+		lNetConf.m_Type			= ZNET_TYPE_UDP;
+		lNetConf.m_IsBroadcast	= 0;
+		lNetConf.m_PeerAddr		= 0;
+		lNetConf.m_PeerPort		= 0;
+		lNetConf.m_BindPort		= ZNET_DEFAULT_PORT;
+		lNetConf.m_BindAddr		= string_to_inetaddr(ZNET_DEFAULT_ANYIP);
+		lNetConf.m_GroupAddr	= string_to_inetaddr(ZNET_DEFAULT_GROUPIP);
+
+		// todo: add callback
+		lNetConf.m_pFunc = nullptr;
+		lNetConf.m_pUserData = nullptr;
+
+		g_pNetComm = new ZUdpComm();
+		g_pNetComm->Init(lNetConf);
+
+		g_pNetComm->Start();
 	}
 
 	ZAppConfigs lAppConfigs = {};

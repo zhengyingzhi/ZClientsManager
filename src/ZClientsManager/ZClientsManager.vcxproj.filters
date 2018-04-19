@@ -90,6 +90,9 @@
     <ClInclude Include="ZNetwork.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="ZNetProtocol.h">
+      <Filter>Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -138,6 +141,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ZNetwork.cpp">
+      <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ZNetProtocol.cpp">
       <Filter>Network</Filter>
     </ClCompile>
   </ItemGroup>
