@@ -35,4 +35,7 @@ public:
 	uint16_t	m_NetType;			// 1:tcp 2:udp-multicast 3:udp-broadcast
 	uint16_t	m_MainPort;			// 主端口
 	char		m_CastIP[16];		// 组播/广播/服务器IP
+
+	char		m_UserDBName[256];
+	char		m_StuDBName[256];
 };

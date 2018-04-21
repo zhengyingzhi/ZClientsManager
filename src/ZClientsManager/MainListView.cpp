@@ -125,7 +125,7 @@ void CMainListView::OnInitialUpdate()
 	// query students data from db
 	if (g_MemData.GetStuDB() == NULL)
 	{
-		if (g_MemData.OpenStuDB(STUINFO_DB_DEFAULT_NAME, "127.0.0.1", 0) != 0)
+		if (g_MemData.OpenStuDB(g_AppConfig.m_StuDBName, g_AppConfig.m_CastIP, g_AppConfig.m_MainPort) != 0)
 		{
 			AfxMessageBox(_T("打开学生数据库信息失败"), MB_OK | MB_ICONWARNING);
 			return;

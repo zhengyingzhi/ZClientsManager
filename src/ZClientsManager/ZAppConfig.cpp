@@ -8,6 +8,10 @@
 
 #include "ZNetwork.h"
 
+#include "UserInfoDB.h"
+
+#include "StudentInfoDB.h"
+
 
 ZAppConfigs::ZAppConfigs()
 	: m_UserID()
@@ -16,6 +20,8 @@ ZAppConfigs::ZAppConfigs()
 	, m_NetType(2)
 	, m_MainPort(ZNET_DEFAULT_PORT)
 	, m_CastIP(ZNET_DEFAULT_GROUPIP)
+	, m_UserDBName(USERINFO_DB_DEFAULT_NAME)
+	, m_StuDBName(STUINFO_DB_DEFAULT_NAME)
 {}
 
 ZAppConfigs::~ZAppConfigs()
@@ -43,7 +49,7 @@ bool ZAppConfigs::ReadAppConfig(const string& aConfName)
 		strncpy(m_Password, lpReadValue, sizeof(m_Password) - 1);
 	}
 
-	ztl_config_read_int32(zconf, "SavePassword", &m_SavePasswd);
+	ztl_config_read_int32(zconf, "SavePasswd", &m_SavePasswd);
 	ztl_config_read_int16(zconf, "NetType", &m_NetType);
 	ztl_config_read_int16(zconf, "MainPort", &m_MainPort);
 
@@ -100,7 +106,10 @@ string ZAppConfigs::ToString()
 	char lBuffer[1000] = "";
 
 	lLength += sprintf(lBuffer + lLength, "UserID%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_UserID);
-	lLength += sprintf(lBuffer + lLength, "Password%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_UserID);
+	if (m_SavePasswd)
+		lLength += sprintf(lBuffer + lLength, "Password%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_Password);
+	else
+		lLength += sprintf(lBuffer + lLength, "Password%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, "");
 	lLength += sprintf(lBuffer + lLength, "SavePasswd%c%d" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_SavePasswd);
 	lLength += sprintf(lBuffer + lLength, "NetType%c%d" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_NetType);
 	lLength += sprintf(lBuffer + lLength, "MainPort%c%d" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_MainPort);

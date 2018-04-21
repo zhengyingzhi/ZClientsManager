@@ -40,7 +40,9 @@ BOOL ZLoginDlg::OnInitDialog()
 		SetDlgItemText(IDC_EDIT_Password, m_Passwd);
 	}
 
-	GetDlgItem(IDC_CHK_MEMORY_PWD)->EnableWindow(m_RememberPasswd);
+	CButton* lpBtn = (CButton*)GetDlgItem(IDC_CHK_MEMORY_PWD);
+	lpBtn->SetCheck(m_RememberPasswd);
+	//GetDlgItem(IDC_CHK_MEMORY_PWD)->EnableWindow(m_RememberPasswd);
 
 	HICON hIcon = AfxGetApp()->LoadIcon(IDI_ICON_AORUIAPP);
 	SetIcon(hIcon, TRUE);

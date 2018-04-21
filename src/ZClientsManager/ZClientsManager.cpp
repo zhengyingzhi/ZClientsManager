@@ -244,7 +244,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	/* database */
 	if (g_MemData.GetUserDB() == NULL)
 	{
-		if (g_MemData.OpenUserDB(USERINFO_DB_DEFAULT_NAME, "127.0.0.1", 0) != 0)
+		if (g_MemData.OpenUserDB(g_AppConfig.m_UserDBName, g_AppConfig.m_CastIP, , g_AppConfig.m_MainPort) != 0)
 		{
 			AfxMessageBox(_T("打开账户信息数据库失败"), MB_OK | MB_ICONWARNING);
 			return FALSE;
@@ -300,6 +300,11 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	{
 		lLoginDlg.SetUserID(g_AppConfig.m_UserID);
 	}
+	if (g_AppConfig.m_Password[0])
+	{
+		lLoginDlg.SetPassword(g_AppConfig.m_Password);
+	}
+	lLoginDlg.SetRememberPwd(g_AppConfig.m_SavePasswd);
 
 	/* show login dialog and verify userid & passwd */
 	do
