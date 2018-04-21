@@ -230,6 +230,7 @@ int ZUdpComm::DirectRecv(char* apRawBuf, uint32_t* apBytesRecv)
 	if (rv > 0)
 	{
 		*apBytesRecv = rv;
+		return rv;
 	}
 	else
 	{
@@ -274,9 +275,9 @@ void ZUdpComm::Run()
 
 		lBytesRecv = ZCOMM_DEFAULT_SIZE;
 		rv = DirectRecv(lpMessage->GetRawBegin(), &lBytesRecv);
-		if (rv != 0)
+		if (rv <= 0)
 		{
-			// try auto reconnect
+			// try auto reconnect if tcp
 			continue;
 		}
 

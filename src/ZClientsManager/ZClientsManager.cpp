@@ -28,13 +28,13 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 	ZMsgHead*	lpMsgHead;
 	void*		lpRawMessage;
 
+	ZNetProtocol::ExtractNetMessage(apMessage, &lpNetHead, &lpMsgHead, &lpRawMessage);
+
 	// got unrecognized message
 	if (!ZNetProtocol::IsValidHead(lpNetHead))
 	{
 		return;
 	}
-
-	ZNetProtocol::ExtractNetMessage(apMessage, &lpNetHead, &lpMsgHead, &lpRawMessage);
 
 	if (lpNetHead->m_Type == ZNET_T_PublishAdd || lpNetHead->m_Type == ZNET_T_PublishUpdate)
 	{
