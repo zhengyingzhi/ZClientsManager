@@ -38,6 +38,7 @@
 #define IDC_COMBO_IMPORTANT             1002
 #define IDC_EDIT_INSERTTIME             1002
 #define IDC_EDIT_COLLEGE                1003
+#define IDC_EDIT_INSERTTIME2            1003
 #define IDC_RADIO_BOY                   1004
 #define IDC_BTN_SAVE                    1005
 #define IDC_EDIT_COUNTRY                1006
@@ -59,6 +60,7 @@
 #define IDC_EDIT_SOURCE                 1014
 #define IDC_BTN_RESET                   1014
 #define IDC_BTN_CLEAR                   1015
+#define IDC_EDIT_IDNumber               1015
 #define IDC_EDIT_YESNO                  1016
 #define IDC_EDIT_STATUS                 1017
 #define IDC_RADIO_GIRL                  1018

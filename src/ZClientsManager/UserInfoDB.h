@@ -9,13 +9,16 @@
 #include "UserInfo.h"
 #include "ZDataBase.h"
 
-#define USERINFO_DB_DEFAULT_NAME    "UserInfo.db"
-#define USERINFO_DB_DEFAULT_SIZE    (256 * 1024)
+#define USERINFO_DB_DEFAULT_NAME    "ZUserInfo.db"
+#define USERINFO_DB_DEFAULT_SIZE    (64 * 1024)
 #define USERINFO_DB_DEFAULT_QRYN    512
 #define USERINFO_DB_ALIGNMENT       512
 
 
 bool ZQueryCompareUserName(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareUserTel(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareUserQQ(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareUserIDNum(const void* apExpect, const void* apAcutal, int aExtend);
 
 class ZUserInfoDBText : public ZDataBase
 {
@@ -35,6 +38,9 @@ public:
 protected:
 	ZUserInfo* NextUserInfo(ZUserInfo* apCurStuInfo, bool aAutoExpand = false);
 	ZUserInfo* GetAvailUserInfo();
+
+private:
+	int PrivUserShmCreate();
 
 protected:
 	char*       m_pBuffer;

@@ -11,9 +11,9 @@
 
 
 #define STUINFO_DB_DEFAULT_NAME     "StudentInfo.db"
-#define STUINFO_DB_DEFAULT_SIZE     (4 * 1024 * 1024)
+#define STUINFO_DB_DEFAULT_SIZE     (1 * 1024 * 1024)
 #define STUINFO_DB_DEFAULT_QRYN     512
-#define STUINFO_DB_ALIGNMENT        2048
+#define STUINFO_DB_ALIGNMENT        1024
 
 typedef struct 
 {
@@ -38,6 +38,7 @@ bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExten
 bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareStatus(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareStuIDNum(const void* apExpect, const void* apAcutal, int aExtend);
 
 
 /* student info db implement by text file
@@ -61,6 +62,9 @@ public:
 protected:
 	ZStudentInfo* NextStudentInfo(ZStudentInfo* apCurStuInfo, bool aAutoExpand = false);
 	ZStudentInfo* GetAvailStudentInfo();
+
+private:
+	int PrivStuShmCreate();
 
 protected:
 	char*       m_pBuffer;

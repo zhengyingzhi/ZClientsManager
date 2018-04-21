@@ -103,17 +103,19 @@ END_MESSAGE_MAP()
 
 void ZUserInfoDlg::OnBnClickedBtnSave()
 {
-	CString lName, lPassword, lTelephone, lQQ, lString;
+	CString lName, lPassword, lTelephone, lQQ, lIDNum, lString;
 	GetDlgItemText(IDC_EDIT_NAME, lName);
 	GetDlgItemText(IDC_EDIT_Password, lPassword);
 	GetDlgItemText(IDC_EDIT_TELEPHONE, lTelephone);
 	GetDlgItemText(IDC_EDIT_QQ, lQQ);
+	GetDlgItemText(IDC_EDIT_IDNumber, lIDNum);
 
 	ZUserInfo lUserInfo = { 0 };
 	strncpy(lUserInfo.UserName, (char*)(LPCSTR)lName, sizeof(lUserInfo.UserName) - 1);
 	strncpy(lUserInfo.Password, (char*)(LPCSTR)lPassword, sizeof(lUserInfo.Password) - 1);
 	strncpy(lUserInfo.Telephone, (char*)(LPCSTR)lTelephone, sizeof(lUserInfo.Telephone) - 1);
 	strncpy(lUserInfo.QQ, (char*)(LPCSTR)lQQ, sizeof(lUserInfo.QQ) - 1);
+	strncpy(lUserInfo.IDNumber, (char*)(LPCSTR)lIDNum, sizeof(lUserInfo.IDNumber) - 1);
 
 	CComboBox* lpCombo = (CComboBox*)GetDlgItem(IDC_COMBO_ROLE);
 	int lSel = lpCombo->GetCurSel();
@@ -144,7 +146,7 @@ void ZUserInfoDlg::OnBnClickedBtnSave()
 	// update user info into db
 	if (0 != g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo)))
 	{
-		AfxMessageBox(_T("插入账户数据失败"), MB_OK | MB_ICONWARNING);
+		AfxMessageBox(_T("插入新账户数据失败"), MB_OK | MB_ICONWARNING);
 		return;
 	}
 

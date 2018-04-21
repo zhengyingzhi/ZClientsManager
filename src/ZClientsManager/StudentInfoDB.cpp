@@ -7,6 +7,7 @@
 using namespace std;
 
 
+/* 比较名字和电话 */
 bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	(void)aExtend;
@@ -35,7 +36,11 @@ bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aEx
 	else if (!lpExpect->Name[0] && lpExpect->Telehone[0])
 	{
 		// query by telephone
-		if (strcmp(lpExpect->Telehone, lpActual->Telehone) == 0)
+		if (strlen(lpExpect->Telehone) == 4 && 
+			strcmp(lpExpect->Telehone, lpActual->Telehone + 7) == 0) {
+			return true;
+		}
+		else if (strcmp(lpExpect->Telehone, lpActual->Telehone) == 0)
 		{
 			return true;
 		}
@@ -43,6 +48,7 @@ bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aEx
 	return false;
 }
 
+/* 比较QQ */
 bool ZQueryCompareStuQQ(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	(void)aExtend;
@@ -57,6 +63,7 @@ bool ZQueryCompareStuQQ(const void* apExpect, const void* apAcutal, int aExtend)
 	return false;
 }
 
+/* 比较国家 */
 bool ZQueryCompareCountry(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	(void)aExtend;
@@ -71,6 +78,7 @@ bool ZQueryCompareCountry(const void* apExpect, const void* apAcutal, int aExten
 	return false;
 }
 
+/* 比较大学 */
 bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	(void)aExtend;
@@ -85,6 +93,7 @@ bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExten
 	return false;
 }
 
+/* 比较分数，aExtend为比较条件 */
 bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
@@ -108,6 +117,7 @@ bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend)
 	return false;
 }
 
+/* 比较状态 */
 bool ZQueryCompareStatus(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	(void)aExtend;
@@ -122,6 +132,7 @@ bool ZQueryCompareStatus(const void* apExpect, const void* apAcutal, int aExtend
 	return false;
 }
 
+/* 比较来源 */
 bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	(void)aExtend;
@@ -136,13 +147,57 @@ bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend
 	return false;
 }
 
+/* 比较身份证号 */
+bool ZQueryCompareStuIDNum(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (strlen(lpExpect->IDNumber) > 0 && strlen(lpExpect->IDNumber) <= 6) {
+		if (strstr(lpActual->IDNumber + 12, lpExpect->IDNumber)) {
+			return true;
+		}
+	}
+	else if (strcmp(lpExpect->IDNumber, lpActual->IDNumber) == 0) {
+		return true;
+	}
+	return false;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
+/* 返回一个学生块信息大小 */
 static uint32_t _ZStudentInfoBlockSize()
 {
 	uint32_t lBlockSize = ztl_align(sizeof(ZStudentInfo), STUINFO_DB_ALIGNMENT);
 	return lBlockSize;
 }
+
+ztl_shm_t* ZDBShmCreate(const std::string& aDBName, uint32_t aDBSize)
+{
+	ztl_shm_t* lpShmObj;
+	lpShmObj = ztl_shm_create(aDBName.c_str(), ztl_open_or_create, ztl_read_write, false);
+
+	if (lpShmObj == NULL)
+	{
+		TRACE(_T("ZDBShmCreate ztl_shm_create() failed"));
+		return NULL;
+	}
+
+	ztl_shm_truncate(lpShmObj, aDBSize);
+	ztl_shm_map_region(lpShmObj, ztl_read_write);
+
+	if (ztl_shm_get_address(lpShmObj) == NULL)
+	{
+		TRACE(_T("ZDBShmCreate ztl_shm_get_address() failed"));
+
+		ztl_shm_release(lpShmObj);
+		return NULL;
+	}
+
+	return lpShmObj;
+}
+
 
 ZStudentInfoDBText::ZStudentInfoDBText()
 	: m_pBuffer(NULL)
@@ -170,25 +225,10 @@ int ZStudentInfoDBText::Open(const std::string& aDBName, const std::string&  ip,
 	}
 	m_DBName = aDBName;
 
-	m_pShmObj = ztl_shm_create(aDBName.c_str(), ztl_open_or_create, ztl_read_write, false);
-
-	if (m_pShmObj == NULL)
+	if (PrivStuShmCreate() != 0)
 	{
-		TRACE(_T("ZStudentInfoDBText open userinfo db failed"));
-		return -1;
-	}
-
-	ztl_shm_truncate(m_pShmObj, STUINFO_DB_DEFAULT_SIZE);
-	ztl_shm_map_region(m_pShmObj, ztl_read_write);
-
-	m_pBuffer = (char*)ztl_shm_get_address(m_pShmObj);
-	if (m_pBuffer == NULL)
-	{
-		TRACE(_T("ZStudentInfoDBText map region userinfo db failed"));
 		return -2;
 	}
-
-	m_BufSize = STUINFO_DB_DEFAULT_SIZE;
 
 	return 0;
 }
@@ -349,6 +389,8 @@ ZStudentInfo* ZStudentInfoDBText::NextStudentInfo(ZStudentInfo* apCurStuInfo, bo
 ZStudentInfo* ZStudentInfoDBText::GetAvailStudentInfo()
 {
 	uint32_t lBlockSize = _ZStudentInfoBlockSize();
+	uint32_t lStuNum = 1;
+
 	ZStudentInfo *lpCurInfo;
 
 	lpCurInfo = NULL;
@@ -356,7 +398,35 @@ ZStudentInfo* ZStudentInfoDBText::GetAvailStudentInfo()
 	{
 		if (!lpCurInfo->Name[0])
 			break;
+		++lStuNum;
 	}
 
+	lpCurInfo->Number = lStuNum;
+
 	return lpCurInfo;
+}
+
+int ZStudentInfoDBText::PrivStuShmCreate()
+{
+	if (m_pShmObj)
+	{
+		ztl_shm_release(m_pShmObj);
+		m_pShmObj = NULL;
+		m_pBuffer = NULL;
+		m_BufSize = m_BufSize * 2;
+	}
+	else
+	{
+		m_BufSize = STUINFO_DB_DEFAULT_SIZE;
+	}
+
+	m_pShmObj = ZDBShmCreate(m_DBName, m_BufSize);
+	if (m_pShmObj == NULL)
+	{
+		return -1;
+	}
+
+	m_pBuffer = (char*)ztl_shm_get_address(m_pShmObj);
+
+	return 0;
 }

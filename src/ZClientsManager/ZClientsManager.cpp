@@ -227,6 +227,7 @@ void CZClientsManagerApp::ReadConfigs(ZAppConfigs& aAppConfigs)
 
 BOOL CZClientsManagerApp::DoLoginDlg()
 {
+	/* database */
 	if (g_MemData.GetUserDB() == NULL)
 	{
 		if (g_MemData.OpenUserDB(USERINFO_DB_DEFAULT_NAME, "127.0.0.1", 0) != 0)
@@ -234,8 +235,25 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			AfxMessageBox(_T("打开账户信息数据库失败"), MB_OK | MB_ICONWARNING);
 			return FALSE;
 		}
+
+		// if have no any user at firstly, add a default root user
+		if (g_MemData.UserCount() == 0)
+		{
+			ZUserInfo lUserInfo = { 0 };
+			strcpy(lUserInfo.UserName, ZUSER_DEFAULT_RootName);
+			strcpy(lUserInfo.Password, ZUSER_DEFAULT_RootPasswd);
+			strcpy(lUserInfo.Telephone, "00");
+			lUserInfo.Number = 1;
+			lUserInfo.Role = ZUSER_ROLE_Root;
+			lUserInfo.Cipher = 0;	// ZUSER_CIPHER_Simple
+			strcpy(lUserInfo.Comment, "    超级管理员账户，具有最高管理权限，可管理一切其它账户信息和学生资源信息。");
+
+			g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo));
+			g_MemData.AddUserInfo(&lUserInfo);
+		}
 	}
 
+	/* network */
 	if (g_pNetComm == NULL)
 	{
 		ZNetConfig lNetConf;
@@ -257,10 +275,11 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		g_pNetComm->Start();
 	}
 
+	/* login user */
 	ZAppConfigs lAppConfigs = {};
 	ReadConfigs(lAppConfigs);
 
-	ZUserInfo*      lpUserInfo;
+	ZUserInfo* lpUserInfo;
 
 	CString   lUserID, lPasswd;
 	ZLoginDlg lLoginDlg;
@@ -274,7 +293,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	lLoginDlg.SetPassword(lPasswd);
 #endif // DEBUG
 
-
+	/* show login dialog and verify userid & passwd */
 	do
 	{
 		if (IDCANCEL == lLoginDlg.DoModal())
@@ -310,6 +329,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		}
 	} while (TRUE);
 
+	/* write userid back to app conf name */
 	if (lUserID.Compare(lAppConfigs.m_UserID) != 0)
 	{
 		char lConfBuffer[1024] = "";

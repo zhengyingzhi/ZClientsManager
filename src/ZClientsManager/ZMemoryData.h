@@ -28,6 +28,8 @@ public:
 	int CloseUserDB();
 	ZDataBase* GetUserDB() { return m_pUserDB; }
 
+	uint32_t UserCount() { return m_CacheUserData.size(); }
+
 	vector<ZUserInfo*> QueryAllUser();
 	vector<ZUserInfo*> QueryUserInfo(const ZUserInfo* apExpect, ZQueryComparePtr apCompFunc);
 
@@ -37,6 +39,8 @@ public:
 	int OpenStuDB(const string& aDBName, const string& aServerIP, uint16_t aPort);
 	int CloseStuDB();
 	ZDataBase* GetStuDB() { return m_pStuDB; }
+
+	uint32_t StuCount() { return m_CacheStuData.size(); }
 
 	vector<ZStudentInfo*> QueryAllStudents();
 	vector<ZStudentInfo*> QueryStuInfo(const ZStudentInfo* apExpect, ZQueryComparePtr apCompFunc, int aExtend);

@@ -5,6 +5,7 @@
 #include "UserInfoDB.h"
 
 
+/* 比较名字 */
 bool ZQueryCompareUserName(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	ZUserInfo* lpExpect = (ZUserInfo*)apExpect;
@@ -16,7 +17,55 @@ bool ZQueryCompareUserName(const void* apExpect, const void* apAcutal, int aExte
 	return false;
 }
 
+/* 比较电话 */
+bool ZQueryCompareUserTel(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	ZUserInfo* lpExpect = (ZUserInfo*)apExpect;
+	ZUserInfo* lpActual = (ZUserInfo*)apAcutal;
 
+	if (strlen(lpExpect->Telephone) > 0 && strlen(lpExpect->Telephone) <= 4) {
+		if (strcmp(lpActual->Telephone + 7, lpExpect->Telephone) == 0) {
+			return true;
+		}
+	}
+	if (strcmp(lpExpect->Telephone, lpActual->Telephone) == 0) {
+		return true;
+	}
+	return false;
+}
+
+/* 比较QQ */
+bool ZQueryCompareUserQQ(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	ZUserInfo* lpExpect = (ZUserInfo*)apExpect;
+	ZUserInfo* lpActual = (ZUserInfo*)apAcutal;
+
+	if (strcmp(lpExpect->QQ, lpActual->QQ) == 0) {
+		return true;
+	}
+	return false;
+}
+
+/* 比较身份证号 */
+bool ZQueryCompareUserIDNum(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	ZUserInfo* lpExpect = (ZUserInfo*)apExpect;
+	ZUserInfo* lpActual = (ZUserInfo*)apAcutal;
+
+	if (strlen(lpExpect->IDNumber) > 0 && strlen(lpExpect->IDNumber) <= 6) {
+		if (strstr(lpActual->IDNumber + 12, lpExpect->IDNumber)) {
+			return true;
+		}
+	}
+	else if (strcmp(lpExpect->IDNumber, lpActual->IDNumber) == 0) {
+		return true;
+	}
+	return false;
+}
+
+
+
+/* 一个账户信息块大小 */
 static uint32_t _ZUserInfoBlockSize()
 {
 	uint32_t lBlockSize = ztl_align(sizeof(ZUserInfo), USERINFO_DB_ALIGNMENT);
@@ -47,25 +96,10 @@ int ZUserInfoDBText::Open(const std::string& aDBName, const std::string& ip, uin
 	}
 	m_DBName = aDBName;
 
-	m_pShmObj = ztl_shm_create(aDBName.c_str(), ztl_open_or_create, ztl_read_write, false);
-
-	if (m_pShmObj == NULL)
+	if (PrivUserShmCreate() != 0)
 	{
-		TRACE(_T("ZUserInfoDBText open userinfo db failed"));
-		return -1;
-	}
-
-	ztl_shm_truncate(m_pShmObj, USERINFO_DB_DEFAULT_SIZE);
-	ztl_shm_map_region(m_pShmObj, ztl_read_write);
-
-	m_pBuffer = (char*)ztl_shm_get_address(m_pShmObj);
-	if (m_pBuffer == NULL)
-	{
-		TRACE(_T("ZUserInfoDBText map region userinfo db failed"));
 		return -2;
 	}
-
-	m_BufSize = USERINFO_DB_DEFAULT_SIZE;
 
 	return 0;
 }
@@ -227,16 +261,47 @@ ZUserInfo* ZUserInfoDBText::NextUserInfo(ZUserInfo* apCurUserInfo, bool aAutoExp
 
 ZUserInfo* ZUserInfoDBText::GetAvailUserInfo()
 {
-	ZUserInfo* lpCurInfo;
-	uint32_t   lBlockSize = _ZUserInfoBlockSize();
+	ZUserInfo*  lpCurInfo;
+	uint32_t    lBlockSize = _ZUserInfoBlockSize();
+	uint32_t    lUserNum = 1;
 
 	lpCurInfo = NULL;
 	while ((lpCurInfo = NextUserInfo(lpCurInfo)) != NULL)
 	{
 		if (!lpCurInfo->UserName[0])
 			break;
+		++lUserNum;
 	}
+
+	lpCurInfo->Number = lUserNum;
 
 	return lpCurInfo;
 }
 
+
+extern ztl_shm_t* ZDBShmCreate(const std::string& aDBName, uint32_t aDBSize);
+
+int ZUserInfoDBText::PrivUserShmCreate()
+{
+	if (m_pShmObj)
+	{
+		ztl_shm_release(m_pShmObj);
+		m_pShmObj = NULL;
+		m_pBuffer = NULL;
+		m_BufSize = m_BufSize * 2;
+	}
+	else
+	{
+		m_BufSize = USERINFO_DB_DEFAULT_SIZE;
+	}
+
+	m_pShmObj = ZDBShmCreate(m_DBName, m_BufSize);
+	if (m_pShmObj == NULL)
+	{
+		return -1;
+	}
+
+	m_pBuffer = (char*)ztl_shm_get_address(m_pShmObj);
+
+	return 0;
+}

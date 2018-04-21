@@ -39,12 +39,16 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		//lString.Format(_T("傲睿国际教育 - %s"), m_StuInfo.Name);
 		//SetWindowText(lString);
 
+		lString.Format("%d", m_StuInfo.Number);
+		SetDlgItemText(IDC_EDIT_NAME, lString);
+
 		SetDlgItemText(IDC_EDIT_NAME, m_StuInfo.Name);
 		SetDlgItemText(IDC_EDIT_TELEPHONE, m_StuInfo.Telehone);
 		SetDlgItemText(IDC_EDIT_COLLEGE, m_StuInfo.College);
 		SetDlgItemText(IDC_EDIT_MAJOR, m_StuInfo.Major);
 		SetDlgItemText(IDC_EDIT_CLASS, m_StuInfo.Class);
 		SetDlgItemText(IDC_EDIT_COUNTRY, m_StuInfo.Country);
+		SetDlgItemText(IDC_EDIT_IDNumber, m_StuInfo.IDNumber);
 
 		double lScore = (m_StuInfo.LanguageScore / 10);
 		if (m_StuInfo.LanguageScore > 2000)
@@ -120,6 +124,7 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 
 	GetDlgItemValue(IDC_EDIT_NAME, lStuInfo.Name, sizeof(lStuInfo.Name));
 	GetDlgItemValue(IDC_EDIT_TELEPHONE, lStuInfo.Telehone, sizeof(lStuInfo.Telehone));
+	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
 	GetDlgItemValue(IDC_EDIT_QQ, lStuInfo.QQ, sizeof(lStuInfo.QQ));
 	GetDlgItemValue(IDC_EDIT_CLASS, lStuInfo.Class, sizeof(lStuInfo.Class));
 	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.College, sizeof(lStuInfo.College));

@@ -12,15 +12,21 @@
 #define ZUSER_CIPHER_Simple         1           // 简单加密
 #define ZUSER_CIPHER_AES            2           // AES加密
 
+#define ZUSER_DEFAULT_RootName     "root"
+#define ZUSER_DEFAULT_RootPasswd   "111111"
+
+
 typedef struct tagZUserInfo
 {
 	char        UserName[24];           // 名字
 	char        Password[24];           // 密码
 	char        Telephone[16];          // 电话
 	char        QQ[16];                 // QQ
+	char		IDNumber[20];			// 身份证号
 	uint32_t    Number;                 // 编号
 	uint32_t    Role;                   // 角色
 	int32_t     Cipher;                 // 加密方式
+	int32_t		ExpireDate;				// 结束日期
 	int32_t     Deleted;                // 预留字段
 	char        Padding1[32];           //
 	char        Padding2[128];          //

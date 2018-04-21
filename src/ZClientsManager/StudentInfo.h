@@ -41,7 +41,8 @@ struct stZStudentInfo
 	char            Country[64];                // 意向国家：可多个国家
 	char            Source[32];                 // 学生来源：活动/推荐等
 	char            Status[32];                 // 目前状态（由于用户自定义描述）
-	char            Recorder[32];               // 谁记录
+	char            Recorder[12];               // 谁记录
+	char			IDNumber[20];               // 身份证号
 
 	uint32_t        Number;                     // 编号
 	uint32_t        LanguageScore;              // 托福/雅思分数(* 10)
