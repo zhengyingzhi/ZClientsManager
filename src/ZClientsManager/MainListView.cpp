@@ -52,8 +52,8 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 	aList.SetItemText(aRow, MAINLIST_COL_Name,     apStuInfo->Name);
 	aList.SetItemText(aRow, MAINLIST_COL_Telephone,apStuInfo->Telehone);
 	aList.SetItemText(aRow, MAINLIST_COL_Country,  apStuInfo->Country);
-	aList.SetItemText(aRow, MAINLIST_COL_College,  apStuInfo->College);
-	aList.SetItemText(aRow, MAINLIST_COL_Major,    apStuInfo->Major);
+	aList.SetItemText(aRow, MAINLIST_COL_College,  apStuInfo->CollegeFrom);
+	aList.SetItemText(aRow, MAINLIST_COL_Major,    apStuInfo->MajorFrom);
 	aList.SetItemText(aRow, MAINLIST_COL_Class,    apStuInfo->Class);
 
 	lString.Format("%.1lf", double(apStuInfo->LanguageScore / 10.0));

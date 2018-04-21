@@ -61,8 +61,9 @@ typedef void(*ZOnNetMessagePtr)(void* apUserData, ZNetMessage* apMessage);
 #define ZNET_DEFAULT_ANYIP		"0.0.0.0"
 #define ZNET_DEFAULT_GROUPIP	"229.5.9.4"
 
-#define ZNET_TYPE_TCP			0
-#define ZNET_TYPE_UDP			1
+#define ZNET_TYPE_UDP_MULTICAST 0
+#define ZNET_TYPE_UDP_BROADCAST 1
+#define ZNET_TYPE_TCP			2
 class ZNetConfig
 {
 public:

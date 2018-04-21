@@ -51,6 +51,8 @@ protected:
 public:
 	void UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec, BOOL aAppend);
 
+	void VagueFind(const char* apFindStr);
+
 // 生成的消息映射函数
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

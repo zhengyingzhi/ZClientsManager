@@ -3,7 +3,9 @@
 extern ZNetCommBase*	g_pNetComm;
 
 ZMemoryData::ZMemoryData()
-	: m_pUserDB()
+	: m_UserLock()
+	, m_pUserDB()
+	, m_StuLock()
 	, m_pStuDB()
 {
 	m_Pool = ztl_create_pool(ZMD_DEFAULT_SIZE);
@@ -58,6 +60,7 @@ int ZMemoryData::OpenUserDB(const string& aDBName, const string& aServerIP, uint
 
 int ZMemoryData::CloseUserDB()
 {
+	ZLockScope lk(&m_UserLock);
 	if (m_pUserDB)
 	{
 		m_pUserDB->Close();
@@ -69,6 +72,8 @@ int ZMemoryData::CloseUserDB()
 
 vector<ZUserInfo*> ZMemoryData::QueryAllUser()
 {
+	ZLockScope lk(&m_UserLock);
+
 	vector<ZUserInfo*> lVec;
 	lVec.reserve(m_CacheUserData.size());
 
@@ -78,6 +83,8 @@ vector<ZUserInfo*> ZMemoryData::QueryAllUser()
 
 vector<ZUserInfo*> ZMemoryData::QueryUserInfo(const ZUserInfo* apExpect, ZQueryComparePtr apCompFunc)
 {
+	ZLockScope lk(&m_UserLock);
+
 	ZUserInfo* lpUserInfo;
 	vector<ZUserInfo*> lVec;
 	lVec.reserve(128);
@@ -96,12 +103,21 @@ vector<ZUserInfo*> ZMemoryData::QueryUserInfo(const ZUserInfo* apExpect, ZQueryC
 
 void ZMemoryData::AddUserInfo(const ZUserInfo* apUserInfo)
 {
+	ZLockScope lk(&m_UserLock);
+
 	ZUserInfo* lpDstData;
 	lpDstData = (ZUserInfo*)ztl_pcalloc(m_Pool, sizeof(ZUserInfo));
 	memcpy(lpDstData, apUserInfo, sizeof(ZUserInfo));
 	m_CacheUserData.push_back(lpDstData);
 }
 
+void ZMemoryData::AddOrUpdateUserInfo(const ZUserInfo* apUserInfo)
+{
+	// todo: add or update
+}
+
+
+//////////////////////////////////////////////////////////////////////////
 
 int ZMemoryData::OpenStuDB(const string& aDBName, const string& aServerIP, uint16_t aPort)
 {
@@ -138,6 +154,8 @@ int ZMemoryData::OpenStuDB(const string& aDBName, const string& aServerIP, uint1
 
 int ZMemoryData::CloseStuDB()
 {
+	ZLockScope lk(&m_StuLock);
+
 	if (m_pStuDB)
 	{
 		m_pStuDB->Close();
@@ -149,6 +167,8 @@ int ZMemoryData::CloseStuDB()
 
 vector<ZStudentInfo*> ZMemoryData::QueryAllStudents()
 {
+	ZLockScope lk(&m_StuLock);
+
 	vector<ZStudentInfo*> lVec;
 	lVec.reserve(m_CacheStuData.size());
 
@@ -162,6 +182,8 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfo(const ZStudentInfo* apExpect, ZQ
 	vector<ZStudentInfo*> lVec;
 	lVec.reserve(128);
 
+	ZLockScope lk(&m_StuLock);
+
 	for (size_t i = 0; i < m_CacheStuData.size(); ++i)
 	{
 		lpStuInfo = m_CacheStuData[i];
@@ -174,9 +196,41 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfo(const ZStudentInfo* apExpect, ZQ
 	return lVec;
 }
 
+vector<ZStudentInfo*> ZMemoryData::QueryStuInfoVague(const char* apFindStr)
+{
+	ZStudentInfo* lpStuInfo;
+	vector<ZStudentInfo*> lVec;
+	lVec.reserve(128);
+
+	ZLockScope lk(&m_StuLock);
+
+	for (size_t i = 0; i < m_CacheStuData.size(); ++i)
+	{
+		lpStuInfo = m_CacheStuData[i];
+
+		if (strcmp(lpStuInfo->Name, apFindStr) == 0 ||
+			strcmp(lpStuInfo->QQ, apFindStr) == 0 ||
+			strcmp(lpStuInfo->Class, apFindStr) == 0 ||
+			strstr(lpStuInfo->CollegeFrom, apFindStr) ||
+			strstr(lpStuInfo->CollegeTo, apFindStr) ||
+			strstr(lpStuInfo->MajorFrom, apFindStr) ||
+			strstr(lpStuInfo->MajorTo, apFindStr) ||
+			strstr(lpStuInfo->Country, apFindStr) ||
+			strstr(lpStuInfo->Status, apFindStr) || 
+			strcmp(lpStuInfo->IDNumber, apFindStr) == 0)
+		{
+			lVec.push_back(lpStuInfo);
+		}
+	}
+
+	return lVec;
+}
+
 
 void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 {
+	ZLockScope lk(&m_StuLock);
+
 	int rv;
 
 	ZStudentInfo* lpDstData;
@@ -188,13 +242,13 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 	{
 		// make a net message packet, and send out
 		ZNetMessage* lpMessage;
-		lpMessage = ZNetProtocol::MakeNetMessage(ZNET_T_Publish, apStuInfo, sizeof(ZStudentInfo));
+		lpMessage = ZNetProtocol::MakeNetMessage(ZNET_T_PublishAdd, ZNET_MSG_StuInfo, apStuInfo, sizeof(ZStudentInfo));
 
 		rv = g_pNetComm->DirectSend(lpMessage->GetRawBegin(), lpMessage->Size());
 		if (rv < 0)
 		{
 			char lErrorMsg[512] = "";
-			sprintf(lErrorMsg, "DirectSend failed %d", get_errno());
+			sprintf(lErrorMsg, "AddStuInfo DirectSend() failed %d", get_errno());
 			OutputDebugString(lErrorMsg);
 		}
 
@@ -202,3 +256,6 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 	}
 }
 
+
+void ZMemoryData::AddOrUpdateStuInfo(const ZStudentInfo* apStuInfo)
+{}

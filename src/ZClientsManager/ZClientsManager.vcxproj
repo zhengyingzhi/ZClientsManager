@@ -208,6 +208,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UserInfo.h" />
     <ClInclude Include="UserInfoDB.h" />
+    <ClInclude Include="ZAppConfig.h" />
     <ClInclude Include="ZClientsManager.h" />
     <ClInclude Include="ZCommon.h" />
     <ClInclude Include="ZConfirmDlg.h" />
@@ -234,6 +235,7 @@
     </ClCompile>
     <ClCompile Include="StudentInfoDB.cpp" />
     <ClCompile Include="UserInfoDB.cpp" />
+    <ClCompile Include="ZAppConfig.cpp" />
     <ClCompile Include="ZClientsManager.cpp" />
     <ClCompile Include="ZConfirmDlg.cpp" />
     <ClCompile Include="ZDataBase.cpp" />

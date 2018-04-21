@@ -10,15 +10,46 @@
 
 #include "ZLoginDlg.h"
 
-#include <ZToolLib/ztl_config.h>
-
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-ZMemoryData		g_MemData;
 ZNetCommBase*	g_pNetComm = NULL;
+ZMemoryData		g_MemData;
+
+ZAppConfigs		g_AppConfig;
+
+/* 收到网络消息 */
+static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
+{
+	// todo: operations
+	ZNetHead*	lpNetHead;
+	ZMsgHead*	lpMsgHead;
+	void*		lpRawMessage;
+
+	// got unrecognized message
+	if (!ZNetProtocol::IsValidHead(lpNetHead))
+	{
+		return;
+	}
+
+	ZNetProtocol::ExtractNetMessage(apMessage, &lpNetHead, &lpMsgHead, &lpRawMessage);
+
+	if (lpNetHead->m_Type == ZNET_T_PublishAdd || lpNetHead->m_Type == ZNET_T_PublishUpdate)
+	{
+		if (lpMsgHead->m_MsgType == ZNET_MSG_UserInfo)
+		{
+			g_MemData.AddOrUpdateUserInfo((ZUserInfo*)lpRawMessage);
+		}
+		else if (lpMsgHead->m_MsgType == ZNET_MSG_StuInfo)
+		{
+			g_MemData.AddOrUpdateStuInfo((ZStudentInfo*)lpRawMessage);
+		}
+	}
+
+	ZNetMessage::Release(apMessage);
+}
 
 // CZClientsManagerApp
 
@@ -108,6 +139,9 @@ BOOL CZClientsManagerApp::InitInstance()
 
 	// load netlib
 	net_init();
+
+	// load config "ZAppConfig.txt"
+	g_AppConfig.ReadAppConfig(ZAPP_CONFIG_NAME);
 
 	if (!DoLoginDlg())
 	{
@@ -205,26 +239,6 @@ void CZClientsManagerApp::SaveCustomState()
 // CZClientsManagerApp 消息处理程序
 
 
-
-void CZClientsManagerApp::ReadConfigs(ZAppConfigs& aAppConfigs)
-{
-	ztl_config_t* zconf;
-	zconf = ztl_config_open(ZAPP_CONFIG_NAME, '#', '=');
-	if (!zconf)
-	{
-		return;
-	}
-
-	int lLength = 0;
-	char* lpOutUserID = nullptr;
-	if (ztl_config_read_str(zconf, "UserID", &lpOutUserID, &lLength))
-	{
-		strncpy(aAppConfigs.m_UserID, lpOutUserID, sizeof(aAppConfigs.m_UserID) - 1);
-	}
-
-	ztl_config_close(zconf);
-}
-
 BOOL CZClientsManagerApp::DoLoginDlg()
 {
 	/* database */
@@ -257,17 +271,17 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	if (g_pNetComm == NULL)
 	{
 		ZNetConfig lNetConf;
-		lNetConf.m_Type			= ZNET_TYPE_UDP;
+		lNetConf.m_Type			= g_AppConfig.m_NetType;
 		lNetConf.m_IsBroadcast	= 0;
 		lNetConf.m_PeerAddr		= 0;
 		lNetConf.m_PeerPort		= 0;
-		lNetConf.m_BindPort		= ZNET_DEFAULT_PORT;
+		lNetConf.m_BindPort		= g_AppConfig.m_MainPort;
 		lNetConf.m_BindAddr		= string_to_inetaddr(ZNET_DEFAULT_ANYIP);
-		lNetConf.m_GroupAddr	= string_to_inetaddr(ZNET_DEFAULT_GROUPIP);
+		lNetConf.m_GroupAddr	= string_to_inetaddr(g_AppConfig.m_CastIP);
 
 		// todo: add callback
-		lNetConf.m_pFunc = nullptr;
-		lNetConf.m_pUserData = nullptr;
+		lNetConf.m_pFunc = _ZOnNetMessage;
+		lNetConf.m_pUserData = this;
 
 		g_pNetComm = new ZUdpComm();
 		g_pNetComm->Init(lNetConf);
@@ -276,22 +290,16 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	}
 
 	/* login user */
-	ZAppConfigs lAppConfigs = {};
-	ReadConfigs(lAppConfigs);
-
 	ZUserInfo* lpUserInfo;
 
-	CString   lUserID, lPasswd;
-	ZLoginDlg lLoginDlg;
-	if (lAppConfigs.m_UserID[0])
-	{
-		lLoginDlg.SetUserID(lAppConfigs.m_UserID);
-	}
+	CString  lUserID, lPasswd;
+	uint32_t lSavePasswd = 0;
 
-#if defined(DEBUG) || defined(_DEBUG)
-	lPasswd = _T("123456");
-	lLoginDlg.SetPassword(lPasswd);
-#endif // DEBUG
+	ZLoginDlg lLoginDlg;
+	if (g_AppConfig.m_UserID[0])
+	{
+		lLoginDlg.SetUserID(g_AppConfig.m_UserID);
+	}
 
 	/* show login dialog and verify userid & passwd */
 	do
@@ -303,6 +311,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 
 		lUserID = lLoginDlg.GetUserID();
 		lPasswd = lLoginDlg.GetPasswd();
+		lSavePasswd = lLoginDlg.IsRememberPasswd();
 
 		ZUserInfo lQryCond = {};
 		strncpy(lQryCond.UserName, (char*)(LPCSTR)lUserID, sizeof(lQryCond.UserName) - 1);
@@ -329,18 +338,14 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		}
 	} while (TRUE);
 
-	/* write userid back to app conf name */
-	if (lUserID.Compare(lAppConfigs.m_UserID) != 0)
+	/* write config back to app conf name */
+	if (lUserID.Compare(g_AppConfig.m_UserID) != 0 || lPasswd.Compare(g_AppConfig.m_Password) != 0)
 	{
-		char lConfBuffer[1024] = "";
-		sprintf(lConfBuffer, "UserID=%s", (char*)(LPCSTR)lUserID);
-		FILE* fp = fopen(ZAPP_CONFIG_NAME, "w");
-		if (fp)
-		{
-			fputs(lConfBuffer, fp);
-			fflush(fp);
-			fclose(fp);
-		}
+		g_AppConfig.SetUserID((char*)(LPCSTR)lUserID);
+		g_AppConfig.SetPassword((char*)(LPCSTR)lPasswd);
+		g_AppConfig.SetSavePasswd(lSavePasswd);
+
+		g_AppConfig.WriteAppConfig(ZAPP_CONFIG_NAME);
 	}
 
 	return TRUE;

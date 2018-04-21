@@ -1,1 +1,6 @@
-UserID=root
+UserID=root
+Password=root
+SavePasswd=0
+NetType=2
+MainPort=40594
+CastIP=229.5.9.4

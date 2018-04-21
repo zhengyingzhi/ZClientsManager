@@ -44,8 +44,8 @@ BOOL ZStuInfoDlg::OnInitDialog()
 
 		SetDlgItemText(IDC_EDIT_NAME, m_StuInfo.Name);
 		SetDlgItemText(IDC_EDIT_TELEPHONE, m_StuInfo.Telehone);
-		SetDlgItemText(IDC_EDIT_COLLEGE, m_StuInfo.College);
-		SetDlgItemText(IDC_EDIT_MAJOR, m_StuInfo.Major);
+		SetDlgItemText(IDC_EDIT_COLLEGE, m_StuInfo.CollegeFrom);
+		SetDlgItemText(IDC_EDIT_MAJOR, m_StuInfo.MajorFrom);
 		SetDlgItemText(IDC_EDIT_CLASS, m_StuInfo.Class);
 		SetDlgItemText(IDC_EDIT_COUNTRY, m_StuInfo.Country);
 		SetDlgItemText(IDC_EDIT_IDNumber, m_StuInfo.IDNumber);
@@ -119,6 +119,8 @@ void ZStuInfoDlg::GetDlgItemValue(int nID, int64_t& aValue)
 
 void ZStuInfoDlg::OnBnClickedBtnSave()
 {
+	/* TODO: 每更新一条消息时，应持久化该操作到一个文件中，便于查找历史 */
+
 	ZStudentInfo lStuInfo;
 	memset(&lStuInfo, 0, sizeof(lStuInfo));
 
@@ -127,8 +129,8 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
 	GetDlgItemValue(IDC_EDIT_QQ, lStuInfo.QQ, sizeof(lStuInfo.QQ));
 	GetDlgItemValue(IDC_EDIT_CLASS, lStuInfo.Class, sizeof(lStuInfo.Class));
-	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.College, sizeof(lStuInfo.College));
-	GetDlgItemValue(IDC_EDIT_MAJOR, lStuInfo.Major, sizeof(lStuInfo.Major));
+	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.CollegeFrom, sizeof(lStuInfo.CollegeFrom));
+	GetDlgItemValue(IDC_EDIT_MAJOR, lStuInfo.MajorFrom, sizeof(lStuInfo.MajorFrom));
 	GetDlgItemValue(IDC_EDIT_COUNTRY, lStuInfo.Country, sizeof(lStuInfo.Country));
 	GetDlgItemValue(IDC_EDIT_SOURCE, lStuInfo.Source, sizeof(lStuInfo.Source));
 	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));

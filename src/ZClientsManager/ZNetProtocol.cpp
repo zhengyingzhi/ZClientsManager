@@ -16,7 +16,7 @@ bool ZNetProtocol::IsValidHead(void* apAddr)
 	return true;
 }
 
-ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aType, const void* apDataInfo, uint32_t aDataSize)
+ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType, const void* apDataInfo, uint32_t aDataSize)
 {
 	uint32_t lSize = sizeof(ZNetHead) + sizeof(ZMsgHead) + sizeof(ZStudentInfo) + 8;
 	ZNetMessage* lpMessage;
@@ -32,12 +32,13 @@ ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aType, const void* apDataInfo
 
 	lpProtoHead->m_StartType	= ZNET_STARTTYPE_CM;
 	lpProtoHead->m_Version		= ZNET_VERSION;
-	lpProtoHead->m_Type			= aType;
+	lpProtoHead->m_Type			= aProtoType;
 	lpProtoHead->m_Length		= sizeof(ZMsgHead) + aDataSize;
 	lpProtoHead->m_Flag			= 0;
 
 	lpMsgHed->m_DataSize		= aDataSize;
 	lpMsgHed->m_Count			= 1;
+	lpMsgHed->m_MsgType			= aMsgType;
 	lpMsgHed->m_BegSeq			= 1;
 
 	memcpy(lpDataInfo, apDataInfo, aDataSize);

@@ -11,17 +11,18 @@
 
 #include "ZMemoryData.h"
 
+#include "ZAppConfig.h"
+
+
+
 class CMainFrame;
 
 extern ZMemoryData		g_MemData;
 extern ZNetCommBase*	g_pNetComm;
 extern CMainFrame*		g_pMainFrame;
 
-#define ZAPP_CONFIG_NAME    "ZAppConfig.txt"
-typedef struct
-{
-	char    m_UserID[24];
-}ZAppConfigs;
+extern ZAppConfigs		g_AppConfig;
+
 
 // CZClientsManagerApp:
 // 有关此类的实现，请参阅 ZClientsManager.cpp
@@ -42,7 +43,6 @@ public:
 
 public:
 	BOOL DoLoginDlg();
-	void ReadConfigs(ZAppConfigs& aAppConfigs);
 
 public:
 	CString GetLoginUserID() { return m_LoginUser; }

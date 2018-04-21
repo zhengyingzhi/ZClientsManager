@@ -93,6 +93,9 @@
     <ClInclude Include="ZNetProtocol.h">
       <Filter>Network</Filter>
     </ClInclude>
+    <ClInclude Include="ZAppConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -145,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="ZNetProtocol.cpp">
       <Filter>Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ZAppConfig.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

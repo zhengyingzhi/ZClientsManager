@@ -85,7 +85,7 @@ bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExten
 	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
 	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
 
-	if (strstr(lpActual->College, lpExpect->College))
+	if (strstr(lpActual->CollegeFrom, lpExpect->CollegeFrom))
 	{
 		return true;
 	}

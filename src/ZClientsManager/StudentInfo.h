@@ -36,8 +36,10 @@ struct stZStudentInfo
 	char            Telehone[16];               // 电话
 	char            QQ[16];                     // QQ
 	char            Class[16];                  // 年级
-	char            College[64];                // 大学
-	char            Major[64];                  // 专业
+	char            CollegeFrom[64];            // 现就读大学
+	char            CollegeTo[64];              // 意向大学
+	char            MajorFrom[64];              // 现就读专业
+	char            MajorTo[64];                // 意向专业
 	char            Country[64];                // 意向国家：可多个国家
 	char            Source[32];                 // 学生来源：活动/推荐等
 	char            Status[32];                 // 目前状态（由于用户自定义描述）

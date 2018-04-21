@@ -76,7 +76,7 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 	GetDlgItemText(IDC_EDIT_SOURCE, lSource);
 	strncpy(lStuInfo.Name, (char*)(LPCSTR)lName, sizeof(lStuInfo.Name) - 1);
 	strncpy(lStuInfo.Telehone, (char*)(LPCSTR)lTelephone, sizeof(lStuInfo.Telehone) - 1);
-	strncpy(lStuInfo.College, (char*)(LPCSTR)lCollge, sizeof(lStuInfo.College) - 1);
+	strncpy(lStuInfo.CollegeFrom, (char*)(LPCSTR)lCollge, sizeof(lStuInfo.CollegeFrom) - 1);
 	strncpy(lStuInfo.QQ, (char*)(LPCSTR)lQQ, sizeof(lStuInfo.QQ) - 1);
 	strncpy(lStuInfo.Status, (char*)(LPCSTR)lStatus, sizeof(lStuInfo.Status) - 1);
 	strncpy(lStuInfo.Source, (char*)(LPCSTR)lSource, sizeof(lStuInfo.Source) - 1);

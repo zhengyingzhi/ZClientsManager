@@ -52,6 +52,41 @@ static UINT indicators[] =
 	ID_INDICATOR_SCRL,
 };
 
+static bool _IsNumericString(const char* apFindStr, int aLength)
+{
+	const char* lpCur = apFindStr;
+	while (lpCur < (apFindStr + aLength))
+	{
+		if (*lpCur < '0' || *lpCur > '9') {
+			return false;
+		}
+		++lpCur;
+	}
+	return true;
+}
+
+static bool _IsScoreString(const char* apFindStr)
+{
+	int lLength = strlen(apFindStr);
+	if (lLength > 4) {
+		return false;
+	}
+
+	const char* lpTemp = strchr(apFindStr, '.');
+	if (lpTemp)
+	{
+		if (_IsNumericString(apFindStr, int(lpTemp - apFindStr))) {
+			return true;
+		}
+		return false;
+	}
+
+	if (_IsNumericString(apFindStr, strlen(apFindStr))) {
+		return true;
+	}
+	return false;
+}
+
 // CMainFrame 构造/析构
 
 CMainFrame::CMainFrame()
@@ -204,7 +239,9 @@ void CMainFrame::OnClose()
 		return;
 	}
 
-	// TODO: save data
+	// save data
+	g_AppConfig.WriteAppConfig(ZAPP_CONFIG_NAME);
+
 	g_MemData.CloseUserDB();
 	g_MemData.CloseStuDB();
 
@@ -285,6 +322,11 @@ void CMainFrame::OnSetFocus(CWnd* /*pOldWnd*/)
 
 BOOL CMainFrame::OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo)
 {
+	if (m_pMainView && (nCode == WM_KEYDOWN))
+	{
+
+	}
+
 	// 让视图第一次尝试该命令
 	if (m_pMainView && m_pMainView->OnCmdMsg(nID, nCode, pExtra, pHandlerInfo))
 		return TRUE;
@@ -388,6 +430,41 @@ void CMainFrame::UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec, BOOL aA
 	}
 }
 
+// 工具栏-模糊查询
+void CMainFrame::VagueFind(const char* apFindStr)
+{
+	int lLength = strlen(apFindStr);
+
+	vector<ZStudentInfo*> lStuVec;
+	ZStudentInfo lStuInfo = {};
+
+	if (_IsNumericString(apFindStr, lLength) && (lLength == 4 || lLength == 11))
+	{
+		strcpy(lStuInfo.Telehone, apFindStr);
+		lStuVec =g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareNameAndTel, 0);
+	}
+	else if (_IsScoreString(apFindStr))
+	{
+		lStuInfo.LanguageScore = uint32_t(atof(apFindStr) * 10);
+		lStuVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareScore, CC_Equal);
+	}
+	else
+	{
+		// 模糊查询 名字、QQ、身份证、大学、状态 等
+		lStuVec = g_MemData.QueryStuInfoVague(apFindStr);
+	}
+
+	if (!lStuVec.empty())
+	{
+		UpdateStuToMainListView(lStuVec, FALSE);
+	}
+	else
+	{
+		AfxMessageBox(_T("未查询到相关学生信息\n可使用查询对话框查询"), MB_OK | MB_ICONWARNING);
+	}
+}
+
+
 // 学生信息插入事件
 void CMainFrame::OnEditInsert()
 {
@@ -479,6 +556,7 @@ void CMainFrame::OnButtonFind()
 			m_comboBox.InsertString(0, lContent);
 		}
 
-		// todo: 模糊查询搜索条件
+		// 模糊查询搜索条件
+		VagueFind((char*)(LPCSTR)lContent);
 	}
 }
