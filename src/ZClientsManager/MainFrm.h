@@ -44,6 +44,7 @@ protected:  // 控件条嵌入成员
 	CMainListView*    m_pMainView;
 
 	CComboBox         m_comboBox;
+	CString           m_comboText;
 
 protected:
 	ZStuQryDlg        m_StuQryDlg;
@@ -77,6 +78,7 @@ public:
 	afx_msg void OnButtonDel();
 	afx_msg void OnButtonModify();
 	afx_msg void OnButtonFind();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
 
 

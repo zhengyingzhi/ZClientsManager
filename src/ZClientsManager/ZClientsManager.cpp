@@ -244,7 +244,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	/* database */
 	if (g_MemData.GetUserDB() == NULL)
 	{
-		if (g_MemData.OpenUserDB(g_AppConfig.m_UserDBName, g_AppConfig.m_CastIP, , g_AppConfig.m_MainPort) != 0)
+		if (g_MemData.OpenUserDB(g_AppConfig.m_UserDBName, g_AppConfig.m_CastIP, g_AppConfig.m_MainPort) != 0)
 		{
 			AfxMessageBox(_T("打开账户信息数据库失败"), MB_OK | MB_ICONWARNING);
 			return FALSE;

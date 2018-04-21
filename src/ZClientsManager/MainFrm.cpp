@@ -536,6 +536,13 @@ void CMainFrame::OnButtonFind()
 	}
 	else
 	{
+		// if text not changed
+		if (m_comboText == lContent)
+		{
+			return;
+		}
+		m_comboText = lContent;
+
 		// try add one search condition to combobox
 		if (m_comboBox.GetCount() > 10) {
 			m_comboBox.DeleteString(10);
@@ -559,4 +566,25 @@ void CMainFrame::OnButtonFind()
 		// 模糊查询搜索条件
 		VagueFind((char*)(LPCSTR)lContent);
 	}
+}
+
+
+BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+	{
+		CString lContent;
+		m_comboBox.GetWindowText(lContent);
+		if (m_comboBox.IsChild(GetFocus()) && !lContent.IsEmpty() && lContent != m_comboText)
+		{
+			m_comboText = lContent;
+
+			// 模糊查询搜索条件
+			VagueFind((char*)(LPCSTR)lContent);
+
+			m_comboBox.SetFocus();
+		}
+	}
+
+	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
