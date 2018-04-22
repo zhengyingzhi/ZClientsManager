@@ -14,6 +14,7 @@
 #define USERLIST_COL_InsertTime     6           // 插入时间
 #define USERLIST_COL_UpdateTime     7           // 更新时间
 #define USERLIST_COL_Status         8           // 状态（是否已删除）
+#define USERLIST_COL_IDNumber       9           // 身份证号
 
 
 // ZUserInfoDlg dialog
@@ -37,7 +38,7 @@ public:
 public:
 	void SetOperateType(ZEnumOperateType aOperateType) { m_OperateType = aOperateType; }
 
-	void UpdateUserInfoToDlg(vector<ZUserInfo*>& aVec);
+	void UpdateUserInfoToDlg(vector<ZUserInfo*>& aVec, BOOL aAppend);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support

@@ -83,7 +83,9 @@ ZUserInfoDBText::ZUserInfoDBText()
 ZUserInfoDBText::~ZUserInfoDBText()
 {
 	if (m_pShmObj)
+	{
 		ztl_shm_release(m_pShmObj);
+	}
 }
 
 int ZUserInfoDBText::Open(const std::string& aDBName, const std::string& ip, uint16_t port)
@@ -141,7 +143,8 @@ int ZUserInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 	}
 
 	// FIXME: only fill some fields
-	memcpy(lpDstInfo, lpUserInfo, sizeof(ZUserInfo));
+	//memcpy(lpDstInfo, lpUserInfo, sizeof(ZUserInfo));
+	ZUserInfoCopy(lpDstInfo, lpUserInfo);
 	ztl_shm_flush_to_file(m_pShmObj, true, NULL, 0);
 
 	return 0;
@@ -167,7 +170,9 @@ int ZUserInfoDBText::Update(void* apDataInfo, uint32_t aDataSize)
 
 	lpDstInfo = lpQryRs->RsAtAsType<ZUserInfo>(0);
 
-	memcpy(lpDstInfo, lpUserInfo, sizeof(ZUserInfo));
+	//memcpy(lpDstInfo, lpUserInfo, sizeof(ZUserInfo));
+	ZUserInfoCopy(lpDstInfo, lpUserInfo);
+
 	ztl_shm_flush_to_file(m_pShmObj, true, NULL, 0);
 
 	FreeQueryRs(lpQryRs);

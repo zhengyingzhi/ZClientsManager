@@ -257,13 +257,23 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	/* database */
 	if (g_MemData.GetUserDB() == NULL)
 	{
+		// 注意：仅要求有该数据库文件
+		FILE* fp = fopen(g_AppConfig.m_UserDBName, "r");
+		if (fp == NULL)
+		{
+			AfxMessageBox(_T("未找到账户信息数据库"), MB_OK | MB_ICONERROR);
+			return FALSE;
+		}
+		fclose(fp);
+
+		// 打开并访问数据库
 		if (g_MemData.OpenUserDB(g_AppConfig.m_UserDBName, g_AppConfig.m_CastIP, g_AppConfig.m_MainPort) != 0)
 		{
-			AfxMessageBox(_T("打开账户信息数据库失败"), MB_OK | MB_ICONWARNING);
+			AfxMessageBox(_T("打开账户信息数据库失败"), MB_OK | MB_ICONERROR);
 			return FALSE;
 		}
 
-		// if have no any user at firstly
+		// 如果是第一次，则创建默认账户
 		if (g_MemData.UserCount() == 0)
 		{
 			// add a root user
@@ -277,7 +287,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			strcpy(lUserInfo.Comment, "    超级管理员账户，具有最高管理权限，可管理一切其它账户信息和学生资源信息。");
 
 			g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo));
-			g_MemData.AddUserInfo(&lUserInfo);
+			g_MemData.AddOrUpdateUserInfo(0, &lUserInfo);
 
 			// add a normal user which can only browse data
 			strcpy(lUserInfo.UserName, "Guess");
@@ -289,7 +299,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			strcpy(lUserInfo.Comment, "    普通账户，只具有浏览学生资源信息的权限，不可管理其它账户信息和学生资源信息。");
 
 			g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo));
-			g_MemData.AddUserInfo(&lUserInfo);
+			g_MemData.AddOrUpdateUserInfo(0, &lUserInfo);
 		}
 	}
 

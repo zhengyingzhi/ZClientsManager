@@ -62,8 +62,16 @@
 #define IDC_BTN_CLEAR                   1015
 #define IDC_EDIT_IDNumber               1015
 #define IDC_EDIT_YESNO                  1016
+#define IDC_EDIT_ADDTIME                1016
 #define IDC_EDIT_STATUS                 1017
 #define IDC_RADIO_GIRL                  1018
+#define IDC_DTPICKER_Date               1019
+#define IDC_DTPICKER_Time               1020
+#define IDC_EDIT_UPDATETIME             1021
+#define IDC_EDIT_COLLEGE_TO             1022
+#define IDC_EDIT_MAJOR_TO               1024
+#define IDC_EDIT_LANGSCORE2             1025
+#define IDC_EDIT_GPA                    1025
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_DELETE                  32772
 #define ID_EDIT_INSERT2                 32773
@@ -100,7 +108,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        337
 #define _APS_NEXT_COMMAND_VALUE         32803
-#define _APS_NEXT_CONTROL_VALUE         1018
+#define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

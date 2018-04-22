@@ -48,8 +48,6 @@ public:
 	vector<ZUserInfo*> QueryAllUser();
 	vector<ZUserInfo*> QueryUserInfo(const ZUserInfo* apExpect, ZQueryComparePtr apCompFunc);
 
-	void AddUserInfo(const ZUserInfo* apUserInfo);
-
 	/* 添加或更新数据 */
 	void AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo);
 

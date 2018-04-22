@@ -31,6 +31,8 @@ struct stZSumaryInfo
 	char            Padding[52];
 };
 
+/* todo: add GPA field */
+
 struct stZStudentInfo
 {
 	char            Name[16];                   // 姓名
@@ -52,9 +54,9 @@ struct stZStudentInfo
 	uint32_t        Flag;                       // 数据标志
 	StuImportant    ImportantLevel;             // 重要级别
 	StudentSex      Sex;                        // 性别 1-boy 2-girl
-	uint32_t        Reserve1;                   // 预留字段1
-	uint32_t        Reserve2;                   // 预留字段2
-	uint32_t        Reserve3;                   // 预留字段3
+	uint32_t        GPA;                        // 绩点（* 10）
+	uint32_t        Reserve2;                   // 预留字段1
+	uint32_t        Reserve3;                   // 预留字段2
 	int64_t         InsertTime;                 // 录入时间
 	int64_t         UpdateTime;                 // 更新时间
 	int64_t         NextVisitTime;              // 下次回访时间
@@ -67,3 +69,5 @@ typedef struct stZStudentInfo ZStudentInfo;
 extern int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aPrePaddingSize);
 
 extern int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSize, ZStudentInfo* apStuInfo);
+
+extern void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo);

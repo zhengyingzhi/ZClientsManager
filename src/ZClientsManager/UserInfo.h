@@ -42,3 +42,5 @@ typedef struct tagZUserInfo
 extern int ZUserInfoFixString(const ZUserInfo* apUserInfo, char* apBuffer, uint32_t aPrePaddingSize);
 
 extern int ZFixString2UserInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSize, ZUserInfo* apUserInfo);
+
+extern void ZUserInfoCopy(ZUserInfo* apDstInfo, const ZUserInfo* apSrcInfo);

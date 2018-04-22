@@ -104,19 +104,23 @@ vector<ZUserInfo*> ZMemoryData::QueryUserInfo(const ZUserInfo* apExpect, ZQueryC
 	return lVec;
 }
 
-void ZMemoryData::AddUserInfo(const ZUserInfo* apUserInfo)
-{
-	ZLockScope lk(&m_UserLock);
-
-	ZUserInfo* lpDstData;
-	lpDstData = (ZUserInfo*)ztl_pcalloc(m_Pool, sizeof(ZUserInfo));
-	memcpy(lpDstData, apUserInfo, sizeof(ZUserInfo));
-	m_CacheUserData.push_back(lpDstData);
-}
 
 void ZMemoryData::AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo)
 {
-	// todo: add or update
+	ZLockScope lk(&m_UserLock);
+
+	vector<ZUserInfo*> lVec = QueryUserInfo(apUserInfo, ZQueryCompareUserName);
+	if (!lVec.empty())
+	{
+		ZUserInfoCopy(lVec[0], apUserInfo);
+	}
+	else
+	{
+		ZUserInfo* lpDstData;
+		lpDstData = (ZUserInfo*)ztl_pcalloc(m_Pool, sizeof(ZUserInfo));
+		memcpy(lpDstData, apUserInfo, sizeof(ZUserInfo));
+		m_CacheUserData.push_back(lpDstData);
+	}
 }
 
 

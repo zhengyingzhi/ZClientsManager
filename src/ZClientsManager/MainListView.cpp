@@ -16,18 +16,21 @@ MainListColDesc MLColums[] = {
 	{ MAINLIST_COL_Name,        60,  _T("姓名") },
 	{ MAINLIST_COL_Telephone,   100, _T("电话") },
 	{ MAINLIST_COL_Country,     80,  _T("国家") },
-	{ MAINLIST_COL_College,     110, _T("大学") },
-	{ MAINLIST_COL_Major,       140, _T("专业") },
+	{ MAINLIST_COL_CollegeFrom, 110, _T("就读大学") },
+	{ MAINLIST_COL_CollegeTo,   110, _T("目标大学") },
+	{ MAINLIST_COL_MajorFrom,   140, _T("就读专业") },
+	{ MAINLIST_COL_MajorTo,     140, _T("目标专业") },
 	{ MAINLIST_COL_Class,       60,  _T("年级") },
 	{ MAINLIST_COL_LangScore,   60,  _T("分数") },
-	{ MAINLIST_COL_Sex,         40,  _T("性别") },
-	{ MAINLIST_COL_QQ,          80,  _T("QQ") },
+	{ MAINLIST_COL_LangScore,   60,  _T("GPA") },
 	{ MAINLIST_COL_Status,      100, _T("状态") },
 	{ MAINLIST_COL_Important,   60,  _T("重要级别") },
 	{ MAINLIST_COL_NextVisitTime, 120, _T("回访时间") },
+	{ MAINLIST_COL_Sex,         40,  _T("性别") },
+	{ MAINLIST_COL_QQ,          80,  _T("QQ") },
+	{ MAINLIST_COL_Source,      160, _T("来源") },
 	{ MAINLIST_COL_InsertTime,  120, _T("插入时间") },
 	{ MAINLIST_COL_UpdateTime,  120, _T("更新时间") },
-	{ MAINLIST_COL_Source,      160, _T("来源") },
 	{ 0, 0, 0 }
 };
 
@@ -77,27 +80,30 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 	aList.InsertItem(aRow, _T(""));
 
 	lString.Format("%d", aRow + 1);
-	aList.SetItemText(aRow, MAINLIST_COL_Row,      lString);
-	aList.SetItemText(aRow, MAINLIST_COL_Name,     apStuInfo->Name);
-	aList.SetItemText(aRow, MAINLIST_COL_Telephone,apStuInfo->Telehone);
-	aList.SetItemText(aRow, MAINLIST_COL_Country,  apStuInfo->Country);
-	aList.SetItemText(aRow, MAINLIST_COL_College,  apStuInfo->CollegeFrom);
-	aList.SetItemText(aRow, MAINLIST_COL_Major,    apStuInfo->MajorFrom);
-	aList.SetItemText(aRow, MAINLIST_COL_Class,    apStuInfo->Class);
+	aList.SetItemText(aRow, MAINLIST_COL_Row,         lString);
+	aList.SetItemText(aRow, MAINLIST_COL_Name,        apStuInfo->Name);
+	aList.SetItemText(aRow, MAINLIST_COL_Telephone,   apStuInfo->Telehone);
+	aList.SetItemText(aRow, MAINLIST_COL_Country,     apStuInfo->Country);
+	aList.SetItemText(aRow, MAINLIST_COL_CollegeFrom, apStuInfo->CollegeFrom);
+	aList.SetItemText(aRow, MAINLIST_COL_CollegeTo,   apStuInfo->CollegeTo);
+	aList.SetItemText(aRow, MAINLIST_COL_MajorFrom,   apStuInfo->MajorFrom);
+	aList.SetItemText(aRow, MAINLIST_COL_MajorTo,     apStuInfo->MajorTo);
+	aList.SetItemText(aRow, MAINLIST_COL_Class,       apStuInfo->Class);
 
 	lString.Format("%.1lf", double(apStuInfo->LanguageScore / 10.0));
 	aList.SetItemText(aRow, MAINLIST_COL_LangScore, lString);
+	lString.Format("%.1lf", double(apStuInfo->GPA / 10.0));
+	aList.SetItemText(aRow, MAINLIST_COL_GPA, lString);
 
-	aList.SetItemText(aRow, MAINLIST_COL_Sex,      ZStuSexDesc(apStuInfo->Sex));
-	aList.SetItemText(aRow, MAINLIST_COL_QQ,       apStuInfo->QQ);
 	aList.SetItemText(aRow, MAINLIST_COL_Status,   apStuInfo->Status);
 	aList.SetItemText(aRow, MAINLIST_COL_Important, ZStuImportantDesc(apStuInfo->ImportantLevel));
 	aList.SetItemText(aRow, MAINLIST_COL_NextVisitTime, ZConvDateTimeStr(apStuInfo->NextVisitTime).c_str());
 
+	aList.SetItemText(aRow, MAINLIST_COL_Sex, ZStuSexDesc(apStuInfo->Sex));
+	aList.SetItemText(aRow, MAINLIST_COL_QQ, apStuInfo->QQ);
+	aList.SetItemText(aRow, MAINLIST_COL_Source, apStuInfo->Source);
 	aList.SetItemText(aRow, MAINLIST_COL_InsertTime, ZConvDateTimeStr(apStuInfo->InsertTime).c_str());
 	aList.SetItemText(aRow, MAINLIST_COL_UpdateTime, ZConvDateTimeStr(apStuInfo->UpdateTime).c_str());
-	aList.SetItemText(aRow, MAINLIST_COL_Source,   apStuInfo->Source);
-
 }
 
 static uint32_t _GetMainListColNum()

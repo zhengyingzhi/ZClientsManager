@@ -272,7 +272,9 @@ int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 	}
 
 	// do write data and sync
-	memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
+	//memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
+	ZStuInfoCopy(lpDstInfo, lpStuInfo);
+
 	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
 
 	return 0;
@@ -298,7 +300,10 @@ int ZStudentInfoDBText::Update(void* apDataInfo, uint32_t aDataSize)
 	lpDstInfo = lpQryRs->RsAtAsType<ZStudentInfo>(0);
 
 	// FIXME: update some fields
-	memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
+	//memcpy(lpDstInfo, lpStuInfo, sizeof(ZStudentInfo));
+	ZStuInfoCopy(lpDstInfo, lpStuInfo);
+
+	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
 
 	FreeQueryRs(lpQryRs);
 	return 0;

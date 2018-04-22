@@ -130,7 +130,9 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	GetDlgItemValue(IDC_EDIT_QQ, lStuInfo.QQ, sizeof(lStuInfo.QQ));
 	GetDlgItemValue(IDC_EDIT_CLASS, lStuInfo.Class, sizeof(lStuInfo.Class));
 	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.CollegeFrom, sizeof(lStuInfo.CollegeFrom));
+	GetDlgItemValue(IDC_EDIT_COLLEGE_TO, lStuInfo.CollegeTo, sizeof(lStuInfo.CollegeTo));
 	GetDlgItemValue(IDC_EDIT_MAJOR, lStuInfo.MajorFrom, sizeof(lStuInfo.MajorFrom));
+	GetDlgItemValue(IDC_EDIT_MAJOR_TO, lStuInfo.MajorTo, sizeof(lStuInfo.MajorTo));
 	GetDlgItemValue(IDC_EDIT_COUNTRY, lStuInfo.Country, sizeof(lStuInfo.Country));
 	GetDlgItemValue(IDC_EDIT_SOURCE, lStuInfo.Source, sizeof(lStuInfo.Source));
 	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));
@@ -141,9 +143,14 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	double lScore = atof((char*)(LPCSTR)lString);
 	lStuInfo.LanguageScore = uint32_t(lScore * 10);
 
+	GetDlgItemText(IDC_EDIT_GPA, lString);
+	double lScore = atof((char*)(LPCSTR)lString);
+	lStuInfo.GPA = uint32_t(lScore * 10);
+
 	CButton* lpBtn = (CButton*)GetDlgItem(IDC_RADIO_BOY);
 	lStuInfo.Sex = lpBtn->GetCheck() ? SSEX_Boy : SSEX_Girl;
 
+	// todo: 比较数据
 	if (memcmp(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
 	{
 		AfxMessageBox(_T("未更新任何数据"), MB_OK | MB_ICONWARNING);
