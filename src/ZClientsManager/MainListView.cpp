@@ -11,6 +11,27 @@
 
 //////////////////////////////////////////////////////////////////////////
 // list control operates
+MainListColDesc MLColums[] = {
+	{ MAINLIST_COL_Row,		    40,  _T("编号") },
+	{ MAINLIST_COL_Name,        60,  _T("姓名") },
+	{ MAINLIST_COL_Telephone,   100, _T("电话") },
+	{ MAINLIST_COL_Country,     80,  _T("国家") },
+	{ MAINLIST_COL_College,     110, _T("大学") },
+	{ MAINLIST_COL_Major,       140, _T("专业") },
+	{ MAINLIST_COL_Class,       60,  _T("年级") },
+	{ MAINLIST_COL_LangScore,   60,  _T("分数") },
+	{ MAINLIST_COL_Sex,         40,  _T("性别") },
+	{ MAINLIST_COL_QQ,          80,  _T("QQ") },
+	{ MAINLIST_COL_Status,      100, _T("状态") },
+	{ MAINLIST_COL_Important,   60,  _T("重要级别") },
+	{ MAINLIST_COL_NextVisitTime, 120, _T("回访时间") },
+	{ MAINLIST_COL_InsertTime,  120, _T("插入时间") },
+	{ MAINLIST_COL_UpdateTime,  120, _T("更新时间") },
+	{ MAINLIST_COL_Source,      160, _T("来源") },
+	{ 0, 0, 0 }
+};
+
+/* 初始化列信息 */
 static void _InitMainListCtrl(CListCtrl& aList)
 {
 	DWORD dwStyle;
@@ -19,6 +40,7 @@ static void _InitMainListCtrl(CListCtrl& aList)
 	//dwStyle |= LVS_EX_CHECKBOXES;
 	aList.SetExtendedStyle(dwStyle);
 
+#if 0
 	aList.InsertColumn(MAINLIST_COL_Row,        _T("编号"),     LVCFMT_LEFT, 40);
 	aList.InsertColumn(MAINLIST_COL_Name,       _T("姓名"),     LVCFMT_LEFT, 60);
 	aList.InsertColumn(MAINLIST_COL_Telephone,  _T("电话"),     LVCFMT_LEFT, 100);
@@ -35,8 +57,15 @@ static void _InitMainListCtrl(CListCtrl& aList)
 	aList.InsertColumn(MAINLIST_COL_InsertTime, _T("插入时间"), LVCFMT_LEFT, 120);
 	aList.InsertColumn(MAINLIST_COL_UpdateTime, _T("更新时间"), LVCFMT_LEFT, 120);
 	aList.InsertColumn(MAINLIST_COL_Source,     _T("来源"),     LVCFMT_LEFT, 160);
+#else
+	for (uint32_t i = 0; MLColums[i].Desc; ++i)
+	{
+		aList.InsertColumn(MLColums[i].Col, MLColums[i].Desc, LVCFMT_LEFT, MLColums[i].Width);
+	}
+#endif//0
 }
 
+/* 更新信息到指定行中 */
 static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuInfo)
 {
 	CString lString;
@@ -71,6 +100,41 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 
 }
 
+static uint32_t _GetMainListColNum()
+{
+	return sizeof(MLColums) / sizeof(MLColums[0]) - 1;
+}
+
+/* 获取头部列信息 */
+static CString _GetMainListHeaderLine()
+{
+	CString lString;
+
+	for (uint32_t i = 0; MLColums[i].Desc; ++i)
+	{
+		lString.Append(MLColums[i].Desc);
+		lString.Append(",");
+	}
+	return lString;
+}
+
+/* 获取一行信息 */
+static CString _GetMainListCtrlLine(int aRow, CListCtrl& aList)
+{
+	if (aRow < 0) {
+		return "";
+	}
+
+	CString lString;
+
+	for (uint32_t i = 0; MLColums[i].Desc; ++i)
+	{
+		lString.Append(aList.GetItemText(aRow, i));
+		lString.Append(",");
+	}
+	return lString;
+}
+
 
 // CMainListView
 
@@ -93,6 +157,7 @@ BEGIN_MESSAGE_MAP(CMainListView, CListView)
 	ON_COMMAND(ID_EDIT_MODIFY, &CMainListView::OnEditModify)
 	ON_COMMAND(ID_EDIT_DELETE, &CMainListView::OnEditDelete)
 	ON_COMMAND(ID_EDIT_RESETMAIN, &CMainListView::OnEditResetmain)
+	ON_COMMAND(ID_EDIT_EXPORT, &CMainListView::OnEditExport)
 END_MESSAGE_MAP()
 
 
@@ -144,6 +209,7 @@ void CMainListView::OnInitialUpdate()
 
 
 
+// 更新学生信息到主ListView中
 void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec, BOOL aAppend)
 {
 	if (!aAppend) {
@@ -158,6 +224,8 @@ void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec, BOOL aAp
 	}
 }
 
+
+// 鼠标左键双击事件
 void CMainListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -171,7 +239,7 @@ void CMainListView::OnNMDblclk(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-
+// 鼠标右键单击事件
 void CMainListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -204,6 +272,7 @@ void CMainListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 }
 
 
+// 右键菜单-修改
 void CMainListView::OnEditModify()
 {
 	// 获取该行数据，并传入Dialog中，并做相应操作
@@ -232,7 +301,7 @@ void CMainListView::OnEditModify()
 	}
 }
 
-
+// 右键菜单-删除
 void CMainListView::OnEditDelete()
 {
 	// 从主界面上删除指定行数据
@@ -248,7 +317,76 @@ void CMainListView::OnEditDelete()
 	}
 }
 
+// 右键菜单-导出
+void CMainListView::OnEditExport()
+{
+	/* 登录进来的用户不具有导出数据的权限 */
+	if (!theApp.HaveExportRight())
+	{
+		CString lNote;
+		lNote.Format("您不具有导出数据的权限");
+		AfxMessageBox(lNote, MB_OK | MB_ICONERROR);
+		return;
+	}
 
+	BOOL    lIsOpen      = FALSE;
+	CString lDefaultDir  = _T(".");
+	CString lDefaultFile = _T("傲睿学生信息.csv");
+	CString lFilter      = _T("文件（*.csv; *.txt）|*.csv; *.txt||");
+	CString lFilePath    = lDefaultDir + "\\" + lDefaultFile;
+
+	CFileDialog lOpenFileDlg(lIsOpen, lDefaultDir, lDefaultFile,
+		OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, lFilter, NULL);
+
+	lOpenFileDlg.GetOFN().lpstrInitialDir = _T(".\\傲睿学生信息.csv");
+
+	INT_PTR lResult    = lOpenFileDlg.DoModal();
+
+	if (lResult != IDOK)
+	{
+		return;
+	}
+
+	lFilePath = lOpenFileDlg.GetPathName();
+
+	CString lLine;
+	POSITION pos;
+
+	FILE* fp = fopen((char*)(LPCSTR)lFilePath, "w");
+	if (fp == NULL)
+	{
+		lLine.Format("导出数据的文件[%s]打开失败:%d", lFilePath, GetLastError());
+		AfxMessageBox(lLine, MB_OK | MB_ICONERROR);
+		return;
+	}
+
+	lLine = _GetMainListHeaderLine();
+	fputs((char*)(LPCSTR)lLine, fp);
+
+	// get data and save into file
+	while (pos = m_list.GetFirstSelectedItemPosition())
+	{
+		int lSelItem = m_list.GetNextSelectedItem(pos);
+		if (lSelItem < 0 || lSelItem >= m_list.GetItemCount()) {
+			continue;
+		}
+
+		// get data
+		lLine = _GetMainListCtrlLine(lSelItem, m_list);
+		if (lLine.IsEmpty()) {
+			continue;
+		}
+
+		lLine.Append("\r\n");
+		fputs((char*)(LPCSTR)lLine, fp);
+	}
+
+	fflush(fp);
+	fclose(fp);
+}
+
+
+// 重置主界面显示信息
 void CMainListView::OnEditResetmain()
 {
 	// 重置主界面查询结果
@@ -256,3 +394,4 @@ void CMainListView::OnEditResetmain()
 	lVec = g_MemData.QueryAllStudents();
 	UpdateStuToListView(lVec, FALSE);
 }
+

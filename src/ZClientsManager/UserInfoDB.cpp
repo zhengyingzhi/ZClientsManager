@@ -192,7 +192,7 @@ int ZUserInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 		lpDstInfo = lpQryRs->RsAtAsType<ZUserInfo>(0);
 
 		// market as deleted
-		lpUserInfo->Deleted = 1;
+		lpUserInfo->Flags |= ZUSER_FLAG_Deleted;
 		ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZUserInfo));
 
 		FreeQueryRs(lpQryRs);
@@ -213,7 +213,7 @@ ZQueryResult* ZUserInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apComp
 			break;
 		}
 
-		if (lpDBInfo->Deleted) {
+		if (lpDBInfo->Flags & ZUSER_FLAG_Deleted) {
 			continue;
 		}
 

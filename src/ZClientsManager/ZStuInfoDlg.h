@@ -21,6 +21,13 @@
 #define MAINLIST_COL_UpdateTime     14          // 更新时间
 #define MAINLIST_COL_Source         15          // 来源
 
+typedef struct 
+{
+	uint16_t   Col;
+	uint16_t   Width;
+	char*      Desc;
+}MainListColDesc;
+
 
 // ZStuInfoDlg dialog
 

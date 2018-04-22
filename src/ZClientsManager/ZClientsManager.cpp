@@ -40,11 +40,15 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 	{
 		if (lpMsgHead->m_MsgType == ZNET_MSG_UserInfo)
 		{
-			g_MemData.AddOrUpdateUserInfo((ZUserInfo*)lpRawMessage);
+			ZUserInfo lUserInfo = { 0 };
+			ZFixString2UserInfo((char*)lpRawMessage, lpMsgHead->m_DataSize, ZNetProtocol::NetMessagePreSize(), &lUserInfo);
+			g_MemData.AddOrUpdateUserInfo(lpNetHead->m_Type, &lUserInfo);
 		}
 		else if (lpMsgHead->m_MsgType == ZNET_MSG_StuInfo)
 		{
-			g_MemData.AddOrUpdateStuInfo((ZStudentInfo*)lpRawMessage);
+			ZStudentInfo lStuInfo = { 0 };
+			ZFixString2StuInfo((char*)lpRawMessage, lpMsgHead->m_DataSize, ZNetProtocol::NetMessagePreSize(), &lStuInfo);
+			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo);
 		}
 	}
 
@@ -239,6 +243,15 @@ void CZClientsManagerApp::SaveCustomState()
 // CZClientsManagerApp 消息处理程序
 
 
+BOOL CZClientsManagerApp::HaveExportRight()
+{
+	if (m_LoginUser.Role == ZUSER_ROLE_Visitor || m_LoginUser.Role == ZUSER_ROLE_Normal)
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
 BOOL CZClientsManagerApp::DoLoginDlg()
 {
 	/* database */
@@ -250,9 +263,10 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			return FALSE;
 		}
 
-		// if have no any user at firstly, add a default root user
+		// if have no any user at firstly
 		if (g_MemData.UserCount() == 0)
 		{
+			// add a root user
 			ZUserInfo lUserInfo = { 0 };
 			strcpy(lUserInfo.UserName, ZUSER_DEFAULT_RootName);
 			strcpy(lUserInfo.Password, ZUSER_DEFAULT_RootPasswd);
@@ -261,6 +275,18 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			lUserInfo.Role = ZUSER_ROLE_Root;
 			lUserInfo.Cipher = 0;	// ZUSER_CIPHER_Simple
 			strcpy(lUserInfo.Comment, "    超级管理员账户，具有最高管理权限，可管理一切其它账户信息和学生资源信息。");
+
+			g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo));
+			g_MemData.AddUserInfo(&lUserInfo);
+
+			// add a normal user which can only browse data
+			strcpy(lUserInfo.UserName, "Guess");
+			strcpy(lUserInfo.Password, "123456");
+			strcpy(lUserInfo.Telephone, "01");
+			lUserInfo.Number = 1;
+			lUserInfo.Role = ZUSER_ROLE_Normal;
+			lUserInfo.Cipher = 0;	// ZUSER_CIPHER_Simple
+			strcpy(lUserInfo.Comment, "    普通账户，只具有浏览学生资源信息的权限，不可管理其它账户信息和学生资源信息。");
 
 			g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo));
 			g_MemData.AddUserInfo(&lUserInfo);
@@ -334,7 +360,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			lPasswd.Compare(lpUserInfo->Password) == 0)
 		{
 			// memory the logined user info
-			m_LoginUser = lUserID;
+			m_LoginUser = *(lVec[0]);
 			break;
 		}
 		else

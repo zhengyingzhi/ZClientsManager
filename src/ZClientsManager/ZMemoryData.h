@@ -51,7 +51,7 @@ public:
 	void AddUserInfo(const ZUserInfo* apUserInfo);
 
 	/* 添加或更新数据 */
-	void AddOrUpdateUserInfo(const ZUserInfo* apUserInfo);
+	void AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo);
 
 public:
 	int OpenStuDB(const string& aDBName, const string& aServerIP, uint16_t aPort);
@@ -67,7 +67,7 @@ public:
 	void AddStuInfo(const ZStudentInfo* apStuInfo);
 
 	/* 添加或更新数据 */
-	void AddOrUpdateStuInfo(const ZStudentInfo* apStuInfo);
+	void AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo);
 
 private:
 	ztl_pool_t*             m_Pool;

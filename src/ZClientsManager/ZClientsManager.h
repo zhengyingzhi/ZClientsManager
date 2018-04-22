@@ -45,8 +45,10 @@ public:
 	BOOL DoLoginDlg();
 
 public:
-	CString GetLoginUserID() { return m_LoginUser; }
-	CString m_LoginUser;
+	BOOL HaveExportRight();
+	CString GetLoginUserID() { return m_LoginUser.UserName; }
+
+	ZUserInfo m_LoginUser;
 
 public:
 	BOOL  m_bHiColorIcons;

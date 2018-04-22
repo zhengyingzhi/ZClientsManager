@@ -18,7 +18,7 @@ bool ZNetProtocol::IsValidHead(void* apAddr)
 
 ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType, const void* apDataInfo, uint32_t aDataSize)
 {
-	uint32_t lSize = sizeof(ZNetHead) + sizeof(ZMsgHead) + sizeof(ZStudentInfo) + 8;
+	uint32_t lSize = sizeof(ZNetHead) + sizeof(ZMsgHead) + aDataSize + 8;
 	ZNetMessage* lpMessage;
 	lpMessage = ZNetMessage::Alloc(lSize);
 
@@ -63,3 +63,7 @@ void ZNetProtocol::ExtractNetMessage(ZNetMessage* apMessage, ZNetHead** appProto
 	}
 }
 
+uint32_t ZNetProtocol::NetMessagePreSize()
+{
+	return sizeof(ZNetHead) + sizeof(ZMsgHead);
+}

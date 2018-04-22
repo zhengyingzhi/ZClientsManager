@@ -5,8 +5,9 @@
 
 
 #define ZSI_FLAG_None               0
-#define ZSI_FLAG_Backup             1	        // 备份数据标志
-#define ZSI_FLAG_Deleted            2	        // 删除标记
+#define ZSI_FLAG_Backup             1	        // 备份数据标志志
+#define ZSI_FLAG_NotPublish         2	        // 还未广播数据
+#define ZSI_FLAG_Deleted            4	        // 删除标记
 
 typedef enum
 {
@@ -62,3 +63,7 @@ struct stZStudentInfo
 };
 typedef struct stZStudentInfo ZStudentInfo;
 
+
+extern int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aPrePaddingSize);
+
+extern int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSize, ZStudentInfo* apStuInfo);

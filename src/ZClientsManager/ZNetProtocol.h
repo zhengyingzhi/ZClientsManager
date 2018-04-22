@@ -13,7 +13,7 @@
  * 3. 收到消息 QueryRsp 消息的端，应当根据消息中的内容，在本地比较，并做过滤，或新增 （未做Query的端，则可直接忽略该类消息）
  */
 
-#define ZNET_STARTTYPE_CM		0x4D43	// CM
+#define ZNET_STARTTYPE_CM		0x4D43	// CM (Client Manager)
 #define ZNET_VERSION			0x0100	// 1.0
 
 #define ZNET_T_Query			3		// query request
@@ -48,6 +48,8 @@ public:
 
 	static void ExtractNetMessage(ZNetMessage* apMessage, ZNetHead** appProtoHead, ZMsgHead** appMsgHead, void** appDataInfo);
 
-	static bool IsValidHead(void* apAddr);
+	static uint32_t NetMessagePreSize();
 
+	static bool IsValidHead(void* apAddr);
 };
+

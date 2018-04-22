@@ -213,6 +213,8 @@
     <ClInclude Include="ZCommon.h" />
     <ClInclude Include="ZConfirmDlg.h" />
     <ClInclude Include="ZDataBase.h" />
+    <ClInclude Include="ZFieldDict.h" />
+    <ClInclude Include="ZFixApi.h" />
     <ClInclude Include="ZInfoDesc.h" />
     <ClInclude Include="ZInfoEncrypt.h" />
     <ClInclude Include="ZLoginDlg.h" />
@@ -233,12 +235,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="StudentInfo.cpp" />
     <ClCompile Include="StudentInfoDB.cpp" />
+    <ClCompile Include="UserInfo.cpp" />
     <ClCompile Include="UserInfoDB.cpp" />
     <ClCompile Include="ZAppConfig.cpp" />
     <ClCompile Include="ZClientsManager.cpp" />
     <ClCompile Include="ZConfirmDlg.cpp" />
     <ClCompile Include="ZDataBase.cpp" />
+    <ClCompile Include="ZFixApi.cpp" />
     <ClCompile Include="ZInfoEncrypt.cpp" />
     <ClCompile Include="ZLoginDlg.cpp" />
     <ClCompile Include="ZMemoryData.cpp" />

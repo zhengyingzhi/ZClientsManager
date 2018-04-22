@@ -19,6 +19,9 @@
     <Filter Include="Network">
       <UniqueIdentifier>{e1623f24-a152-4058-bce6-056ee5da34b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fix">
+      <UniqueIdentifier>{b3cc8bb4-aeab-48f8-96b7-223d217aecb5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -96,6 +99,12 @@
     <ClInclude Include="ZAppConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ZFieldDict.h">
+      <Filter>Fix</Filter>
+    </ClInclude>
+    <ClInclude Include="ZFixApi.h">
+      <Filter>Fix</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -151,6 +160,15 @@
     </ClCompile>
     <ClCompile Include="ZAppConfig.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZFixApi.cpp">
+      <Filter>Fix</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInfo.cpp">
+      <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="StudentInfo.cpp">
+      <Filter>DataBase</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

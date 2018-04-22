@@ -568,7 +568,7 @@ void CMainFrame::OnButtonFind()
 	}
 }
 
-
+// 主框架消息处理
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)

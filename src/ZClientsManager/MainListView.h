@@ -43,6 +43,7 @@ public:
 	afx_msg void OnEditModify();
 	afx_msg void OnEditDelete();
 	afx_msg void OnEditResetmain();
+	afx_msg void OnEditExport();
 };
 
 

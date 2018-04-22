@@ -1,5 +1,8 @@
 #include "ZMemoryData.h"
 
+#include "ZNetProtocol.h"
+
+
 extern ZNetCommBase*	g_pNetComm;
 
 ZMemoryData::ZMemoryData()
@@ -111,7 +114,7 @@ void ZMemoryData::AddUserInfo(const ZUserInfo* apUserInfo)
 	m_CacheUserData.push_back(lpDstData);
 }
 
-void ZMemoryData::AddOrUpdateUserInfo(const ZUserInfo* apUserInfo)
+void ZMemoryData::AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo)
 {
 	// todo: add or update
 }
@@ -241,8 +244,11 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 	if (g_pNetComm)
 	{
 		// make a net message packet, and send out
+		char lMessagePacket[4096] = "";
+		int  lLength = ZStuInfoFixString(apStuInfo, lMessagePacket, ZNetProtocol::NetMessagePreSize());
+
 		ZNetMessage* lpMessage;
-		lpMessage = ZNetProtocol::MakeNetMessage(ZNET_T_PublishAdd, ZNET_MSG_StuInfo, apStuInfo, sizeof(ZStudentInfo));
+		lpMessage = ZNetProtocol::MakeNetMessage(ZNET_T_PublishAdd, ZNET_MSG_StuInfo, lMessagePacket, lLength);
 
 		rv = g_pNetComm->DirectSend(lpMessage->GetRawBegin(), lpMessage->Size());
 		if (rv < 0)
@@ -257,5 +263,5 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 }
 
 
-void ZMemoryData::AddOrUpdateStuInfo(const ZStudentInfo* apStuInfo)
+void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo)
 {}
