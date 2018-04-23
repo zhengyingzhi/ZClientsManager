@@ -139,9 +139,10 @@ BEGIN
     POPUP "编辑(&E)",                         65535,MFT_STRING,MFS_ENABLED
     BEGIN
         MENUITEM "插入(&I)\tCtrl+I",              ID_EDIT_INSERT,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
-        MENUITEM MFT_SEPARATOR
         MENUITEM "删除(&D)\tCtrl+D",              ID_EDIT_DELETE,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
         MENUITEM "查找(&F)\tCtrl+F",              ID_EDIT_FIND,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "同步数据",                        ID_EDIT_Sync,MFT_STRING,MFS_ENABLED
         MENUITEM MFT_SEPARATOR
         MENUITEM "重置主界面",                       ID_EDIT_RESETMAIN,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
     END
@@ -615,6 +616,11 @@ BEGIN
     ID_BUTTON_Del           "仅界面上删除学生资源\n删除"
     ID_BUTTON_Modify        "修改一个学生资源信息\n修改"
     ID_BUTTON_Find          "查找学生资源信息\n查找"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_Sync            "尝试从其它机器同步最新学生资源信息\n同步"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

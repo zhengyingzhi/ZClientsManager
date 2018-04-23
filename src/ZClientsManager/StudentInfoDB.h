@@ -15,17 +15,12 @@
 #define STUINFO_DB_DEFAULT_QRYN     512
 #define STUINFO_DB_ALIGNMENT        1024
 
-typedef struct 
-{
-	const char* m_pName;
-	const char* m_pTelephone;
-}ZQueryCondition;
-
 typedef enum
 {
 	CC_Equal = 0,
 	CC_BiggerThan = 1,
-	CC_SmallerThan = 2
+	CC_SmallerThan = 2,
+	CC_WithDeleted = 3
 }ZCompareCond;
 
 

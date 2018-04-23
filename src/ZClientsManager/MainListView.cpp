@@ -335,6 +335,15 @@ void CMainListView::OnEditExport()
 		return;
 	}
 
+	if (m_list.GetSelectionMark() < 0)
+	{
+		CString lNote;
+		lNote.Format("请选择要导出的数据");
+		AfxMessageBox(lNote, MB_OK | MB_ICONWARNING);
+		return;
+	}
+
+	// open file dialog
 	BOOL    lIsOpen      = FALSE;
 	CString lDefaultDir  = _T(".");
 	CString lDefaultFile = _T("傲睿学生信息.csv");

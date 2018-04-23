@@ -18,6 +18,9 @@
 // CMainFrame
 CMainFrame* g_pMainFrame = NULL;
 
+// whether do a query stuinfo request
+BOOL g_DoSyncStuRequest = FALSE;
+
 IMPLEMENT_DYNAMIC(CMainFrame, CFrameWndEx)
 
 const int  iMaxUserToolbars = 10;
@@ -36,6 +39,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_EDIT_INSERT, &CMainFrame::OnEditInsert)
 	ON_COMMAND(ID_EDIT_FIND, &CMainFrame::OnEditFind)
 	ON_COMMAND(ID_EDIT_DELETE, &CMainFrame::OnEditDelete)
+	ON_COMMAND(ID_EDIT_Sync, &CMainFrame::OnEditSync)
 	ON_COMMAND(ID_EDIT_MANAGER, &CMainFrame::OnEditManager)
 	ON_COMMAND(ID_SYS_CLOSE, &CMainFrame::OnSysClose)
 	ON_COMMAND(ID_BUTTON_Add, &CMainFrame::OnButtonAdd)
@@ -489,6 +493,17 @@ void CMainFrame::OnEditDelete()
 	lSIDlg.DoModal();
 }
 
+// 学生信息同步事件
+void CMainFrame::OnEditSync()
+{
+	g_DoSyncStuRequest = TRUE;
+
+	ZNetMessage* lpMessage;
+	ZNetProtocol::MakeNetMessage(ZNET_T_Query, ZNET_MSG_StuInfo, NULL, 0);
+	g_pNetComm->DirectSend(lpMessage->GetRawBegin(), lpMessage->Size());
+
+	ZNetMessage::Release(lpMessage);
+}
 
 // 系统关闭事件
 void CMainFrame::OnSysClose()
@@ -588,3 +603,4 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
+

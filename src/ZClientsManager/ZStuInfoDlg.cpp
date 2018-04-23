@@ -139,18 +139,19 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
 
 	CString lString;
+	double lScore;
 	GetDlgItemText(IDC_EDIT_LANGSCORE, lString);
-	double lScore = atof((char*)(LPCSTR)lString);
+	lScore = atof((char*)(LPCSTR)lString);
 	lStuInfo.LanguageScore = uint32_t(lScore * 10);
 
 	GetDlgItemText(IDC_EDIT_GPA, lString);
-	double lScore = atof((char*)(LPCSTR)lString);
+	lScore = atof((char*)(LPCSTR)lString);
 	lStuInfo.GPA = uint32_t(lScore * 10);
 
 	CButton* lpBtn = (CButton*)GetDlgItem(IDC_RADIO_BOY);
 	lStuInfo.Sex = lpBtn->GetCheck() ? SSEX_Boy : SSEX_Girl;
 
-	// todo: 比较数据
+	// 比较数据
 	if (memcmp(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
 	{
 		AfxMessageBox(_T("未更新任何数据"), MB_OK | MB_ICONWARNING);
@@ -192,5 +193,5 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	lVec.push_back(&m_StuInfo);
 	g_pMainFrame->UpdateStuToMainListView(lVec, TRUE);
 
-	g_MemData.AddStuInfo(&m_StuInfo);
+	g_MemData.AddOrUpdateStuInfo(0, &m_StuInfo);
 }

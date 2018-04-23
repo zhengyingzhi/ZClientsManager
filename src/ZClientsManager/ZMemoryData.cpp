@@ -73,14 +73,22 @@ int ZMemoryData::CloseUserDB()
 	return 0;
 }
 
-vector<ZUserInfo*> ZMemoryData::QueryAllUser()
+vector<ZUserInfo*> ZMemoryData::QueryAllUser(BOOL aWithDeleted)
 {
 	ZLockScope lk(&m_UserLock);
 
 	vector<ZUserInfo*> lVec;
 	lVec.reserve(m_CacheUserData.size());
 
-	lVec.assign(m_CacheUserData.begin(), m_CacheUserData.end());
+	for (size_t i = 0; i < m_CacheUserData.size(); ++i)
+	{
+		if (!aWithDeleted && m_CacheUserData[i]->Flags & ZUSER_FLAG_Deleted) {
+			continue;
+		}
+
+		lVec.push_back(m_CacheUserData[i]);
+	}
+
 	return lVec;
 }
 
@@ -139,7 +147,7 @@ int ZMemoryData::OpenStuDB(const string& aDBName, const string& aServerIP, uint1
 
 	ZQueryResult*   lpQryRs;
 	ZStudentInfo    lQryCond = {};
-	lpQryRs = m_pStuDB->Query(&lQryCond, ZQueryCompareNothing, 0);
+	lpQryRs = m_pStuDB->Query(&lQryCond, ZQueryCompareNothing, CC_WithDeleted);
 	if (lpQryRs)
 	{
 		ZStudentInfo *lpSrcData, *lpDstData;
@@ -172,14 +180,20 @@ int ZMemoryData::CloseStuDB()
 	return 0;
 }
 
-vector<ZStudentInfo*> ZMemoryData::QueryAllStudents()
+vector<ZStudentInfo*> ZMemoryData::QueryAllStudents(BOOL aWithDeleted)
 {
 	ZLockScope lk(&m_StuLock);
 
 	vector<ZStudentInfo*> lVec;
 	lVec.reserve(m_CacheStuData.size());
 
-	lVec.assign(m_CacheStuData.begin(), m_CacheStuData.end());
+	for (size_t i = 0; i < m_CacheStuData.size(); ++i)
+	{
+		if (!aWithDeleted && m_CacheStuData[i]->Flag & ZSI_FLAG_Deleted) {
+			continue;
+		}
+		lVec.push_back(m_CacheStuData[i]);
+	}
 	return lVec;
 }
 
@@ -203,6 +217,7 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfo(const ZStudentInfo* apExpect, ZQ
 	return lVec;
 }
 
+/* 模糊查询学生信息 */
 vector<ZStudentInfo*> ZMemoryData::QueryStuInfoVague(const char* apFindStr)
 {
 	ZStudentInfo* lpStuInfo;
@@ -234,7 +249,7 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfoVague(const char* apFindStr)
 }
 
 
-void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
+void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo, BOOL aPublishToNet)
 {
 	ZLockScope lk(&m_StuLock);
 
@@ -245,7 +260,7 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 	memcpy(lpDstData, apStuInfo, sizeof(ZStudentInfo));
 	m_CacheStuData.push_back(lpDstData);
 
-	if (g_pNetComm)
+	if (aPublishToNet && g_pNetComm)
 	{
 		// make a net message packet, and send out
 		char lMessagePacket[4096] = "";
@@ -266,6 +281,43 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 	}
 }
 
+void ZMemoryData::UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo)
+{
+	if (apTobeUpdated == NULL)
+	{
+		vector<ZStudentInfo*> lVec;
+		lVec = QueryStuInfo(apNewStuInfo, ZQueryCompareNameAndTel, 0);
+		if (!lVec.empty())
+		{
+			ZStuInfoCopy(lVec[0], apNewStuInfo);
+		}
+	}
+	else
+	{
+		ZLockScope lk(&m_StuLock);
+		ZStuInfoCopy(apTobeUpdated, apNewStuInfo);
+	}
+}
+
 
 void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo)
-{}
+{
+	// search firstly and add or update
+	vector<ZStudentInfo*> lVec;
+	lVec = QueryStuInfo(apStuInfo, ZQueryCompareNameAndTel, CC_WithDeleted);
+
+	if (lVec.empty())
+	{
+		// insert new
+		m_pStuDB->Insert((void*)apStuInfo, sizeof(ZStudentInfo));
+
+		AddStuInfo(apStuInfo, FALSE);
+	}
+	else
+	{
+		// try update 
+		m_pStuDB->Update((void*)apStuInfo, sizeof(ZStudentInfo));
+
+		UpdateStuInfo(lVec[0], apStuInfo);
+	}
+}

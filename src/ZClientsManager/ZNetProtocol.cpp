@@ -41,7 +41,9 @@ ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType
 	lpMsgHed->m_MsgType			= aMsgType;
 	lpMsgHed->m_BegSeq			= 1;
 
-	memcpy(lpDataInfo, apDataInfo, aDataSize);
+	if (apDataInfo && aDataSize > 0) {
+		memcpy(lpDataInfo, apDataInfo, aDataSize);
+	}
 
 	return lpMessage;
 }

@@ -10,6 +10,8 @@
 
 #include "ZLoginDlg.h"
 
+#include "ZUtility.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -20,10 +22,11 @@ ZMemoryData		g_MemData;
 
 ZAppConfigs		g_AppConfig;
 
+extern BOOL     g_DoSyncStuRequest;
+
 /* 收到网络消息 */
 static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 {
-	// todo: operations
 	ZNetHead*	lpNetHead;
 	ZMsgHead*	lpMsgHead;
 	void*		lpRawMessage;
@@ -38,6 +41,10 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 
 	if (lpNetHead->m_Type == ZNET_T_PublishAdd || lpNetHead->m_Type == ZNET_T_PublishUpdate)
 	{
+		/* got published message */
+
+		ZDebug("_ZOnNetMessage got Publish %d\n", lpNetHead->m_Type);
+
 		if (lpMsgHead->m_MsgType == ZNET_MSG_UserInfo)
 		{
 			ZUserInfo lUserInfo = { 0 };
@@ -48,6 +55,39 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 		{
 			ZStudentInfo lStuInfo = { 0 };
 			ZFixString2StuInfo((char*)lpRawMessage, lpMsgHead->m_DataSize, ZNetProtocol::NetMessagePreSize(), &lStuInfo);
+			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo);
+		}
+	}
+	else if (lpNetHead->m_Type == ZNET_T_Query)
+	{
+		ZDebug("_ZOnNetMessage got T_Query request\n");
+
+		/* got query request, publish the data */
+		char lBuffer[4000] = "";
+		int  lLength = 0;
+		ZNetMessage* lpMessageToSend;
+
+		vector<ZStudentInfo*> lVec = g_MemData.QueryAllStudents();
+		for (size_t i = 0; i < lVec.size(); ++i)
+		{
+			lLength = ZStuInfoFixString(lVec[i], lBuffer, ZNetProtocol::NetMessagePreSize());
+			lpMessageToSend = ZNetProtocol::MakeNetMessage(ZNET_T_QueryRsp, ZNET_MSG_StuInfo, lBuffer, lLength);
+
+			g_pNetComm->DirectSend(lpMessageToSend->GetRawBegin(), lpMessageToSend->Size());
+
+			ZNetMessage::Release(lpMessageToSend);
+		}
+	}
+	else if (lpNetHead->m_Type == ZNET_T_QueryRsp)
+	{
+		/* got query response */
+		if (lpMsgHead->m_MsgType == ZNET_MSG_StuInfo)
+		{
+			// mark as false when the query responsed
+			g_DoSyncStuRequest = FALSE;
+
+			ZStudentInfo lStuInfo = {};
+			ZFixString2StuInfo(apMessage->GetRawBegin(), apMessage->Size(), ZNetProtocol::NetMessagePreSize(), &lStuInfo);
 			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo);
 		}
 	}

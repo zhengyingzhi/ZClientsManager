@@ -1,7 +1,10 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <string.h>
+
+#include <Windows.h>
 
 #include "ZUtility.h"
 
@@ -57,3 +60,23 @@ std::string ZConvStdTimeStr(time_t aTime)
 	return std::string(lBuffer);
 }
 
+void ZLog2DebugView(const char* fmt, ...)
+{
+	std::string lNowStr = ZConvStdTimeStr(time_t(0));
+
+	int  lLength = 0;
+	char lBuffer[4000] = "";
+
+	strcpy(lBuffer + lLength, lNowStr.c_str());
+	lLength += lNowStr.length();
+
+	va_list args;
+	va_start(args, fmt);
+	lLength += vsnprintf(lBuffer + lLength, sizeof(lBuffer) - lLength - 2, fmt, args);
+	va_end(args);
+
+	lBuffer[lLength++] = '\r';
+	lBuffer[lLength++] = '\n';
+
+	OutputDebugString(lBuffer);
+}

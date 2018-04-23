@@ -346,7 +346,7 @@ ZQueryResult* ZStudentInfoDBText::Query(void* apExpectInfo, ZQueryComparePtr apC
 			break;
 		}
 
-		if (lpStuInfo->Flag & ZSI_FLAG_Deleted) {
+		if (aExtend != CC_WithDeleted && lpStuInfo->Flag & ZSI_FLAG_Deleted) {
 			continue;
 		}
 

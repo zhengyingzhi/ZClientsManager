@@ -45,7 +45,7 @@ public:
 
 	uint32_t UserCount() { return m_CacheUserData.size(); }
 
-	vector<ZUserInfo*> QueryAllUser();
+	vector<ZUserInfo*> QueryAllUser(BOOL aWithDeleted = FALSE);
 	vector<ZUserInfo*> QueryUserInfo(const ZUserInfo* apExpect, ZQueryComparePtr apCompFunc);
 
 	/* 添加或更新数据 */
@@ -58,11 +58,12 @@ public:
 
 	uint32_t StuCount() { return m_CacheStuData.size(); }
 
-	vector<ZStudentInfo*> QueryAllStudents();
+	vector<ZStudentInfo*> QueryAllStudents(BOOL aWithDeleted = FALSE);
 	vector<ZStudentInfo*> QueryStuInfo(const ZStudentInfo* apExpect, ZQueryComparePtr apCompFunc, int aExtend);
 	vector<ZStudentInfo*> QueryStuInfoVague(const char* apFindStr);
 
-	void AddStuInfo(const ZStudentInfo* apStuInfo);
+	void AddStuInfo(const ZStudentInfo* apStuInfo, BOOL aPublishToNet);
+	void UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo);
 
 	/* 添加或更新数据 */
 	void AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo);

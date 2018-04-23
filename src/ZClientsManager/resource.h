@@ -70,7 +70,6 @@
 #define IDC_EDIT_UPDATETIME             1021
 #define IDC_EDIT_COLLEGE_TO             1022
 #define IDC_EDIT_MAJOR_TO               1024
-#define IDC_EDIT_LANGSCORE2             1025
 #define IDC_EDIT_GPA                    1025
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_DELETE                  32772
@@ -101,13 +100,15 @@
 #define ID_BUTTON32800                  32800
 #define ID_BUTTON32801                  32801
 #define ID_BUTTON32802                  32802
+#define ID_Menu32803                    32803
+#define ID_EDIT_Sync                    32804
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        337
-#define _APS_NEXT_COMMAND_VALUE         32803
+#define _APS_NEXT_COMMAND_VALUE         32805
 #define _APS_NEXT_CONTROL_VALUE         1021
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
