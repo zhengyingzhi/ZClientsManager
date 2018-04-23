@@ -2,6 +2,7 @@
 
 #include "StudentInfoDB.h"
 #include "ZCommon.h"
+#include "afxwin.h"
 
 
 #define MAINLIST_COL_Row            0           // 仅是列表编号
@@ -68,4 +69,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnSave();
+	CComboBox m_comboImportant;
 };

@@ -18,9 +18,9 @@ typedef enum
 
 typedef enum
 {
-	SIM_Normal		= 0,                        // 普通
+	SIM_Emergency   = 2,                        // 紧急
 	SIM_Important   = 1,                        // 重要
-	SIM_Emergency   = 2                         // 紧急
+	SIM_Normal      = 0                         // 普通
 }StuImportant;
 
 struct stZSumaryInfo

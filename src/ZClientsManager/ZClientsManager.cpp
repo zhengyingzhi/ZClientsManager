@@ -12,6 +12,8 @@
 
 #include "ZUtility.h"
 
+#include <ZToolLib/ztl_win32_stacktrace.h>
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -81,7 +83,7 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 	else if (lpNetHead->m_Type == ZNET_T_QueryRsp)
 	{
 		/* got query response */
-		if (lpMsgHead->m_MsgType == ZNET_MSG_StuInfo)
+		if (lpMsgHead->m_MsgType == ZNET_MSG_StuInfo && g_DoSyncStuRequest)
 		{
 			// mark as false when the query responsed
 			g_DoSyncStuRequest = FALSE;
@@ -129,6 +131,7 @@ CZClientsManagerApp::CZClientsManagerApp()
 
 CZClientsManagerApp theApp;
 
+static char theDumpName[512] = "";
 
 // CZClientsManagerApp ≥ı ºªØ
 
@@ -183,6 +186,10 @@ BOOL CZClientsManagerApp::InitInstance()
 
 	// load netlib
 	net_init();
+
+	// win32 dump init
+	//sprintf(theDumpName, "AoruiCore_%d.dmp", GetCurrentProcessId());
+	//ztl_stack_trace_init(theDumpName);
 
 	// load config "ZAppConfig.txt"
 	g_AppConfig.ReadAppConfig(ZAPP_CONFIG_NAME);

@@ -27,11 +27,18 @@ ZStuInfoDlg::~ZStuInfoDlg()
 void ZStuInfoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_COMBO_IMPORTANT, m_comboImportant);
 }
 
 BOOL ZStuInfoDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+	// 
+	m_comboImportant.AddString("普通");
+	m_comboImportant.AddString("重要");
+	m_comboImportant.AddString("紧急");
+	m_comboImportant.SetCurSel(0);
 
 	CString lString;
 	if (m_StuInfo.Name[0])
@@ -56,6 +63,11 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		else
 			lString.Format("%.1f", lScore);
 		SetDlgItemText(IDC_EDIT_LANGSCORE, lString);
+
+		double lGPA = (m_StuInfo.GPA / 10);
+		lString.Format("%.1f", lGPA);
+		SetDlgItemText(IDC_EDIT_GPA, lString);
+
 		SetDlgItemText(IDC_EDIT_QQ, m_StuInfo.QQ);
 		SetDlgItemText(IDC_COMBO_IMPORTANT, ZStuImportantDesc(m_StuInfo.ImportantLevel));
 		SetDlgItemText(IDC_EDIT_SOURCE, m_StuInfo.Source);
@@ -71,6 +83,8 @@ BOOL ZStuInfoDlg::OnInitDialog()
 			lpBtn = (CButton*)GetDlgItem(IDC_RADIO_GIRL);
 			lpBtn->SetCheck(1);
 		}
+
+		m_comboImportant.SetCurSel(m_StuInfo.ImportantLevel);
 	}
 
 	return TRUE;
@@ -186,12 +200,12 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 			AfxMessageBox(_T("插入学生信息数据失败"), MB_OK | MB_ICONWARNING);
 			return;
 		}
+
+		vector<ZStudentInfo*> lVec;
+		lVec.push_back(&lStuInfo);
+		g_pMainFrame->UpdateStuToMainListView(lVec, TRUE);
 	}
 	memcpy(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo));
-
-	vector<ZStudentInfo*> lVec;
-	lVec.push_back(&m_StuInfo);
-	g_pMainFrame->UpdateStuToMainListView(lVec, TRUE);
 
 	g_MemData.AddOrUpdateStuInfo(0, &m_StuInfo);
 }

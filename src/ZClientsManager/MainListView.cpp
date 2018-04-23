@@ -335,7 +335,7 @@ void CMainListView::OnEditExport()
 		return;
 	}
 
-	if (m_list.GetSelectionMark() < 0)
+	if (m_list.GetSelectedCount() <= 0)
 	{
 		CString lNote;
 		lNote.Format("请选择要导出的数据");
@@ -376,14 +376,17 @@ void CMainListView::OnEditExport()
 	}
 
 	lLine = _GetMainListHeaderLine();
-	fputs((char*)(LPCSTR)lLine, fp);
+	lLine.Append("\r\n");
+	fwrite((char*)(LPCSTR)lLine, lLine.GetLength(), 1, fp);
+
+	pos = m_list.GetFirstSelectedItemPosition();
 
 	// get data and save into file
-	while (pos = m_list.GetFirstSelectedItemPosition())
+	while (pos)
 	{
 		int lSelItem = m_list.GetNextSelectedItem(pos);
 		if (lSelItem < 0 || lSelItem >= m_list.GetItemCount()) {
-			continue;
+			break;
 		}
 
 		// get data
@@ -393,7 +396,7 @@ void CMainListView::OnEditExport()
 		}
 
 		lLine.Append("\r\n");
-		fputs((char*)(LPCSTR)lLine, fp);
+		fwrite((char*)(LPCSTR)lLine, lLine.GetLength(), 1, fp);
 	}
 
 	fflush(fp);

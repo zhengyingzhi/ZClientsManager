@@ -477,13 +477,11 @@ void CMainFrame::OnEditInsert()
 	lSIDlg.DoModal();
 }
 
-
 // 学生信息编辑事件
 void CMainFrame::OnEditFind()
 {
 	m_StuQryDlg.DoModal();
 }
-
 
 // 学生信息删除事件
 void CMainFrame::OnEditDelete()
@@ -499,7 +497,7 @@ void CMainFrame::OnEditSync()
 	g_DoSyncStuRequest = TRUE;
 
 	ZNetMessage* lpMessage;
-	ZNetProtocol::MakeNetMessage(ZNET_T_Query, ZNET_MSG_StuInfo, NULL, 0);
+	lpMessage = ZNetProtocol::MakeNetMessage(ZNET_T_Query, ZNET_MSG_StuInfo, NULL, 0);
 	g_pNetComm->DirectSend(lpMessage->GetRawBegin(), lpMessage->Size());
 
 	ZNetMessage::Release(lpMessage);
