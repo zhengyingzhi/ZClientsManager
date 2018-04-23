@@ -80,6 +80,7 @@ public:
 	afx_msg void OnButtonFind();
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnEditSync();
+	afx_msg void OnButtonReset();
 };
 
 

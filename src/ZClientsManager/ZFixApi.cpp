@@ -225,4 +225,6 @@ int ZFixApi::DecodeData2Map()
 		lKey = atoi(lpData);
 		m_FixMap[lKey] = lpValue;
 	}
+
+	return 0;
 }

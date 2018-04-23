@@ -282,8 +282,12 @@ void CMainListView::OnNMRClick(NMHDR *pNMHDR, LRESULT *pResult)
 void CMainListView::OnEditModify()
 {
 	// 获取该行数据，并传入Dialog中，并做相应操作
+	if (m_Row < 0) {
+		POSITION pos = m_list.GetFirstSelectedItemPosition();
+		if (pos)
+			m_Row = m_list.GetNextSelectedItem(pos);
+	}
 	int lRow = m_Row;
-	//lRow = m_list.GetSelectionMark();
 	if (lRow < 0) {
 		return;
 	}

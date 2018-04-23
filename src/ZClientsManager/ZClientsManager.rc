@@ -114,12 +114,13 @@ BEGIN
     BUTTON      ID_BUTTON_Add
     BUTTON      ID_BUTTON_Del
     BUTTON      ID_BUTTON_Modify
+    BUTTON      ID_BUTTON_Reset
     BUTTON      ID_BUTTON_Find
     BUTTON      ID_BUTTON_Combo
-    BUTTON      ID_BUTTON32799
     BUTTON      ID_BUTTON32800
     BUTTON      ID_BUTTON32801
     BUTTON      ID_BUTTON32802
+    BUTTON      ID_BUTTON32806
 END
 
 
@@ -238,7 +239,7 @@ BEGIN
     LTEXT           "Q  Q",IDC_STATIC,11,114,16,8
     EDITTEXT        IDC_EDIT_QQ,32,112,77,14,ES_AUTOHSCROLL
     LTEXT           "重要",IDC_STATIC,9,134,17,8
-    COMBOBOX        IDC_COMBO_IMPORTANT,32,132,76,51,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_IMPORTANT,32,132,76,51,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "性别",IDC_STATIC,245,93,17,8
     CONTROL         "男",IDC_RADIO_BOY,"Button",BS_AUTORADIOBUTTON,267,93,22,10
     CONTROL         "女",IDC_RADIO_GIRL,"Button",BS_AUTORADIOBUTTON,310,93,22,10
@@ -615,7 +616,9 @@ BEGIN
     ID_BUTTON_Add           "添加一个学生资源信息\n添加"
     ID_BUTTON_Del           "仅界面上删除学生资源\n删除"
     ID_BUTTON_Modify        "修改一个学生资源信息\n修改"
+    ID_BUTTON_Reset         "重置主界面信息\n重置"
     ID_BUTTON_Find          "查找学生资源信息\n查找"
+    ID_BUTTON_Combo         "输入关键字查询学生信息"
 END
 
 STRINGTABLE

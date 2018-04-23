@@ -46,6 +46,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_BUTTON_Del, &CMainFrame::OnButtonDel)
 	ON_COMMAND(ID_BUTTON_Modify, &CMainFrame::OnButtonModify)
 	ON_COMMAND(ID_BUTTON_Find, &CMainFrame::OnButtonFind)
+	ON_COMMAND(ID_BUTTON_Reset, &CMainFrame::OnButtonReset)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -579,6 +580,14 @@ void CMainFrame::OnButtonFind()
 		// 模糊查询搜索条件
 		VagueFind((char*)(LPCSTR)lContent);
 	}
+}
+
+// 工具栏 - 重置
+void CMainFrame::OnButtonReset()
+{
+	vector<ZStudentInfo*> lVec;
+	lVec = g_MemData.QueryAllStudents();
+	UpdateStuToMainListView(lVec, FALSE);
 }
 
 // 主框架消息处理
