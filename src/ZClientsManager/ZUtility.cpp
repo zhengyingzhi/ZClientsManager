@@ -109,10 +109,10 @@ std::string ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDo
 	char lRawData[1024];
 	strcpy(lRawData, apRawData);
 	if (aDoSimpleChange) {
-		apRawData = ZPasswordChange(lRawData);
+		//apRawData = ZPasswordChange(lRawData);
 	}
 
-	char lOutData[1000] = "";
+	char lOutData[4096] = "";
 	uint32_t lOutSize = sizeof(lOutData);
 	ztl_base64_encode(apRawData, strlen(apRawData), lOutData, &lOutSize);
 
@@ -121,15 +121,15 @@ std::string ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDo
 
 std::string ZConvBase64ToData(const char* apBaseData, uint32_t aBaseDataSize, bool aDoSimpleChange)
 {
-	char lOutData[1024] = "";
+	char lOutData[4096] = "";
 	uint32_t lOutSize = sizeof(lOutData);
 	ztl_base64_decode(apBaseData, strlen(apBaseData), lOutData, &lOutSize);
 
 	if (aDoSimpleChange) {
-		apBaseData = ZPasswordChange(lOutData);
+		//apBaseData = ZPasswordChange(lOutData);
 	}
 
-	return std::string(apBaseData);
+	return std::string(lOutData);
 }
 
 uint32_t ZGetCheckSum(const void* apRawData, uint32_t aRawSize, int aRefNum)

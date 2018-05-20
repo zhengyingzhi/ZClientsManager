@@ -34,6 +34,8 @@ int ZMemoryData::OpenUserDB(const string& aDBName, const string& aServerIP, uint
 	rv = m_pUserDB->Open(aDBName, aServerIP, aPort);
 	if (0 != rv)
 	{
+		ztl_log_error(g_Logger, ZTL_LOG_CRITICAL, "OpenUserDB failed rv:%d", rv);
+
 		delete m_pUserDB;
 		m_pUserDB = NULL;
 		return rv;

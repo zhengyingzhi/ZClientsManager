@@ -4,6 +4,16 @@
 
 #include "UserInfoDB.h"
 
+#define USERINFO_DB_DESC_SIZE   64
+#define USERINFO_DB_TYPE        0x42444955  // UIDB
+
+typedef struct  
+{
+	uint32_t    m_Desc;
+	uint32_t    m_Size;
+	char        m_Padding[56];
+}ZUserInfoDBDesc;
+
 
 /* ±È½ÏÃû×Ö */
 bool ZQueryCompareUserName(const void* apExpect, const void* apAcutal, int aExtend)
@@ -101,6 +111,19 @@ int ZUserInfoDBText::Open(const std::string& aDBName, const std::string& ip, uin
 	if (PrivUserShmCreate() != 0)
 	{
 		return -2;
+	}
+
+	ZUserInfoDBDesc* lpUIDesc;
+	lpUIDesc = (ZUserInfoDBDesc*)(m_pBuffer - USERINFO_DB_DESC_SIZE);
+
+	if (lpUIDesc->m_Desc != USERINFO_DB_TYPE)
+	{
+		// invalid db file
+		return -3;
+	}
+	if (lpUIDesc->m_Size == 0)
+	{
+		lpUIDesc->m_Size = m_BufSize;
 	}
 
 	return 0;
@@ -307,6 +330,8 @@ int ZUserInfoDBText::PrivUserShmCreate()
 	}
 
 	m_pBuffer = (char*)ztl_shm_get_address(m_pShmObj);
+
+	m_pBuffer += USERINFO_DB_DESC_SIZE;
 
 	return 0;
 }
