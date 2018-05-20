@@ -17,6 +17,10 @@
 #define ZUSER_DEFAULT_RootName			"root"
 #define ZUSER_DEFAULT_RootPasswd		"111111"
 
+#define ZUSER_INFO_Version				10000
+
+#define ZUSER_SimpleChange              true
+
 
 typedef struct tagZUserInfo
 {

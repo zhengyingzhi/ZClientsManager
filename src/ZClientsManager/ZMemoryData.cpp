@@ -2,6 +2,10 @@
 
 #include "ZNetProtocol.h"
 
+#include "ZUtility.h"
+
+#include "ZAppConfig.h"
+
 
 extern ZNetCommBase*	g_pNetComm;
 
@@ -115,9 +119,9 @@ vector<ZUserInfo*> ZMemoryData::QueryUserInfo(const ZUserInfo* apExpect, ZQueryC
 
 void ZMemoryData::AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo)
 {
-	ZLockScope lk(&m_UserLock);
-
 	vector<ZUserInfo*> lVec = QueryUserInfo(apUserInfo, ZQueryCompareUserName);
+
+	ZLockScope lk(&m_UserLock);
 	if (!lVec.empty())
 	{
 		ZUserInfoCopy(lVec[0], apUserInfo);
@@ -315,7 +319,15 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 	}
 	else
 	{
-		// try update 
+		// try check data or update 
+		uint32_t lLocalCS = ZGetCheckSum(lVec[0], sizeof(ZStudentInfo), 0);
+		uint32_t lNewCS = ZGetCheckSum(apStuInfo, sizeof(ZStudentInfo), 0);
+		if (lLocalCS == lNewCS)
+		{
+			ztl_log_error(g_Logger, ZTL_LOG_DEBUG, "ZMemoryData::AddOrUpdateStuInfo same checksum for name:%s", apStuInfo->Name);
+			return;
+		}
+
 		m_pStuDB->Update((void*)apStuInfo, sizeof(ZStudentInfo));
 
 		UpdateStuInfo(lVec[0], apStuInfo);

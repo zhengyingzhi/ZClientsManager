@@ -2,16 +2,29 @@
 
 #include "ZFixApi.h"
 
+#include "ZUtility.h"
+
+
 int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aPrePaddingSize)
 {
 	ZFixApi lFixApi;
 	lFixApi.SetPrePaddingSize(aPrePaddingSize);
 	lFixApi.SetBuffer(apBuffer);
 
+	std::string lName   = ZConvDataToBase64(apStuInfo->Name, strlen(apStuInfo->Name), ZSTU_SimpleChange);
+	std::string lTel    = ZConvDataToBase64(apStuInfo->Telehone, strlen(apStuInfo->Telehone), ZSTU_SimpleChange);
+	std::string lQQ     = ZConvDataToBase64(apStuInfo->QQ, strlen(apStuInfo->QQ), ZSTU_SimpleChange);
+	std::string lIDNum  = ZConvDataToBase64(apStuInfo->IDNumber, strlen(apStuInfo->IDNumber), ZSTU_SimpleChange);
+
+	// comments not use simple password change
+	std::string lComments = ZConvDataToBase64(apStuInfo->Comments, strlen(apStuInfo->Comments), false);
+
+	lFixApi.SetItem(ZFD_Version,		ZSTU_Version);
+
 	lFixApi.SetItem(ZFD_Number,         apStuInfo->Number);
-	lFixApi.SetItem(ZFD_Name,           apStuInfo->Name);
-	lFixApi.SetItem(ZFD_Telephone,      apStuInfo->Telehone);
-	lFixApi.SetItem(ZFD_QQ,             apStuInfo->QQ);
+	lFixApi.SetItem(ZFD_Name,           lName);
+	lFixApi.SetItem(ZFD_Telephone,		lTel);
+	lFixApi.SetItem(ZFD_QQ,             lQQ);
 	lFixApi.SetItem(ZFD_Class,          apStuInfo->Class);
 	lFixApi.SetItem(ZFD_CollegeFrom,    apStuInfo->CollegeFrom);
 	lFixApi.SetItem(ZFD_CollegeTo,      apStuInfo->CollegeTo);
@@ -21,7 +34,7 @@ int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aP
 	lFixApi.SetItem(ZFD_Source,         apStuInfo->Source);
 	lFixApi.SetItem(ZFD_Status,         apStuInfo->Status);
 	lFixApi.SetItem(ZFD_Recorder,       apStuInfo->Recorder);
-	lFixApi.SetItem(ZFD_IDNumber,       apStuInfo->IDNumber);
+	lFixApi.SetItem(ZFD_IDNumber,       lIDNum);
 	lFixApi.SetItem(ZFD_LanScore,       apStuInfo->LanguageScore);
 	lFixApi.SetItem(ZFD_Flag,           apStuInfo->Flag);
 	lFixApi.SetItem(ZFD_Sex,            apStuInfo->Sex);
@@ -29,11 +42,18 @@ int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aP
 	lFixApi.SetItem(ZFD_InsertTime,     apStuInfo->InsertTime);
 	lFixApi.SetItem(ZFD_UpdateTime,     apStuInfo->UpdateTime);
 	lFixApi.SetItem(ZFD_NextVisitTime,  apStuInfo->NextVisitTime);
-	lFixApi.SetItem(ZFD_Comment,        apStuInfo->Comments);
+	lFixApi.SetItem(ZFD_Comment,        lComments);
 
 	return lFixApi.Length();
 }
 
+static std::string _ZGetRawData(ZFixApi& aFixApi, uint32_t aFixID, bool aDoSimpleChange)
+{
+	std::string lValue;
+	aFixApi.GetItem(aFixID, lValue);
+	lValue = ZConvDataToBase64(lValue.c_str(), lValue.length(), aDoSimpleChange);
+	return lValue;
+}
 
 int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSize, ZStudentInfo* apStuInfo)
 {
@@ -41,12 +61,23 @@ int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSiz
 	lFixApi.SetPrePaddingSize(aPrePaddingSize);
 	lFixApi.SetBuffer(apString);
 
+	std::string lName   = _ZGetRawData(lFixApi, ZFD_Name, ZSTU_SimpleChange);
+	std::string lTel    = _ZGetRawData(lFixApi, ZFD_Telephone, ZSTU_SimpleChange);
+	std::string lQQ     = _ZGetRawData(lFixApi, ZFD_QQ, ZSTU_SimpleChange);
+	std::string lIDNum  = _ZGetRawData(lFixApi, ZFD_IDNumber, ZSTU_SimpleChange);
+	// comments not use simple password change
+	std::string lComments = _ZGetRawData(lFixApi, ZFD_Comment, false);
+
+
 	if (!lFixApi.GetItem(ZFD_Number, apStuInfo->Number)) {
 		return -1;
 	}
-	lFixApi.GetItem(ZFD_Name,           apStuInfo->Name);
-	lFixApi.GetItem(ZFD_Telephone,      apStuInfo->Telehone);
-	lFixApi.GetItem(ZFD_QQ,             apStuInfo->QQ);
+
+	strncpy(apStuInfo->Name, lName.c_str(), sizeof(apStuInfo->Name) - 1);
+	strncpy(apStuInfo->Telehone, lTel.c_str(), sizeof(apStuInfo->Telehone) - 1);
+	strncpy(apStuInfo->QQ, lQQ.c_str(), sizeof(apStuInfo->QQ) - 1);
+	strncpy(apStuInfo->IDNumber, lIDNum.c_str(), sizeof(apStuInfo->IDNumber) - 1);
+
 	lFixApi.GetItem(ZFD_Class,          apStuInfo->Class);
 	lFixApi.GetItem(ZFD_CollegeFrom,    apStuInfo->CollegeFrom);
 	lFixApi.GetItem(ZFD_CollegeTo,      apStuInfo->CollegeTo);
@@ -56,13 +87,11 @@ int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSiz
 	lFixApi.GetItem(ZFD_Source,         apStuInfo->Source);
 	lFixApi.GetItem(ZFD_Status,         apStuInfo->Status);
 	lFixApi.GetItem(ZFD_Recorder,       apStuInfo->Recorder);
-	lFixApi.GetItem(ZFD_IDNumber,       apStuInfo->IDNumber);
 	lFixApi.GetItem(ZFD_LanScore,       apStuInfo->LanguageScore);
 	lFixApi.GetItem(ZFD_Flag,           apStuInfo->Flag);
 	lFixApi.GetItem(ZFD_InsertTime,     apStuInfo->InsertTime);
 	lFixApi.GetItem(ZFD_UpdateTime,     apStuInfo->UpdateTime);
 	lFixApi.GetItem(ZFD_NextVisitTime,  apStuInfo->NextVisitTime);
-	lFixApi.GetItem(ZFD_Comment,        apStuInfo->Comments);
 
 	uint32_t lTempVal = 0;
 	lFixApi.GetItem(ZFD_Sex, lTempVal);

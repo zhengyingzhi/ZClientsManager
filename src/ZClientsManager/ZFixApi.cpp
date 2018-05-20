@@ -15,7 +15,7 @@ ZFixApi::~ZFixApi()
 void ZFixApi::Clear()
 {
 	m_pBuff = m_Buffer;
-	m_Length = 0;
+	m_Length = m_PrePaddingSize;
 	m_FixMap.clear();
 }
 
@@ -33,7 +33,12 @@ void ZFixApi::SetBuffer(char* apRawBuffer)
 
 void ZFixApi::SetPrePaddingSize(uint32_t aPrePaddingSize)
 {
+	if (m_PrePaddingSize != 0) {
+		return;
+	}
+
 	m_PrePaddingSize = aPrePaddingSize;
+	m_Length = m_PrePaddingSize;
 }
 
 char* ZFixApi::Data() const
@@ -90,6 +95,11 @@ void ZFixApi::SetItem(uint32_t aID, const char* apValue, int aLength)
 	m_Length += aLength;
 	m_pBuff[m_Length] = ZFIX_DELIMITER;
 	m_Length += 1;
+}
+
+void ZFixApi::SetItem(uint32_t aID, const std::string& aValue)
+{
+	SetItem(aID, aValue.c_str(), aValue.length());
 }
 
 

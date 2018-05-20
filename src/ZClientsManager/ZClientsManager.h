@@ -14,12 +14,13 @@
 #include "ZAppConfig.h"
 
 
-
 class CMainFrame;
 
 extern ZMemoryData		g_MemData;
 extern ZNetCommBase*	g_pNetComm;
 extern CMainFrame*		g_pMainFrame;
+
+extern ztl_log_t*		g_Logger;
 
 extern ZAppConfigs		g_AppConfig;
 

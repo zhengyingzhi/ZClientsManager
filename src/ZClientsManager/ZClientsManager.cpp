@@ -15,12 +15,15 @@
 #include <ZToolLib/ztl_win32_stacktrace.h>
 
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 ZNetCommBase*	g_pNetComm = NULL;
 ZMemoryData		g_MemData;
+
+ztl_log_t*		g_Logger = NULL;
 
 ZAppConfigs		g_AppConfig;
 
@@ -30,7 +33,7 @@ extern BOOL     g_DoSyncStuRequest;
 static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 {
 	ZNetHead*	lpNetHead;
-	ZMsgHead*	lpMsgHead;
+	ZMsgDesc*	lpMsgHead;
 	void*		lpRawMessage;
 
 	ZNetProtocol::ExtractNetMessage(apMessage, &lpNetHead, &lpMsgHead, &lpRawMessage);
@@ -45,7 +48,7 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 	{
 		/* got published message */
 
-		ZDebug("_ZOnNetMessage got Publish %d\n", lpNetHead->m_Type);
+		ZDebug("_ZOnNetMessage got Publish NetType:%d, MsgType:%d\n", lpNetHead->m_Type, lpMsgHead->m_MsgType);
 
 		if (lpMsgHead->m_MsgType == ZNET_MSG_UserInfo)
 		{
@@ -75,6 +78,12 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 			lLength = ZStuInfoFixString(lVec[i], lBuffer, ZNetProtocol::NetMessagePreSize());
 			lpMessageToSend = ZNetProtocol::MakeNetMessage(ZNET_T_QueryRsp, ZNET_MSG_StuInfo, lBuffer, lLength);
 
+			ZNetHead* lpNetHead = ZNetProtocol::GetMessageNetHead(lpMessageToSend);
+			if (i == lVec.size() - 1)
+			{
+				lpNetHead->m_Flag |= ZNET_FLAT_IsLast;
+			}
+
 			g_pNetComm->DirectSend(lpMessageToSend->GetRawBegin(), lpMessageToSend->Size());
 
 			ZNetMessage::Release(lpMessageToSend);
@@ -85,8 +94,12 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 		/* got query response */
 		if (lpMsgHead->m_MsgType == ZNET_MSG_StuInfo && g_DoSyncStuRequest)
 		{
-			// mark as false when the query responsed
-			g_DoSyncStuRequest = FALSE;
+			// mark as false when the last query responsed
+			ZNetHead* lpNetHead = ZNetProtocol::GetMessageNetHead(apMessage);
+			if (lpNetHead->m_Flag & ZNET_FLAT_IsLast)
+			{
+				g_DoSyncStuRequest = FALSE;
+			}
 
 			ZStudentInfo lStuInfo = {};
 			ZFixString2StuInfo(apMessage->GetRawBegin(), apMessage->Size(), ZNetProtocol::NetMessagePreSize(), &lStuInfo);
@@ -198,6 +211,16 @@ BOOL CZClientsManagerApp::InitInstance()
 	{
 		return FALSE;
 	}
+
+	// login success
+	g_Logger = ztl_log_create(g_AppConfig.m_LogName, ZTL_WritFile, false);
+	if (!g_Logger) {
+		ZDebug("Create log %s failed", g_AppConfig.m_LogName);
+	}
+	else {
+		ztl_log_set_level(g_Logger, g_AppConfig.m_LogLevel);
+	}
+
 
 	// 若要创建主窗口，此代码将创建新的框架窗口
 	// 对象，然后将其设置为应用程序的主窗口对象

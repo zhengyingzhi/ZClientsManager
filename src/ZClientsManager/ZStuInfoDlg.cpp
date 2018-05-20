@@ -10,6 +10,8 @@
 #include "ZStuInfoDlg.h"
 #include "ZInfoDesc.h"
 
+#include "ZAppConfig.h"
+
 // ZStuInfoDlg dialog
 
 IMPLEMENT_DYNAMIC(ZStuInfoDlg, CDialogEx)

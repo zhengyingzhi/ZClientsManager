@@ -8,6 +8,10 @@
 
 #include "ZUtility.h"
 
+#include <ZToolLib/ztl_base64.h>
+#include <ZToolLib/ztl_utils.h>
+
+
 uint32_t ZCurrentDate()
 {
 	time_t lNow = time(0);
@@ -80,3 +84,70 @@ void ZLog2DebugView(const char* fmt, ...)
 
 	OutputDebugString(lBuffer);
 }
+
+
+char* ZPasswordChange(char* apData)
+{
+	unsigned char *p;
+	unsigned char uch, umask, index = 0;
+	p = (unsigned char *)apData;
+	while ((uch = *p))
+	{
+		umask = 0xFF - index;
+		*p++ = uch  ^ umask;
+		index++;
+
+		if (index > 8)
+			index = 0;
+	}
+
+	return apData;
+}
+
+std::string ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDoSimpleChange)
+{
+	char lRawData[1024];
+	strcpy(lRawData, apRawData);
+	if (aDoSimpleChange) {
+		apRawData = ZPasswordChange(lRawData);
+	}
+
+	char lOutData[1000] = "";
+	uint32_t lOutSize = sizeof(lOutData);
+	ztl_base64_encode(apRawData, strlen(apRawData), lOutData, &lOutSize);
+
+	return std::string(lOutData);
+}
+
+std::string ZConvBase64ToData(const char* apBaseData, uint32_t aBaseDataSize, bool aDoSimpleChange)
+{
+	char lOutData[1024] = "";
+	uint32_t lOutSize = sizeof(lOutData);
+	ztl_base64_decode(apBaseData, strlen(apBaseData), lOutData, &lOutSize);
+
+	if (aDoSimpleChange) {
+		apBaseData = ZPasswordChange(lOutData);
+	}
+
+	return std::string(apBaseData);
+}
+
+uint32_t ZGetCheckSum(const void* apRawData, uint32_t aRawSize, int aRefNum)
+{
+	if (aRefNum <= 7)
+		aRefNum = 10;
+
+	uint32_t lModNum = 1;
+	while (aRefNum--)
+		lModNum = lModNum << 1;
+
+	uint32_t lIndex = 0;
+	uint32_t lSum = 0;
+	unsigned char* lpRawData = (unsigned char*)apRawData;
+	while (lIndex < aRawSize) {
+		lSum += uint32_t(lpRawData[lIndex++]);
+	}
+
+	return lSum & (lModNum - 1);
+}
+

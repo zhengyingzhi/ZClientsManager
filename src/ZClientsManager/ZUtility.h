@@ -16,3 +16,15 @@ std::string ZConvStdTimeStr(time_t aTime);
 
 void ZLog2DebugView(const char* fmt, ...);
 #define ZDebug(fmt,...) ZLog2DebugView(fmt,__VA_ARGS__)
+
+
+/* simple password change */
+char* ZPasswordChange(char* apData);
+
+/* convert to base64 */
+std::string ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDoSimpleChange);
+
+std::string ZConvBase64ToData(const char* apBaseData, uint32_t aBaseDataSize, bool aDoSimpleChange);
+
+uint32_t ZGetCheckSum(const void* apRawData, uint32_t aRawSize, int aRefNum);
+

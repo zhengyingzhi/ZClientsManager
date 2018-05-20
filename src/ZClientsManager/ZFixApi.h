@@ -34,6 +34,7 @@ public:
 	void SetItem(uint32_t aID, const uint32_t aValue);
 	void SetItem(uint32_t aID, int64_t aValue);
 	void SetItem(uint32_t aID, const char* apValue, int aLength = -1);
+	void SetItem(uint32_t aID, const std::string& aValue);
 
 	bool GetItem(uint32_t aID, char& aOutValue);
 	bool GetItem(uint32_t aID, uint16_t& aOutValue);

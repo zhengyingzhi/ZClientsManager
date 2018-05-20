@@ -1,5 +1,7 @@
 #pragma once
 
+#define ZFD_Version         3
+#define ZFD_CheckSum        4
 
 #define ZFD_Reserve			11
 #define ZFD_Number          12

@@ -12,6 +12,8 @@
 
 #include "StudentInfoDB.h"
 
+#include "ZUtility.h"
+
 
 ZAppConfigs::ZAppConfigs()
 	: m_UserID()
@@ -22,6 +24,8 @@ ZAppConfigs::ZAppConfigs()
 	, m_CastIP(ZNET_DEFAULT_GROUPIP)
 	, m_UserDBName(USERINFO_DB_DEFAULT_NAME)
 	, m_StuDBName(STUINFO_DB_DEFAULT_NAME)
+	, m_LogLevel(ZTL_LOG_INFO)
+	, m_LogName(ZAPP_LOG_NAME)
 {}
 
 ZAppConfigs::~ZAppConfigs()
@@ -46,7 +50,8 @@ bool ZAppConfigs::ReadAppConfig(const string& aConfName)
 
 	if (ztl_config_read_str(zconf, "Password", &lpReadValue, &lLength))
 	{
-		strncpy(m_Password, lpReadValue, sizeof(m_Password) - 1);
+		std::string lPassword = ZConvBase64ToData(lpReadValue, lLength, true);
+		strncpy(m_Password, lPassword.c_str(), sizeof(m_Password) - 1);
 	}
 
 	ztl_config_read_int32(zconf, "SavePasswd", &m_SavePasswd);
@@ -56,6 +61,27 @@ bool ZAppConfigs::ReadAppConfig(const string& aConfName)
 	if (ztl_config_read_str(zconf, "CastIP", &lpReadValue, &lLength))
 	{
 		strncpy(m_CastIP, lpReadValue, sizeof(m_CastIP) - 1);
+	}
+
+	if (ztl_config_read_str(zconf, "LogName", &lpReadValue, &lLength))
+	{
+		if (lLength > 0)
+			strncpy(m_LogName, lpReadValue, sizeof(m_LogName) - 1);
+	}
+	if (ztl_config_read_str(zconf, "LogLevel", &lpReadValue, &lLength))
+	{
+		std::string lLevel = lpReadValue;
+		if (lLength > 0)
+		{
+			if (lLevel == "DEBUG")
+				m_LogLevel = ZTL_LOG_DEBUG;
+			else if (lLevel == "WARN")
+				m_LogLevel = ZTL_LOG_WARN;
+			else if (lLevel == "ERROR")
+				m_LogLevel = ZTL_LOG_CRITICAL;
+			else
+				m_LogLevel = ZTL_LOG_INFO;
+		}
 	}
 
 	ztl_config_close(zconf);
@@ -105,9 +131,11 @@ string ZAppConfigs::ToString()
 	int  lLength = 0;
 	char lBuffer[1000] = "";
 
+	std::string lPassword = ZConvDataToBase64(m_Password, strlen(m_Password), true);
+
 	lLength += sprintf(lBuffer + lLength, "UserID%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_UserID);
 	if (m_SavePasswd)
-		lLength += sprintf(lBuffer + lLength, "Password%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_Password);
+		lLength += sprintf(lBuffer + lLength, "Password%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, lPassword.c_str());
 	else
 		lLength += sprintf(lBuffer + lLength, "Password%c%s" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, "");
 	lLength += sprintf(lBuffer + lLength, "SavePasswd%c%d" ZAPP_CONFIG_LINEFEED, ZAPP_CONFIG_DELIMITER, m_SavePasswd);

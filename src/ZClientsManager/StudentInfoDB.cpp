@@ -3,6 +3,8 @@
 
 #include <ZToolLib/ztl_utils.h>
 
+#include "ZAppConfig.h"
+
 #include <vector>
 using namespace std;
 
@@ -259,6 +261,8 @@ int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 	if (lpQryRs)
 	{
 		// already exist
+		ztl_log_error(g_Logger, ZTL_LOG_WARN, "StudentInfoDB Insert already exist name:%s, college:%s",
+			lpStuInfo->Name, lpStuInfo->CollegeFrom);
 
 		FreeQueryRs(lpQryRs);
 		return 1;
@@ -268,6 +272,8 @@ int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 	lpDstInfo = GetAvailStudentInfo();
 	if (!lpDstInfo)
 	{
+		ztl_log_error(g_Logger, ZTL_LOG_CRITICAL, "StudentInfoDB Insert no enough db memory for name:%s, college:%s",
+			lpStuInfo->Name, lpStuInfo->CollegeFrom);
 		return -99;
 	}
 
@@ -276,6 +282,11 @@ int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 	ZStuInfoCopy(lpDstInfo, lpStuInfo);
 
 	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
+
+	char lFixString[4096] = "";
+	int  lLength = ZStuInfoFixString(lpStuInfo, lFixString, 0);
+	lFixString[lLength] = '\0';
+	ztl_log_error(g_Logger, ZTL_LOG_INFO, "StudentInfoDB Insert\r\n%s", lFixString);
 
 	return 0;
 }
@@ -293,6 +304,8 @@ int ZStudentInfoDBText::Update(void* apDataInfo, uint32_t aDataSize)
 	lpQryRs = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
 	if (!lpQryRs)
 	{
+		ztl_log_error(g_Logger, ZTL_LOG_WARN, "StudentInfoDB Update not find %s,%s", 
+			lpStuInfo->Name, lpStuInfo->Telehone);
 		return -2;
 	}
 
@@ -304,6 +317,11 @@ int ZStudentInfoDBText::Update(void* apDataInfo, uint32_t aDataSize)
 	ZStuInfoCopy(lpDstInfo, lpStuInfo);
 
 	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
+
+	char lFixString[4096] = "";
+	int  lLength = ZStuInfoFixString(lpStuInfo, lFixString, 0);
+	lFixString[lLength] = '\0';
+	ztl_log_error(g_Logger, ZTL_LOG_INFO, "StudentInfoDB Update\r\n%s", lFixString);
 
 	FreeQueryRs(lpQryRs);
 	return 0;
@@ -318,7 +336,9 @@ int ZStudentInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 	lpQryRs = Query(lpStuInfo, ZQueryCompareNameAndTel, 0);
 	if (!lpQryRs)
 	{
-		return -1;
+		ztl_log_error(g_Logger, ZTL_LOG_WARN, "StudentInfoDB Delete not find %s,%s",
+			lpStuInfo->Name, lpStuInfo->Telehone);
+		return -2;
 	}
 
 	ZStudentInfo* lpDstInfo;
@@ -327,6 +347,9 @@ int ZStudentInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 	// market as deleted
 	lpDstInfo->Flag |= ZSI_FLAG_Deleted;
 	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
+
+	ztl_log_error(g_Logger, ZTL_LOG_INFO, "StudentInfoDB Delete name:%s, college:%s-->>%s", 
+		lpDstInfo->Name, lpDstInfo->CollegeFrom, lpDstInfo->CollegeTo);
 
 	FreeQueryRs(lpQryRs);
 	return 0;

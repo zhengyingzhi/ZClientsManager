@@ -18,7 +18,7 @@ bool ZNetProtocol::IsValidHead(void* apAddr)
 
 ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType, const void* apDataInfo, uint32_t aDataSize)
 {
-	uint32_t lSize = sizeof(ZNetHead) + sizeof(ZMsgHead) + aDataSize + 8;
+	uint32_t lSize = sizeof(ZNetHead) + sizeof(ZMsgDesc) + aDataSize + 8;
 	ZNetMessage* lpMessage;
 	lpMessage = ZNetMessage::Alloc(lSize);
 
@@ -26,20 +26,20 @@ ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType
 
 	// fill header fields
 	ZNetHead*	lpProtoHead;
-	ZMsgHead*	lpMsgHed;
+	ZMsgDesc*	lpMsgDesc;
 	void*		lpDataInfo;
-	ExtractNetMessage(lpMessage, &lpProtoHead, &lpMsgHed, (void**)&lpDataInfo);
+	ExtractNetMessage(lpMessage, &lpProtoHead, &lpMsgDesc, (void**)&lpDataInfo);
 
 	lpProtoHead->m_StartType	= ZNET_STARTTYPE_CM;
 	lpProtoHead->m_Version		= ZNET_VERSION;
 	lpProtoHead->m_Type			= aProtoType;
-	lpProtoHead->m_Length		= sizeof(ZMsgHead) + aDataSize;
+	lpProtoHead->m_Length		= sizeof(ZMsgDesc) + aDataSize;
 	lpProtoHead->m_Flag			= 0;
 
-	lpMsgHed->m_DataSize		= aDataSize;
-	lpMsgHed->m_Count			= 1;
-	lpMsgHed->m_MsgType			= aMsgType;
-	lpMsgHed->m_BegSeq			= 1;
+	lpMsgDesc->m_DataSize		= aDataSize;
+	lpMsgDesc->m_Count			= 1;
+	lpMsgDesc->m_MsgType			= aMsgType;
+	lpMsgDesc->m_BegSeq			= 1;
 
 	if (apDataInfo && aDataSize > 0) {
 		memcpy(lpDataInfo, apDataInfo, aDataSize);
@@ -48,7 +48,12 @@ ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType
 	return lpMessage;
 }
 
-void ZNetProtocol::ExtractNetMessage(ZNetMessage* apMessage, ZNetHead** appProtoHead, ZMsgHead** appMsgHead, void** appDataInfo)
+ZNetHead* ZNetProtocol::GetMessageNetHead(ZNetMessage* apMessage)
+{
+	return (ZNetHead*)apMessage->GetRawBegin();
+}
+
+void ZNetProtocol::ExtractNetMessage(ZNetMessage* apMessage, ZNetHead** appProtoHead, ZMsgDesc** appMsgDesc, void** appDataInfo)
 {
 	char* lpRawBegin = apMessage->GetRawBegin();
 
@@ -56,16 +61,16 @@ void ZNetProtocol::ExtractNetMessage(ZNetMessage* apMessage, ZNetHead** appProto
 		*appProtoHead = (ZNetHead*)lpRawBegin;
 	}
 
-	if (appMsgHead) {
-		*appMsgHead = (ZMsgHead*)(lpRawBegin + sizeof(ZNetHead));
+	if (appMsgDesc) {
+		*appMsgDesc = (ZMsgDesc*)(lpRawBegin + sizeof(ZNetHead));
 	}
 
 	if (appDataInfo) {
-		*appDataInfo = (void*)(lpRawBegin + sizeof(ZNetHead) + sizeof(ZMsgHead));
+		*appDataInfo = (void*)(lpRawBegin + sizeof(ZNetHead) + sizeof(ZMsgDesc));
 	}
 }
 
 uint32_t ZNetProtocol::NetMessagePreSize()
 {
-	return sizeof(ZNetHead) + sizeof(ZMsgHead);
+	return sizeof(ZNetHead) + sizeof(ZMsgDesc);
 }

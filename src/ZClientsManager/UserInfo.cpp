@@ -2,15 +2,21 @@
 
 #include "ZFixApi.h"
 
+#include "ZUtility.h"
+
+
 int ZUserInfoFixString(const ZUserInfo* apUserInfo, char* apBuffer, uint32_t aPrePaddingSize)
 {
 	ZFixApi lFixApi;
 	lFixApi.SetPrePaddingSize(aPrePaddingSize);
 	lFixApi.SetBuffer(apBuffer);
 
+	std::string lPassword = ZConvDataToBase64(apUserInfo->Password, strlen(apUserInfo->Password), ZUSER_SimpleChange);
+
+	lFixApi.SetItem(ZFD_Version,    ZUSER_INFO_Version);
 	lFixApi.SetItem(ZFD_Number,     apUserInfo->Number);
 	lFixApi.SetItem(ZFD_Name,       apUserInfo->UserName);
-	lFixApi.SetItem(ZFD_Password,   apUserInfo->Password);
+	lFixApi.SetItem(ZFD_Password,   lPassword);
 	lFixApi.SetItem(ZFD_Cipher,     apUserInfo->Cipher);
 	lFixApi.SetItem(ZFD_Telephone,  apUserInfo->Telephone);
 	lFixApi.SetItem(ZFD_QQ,         apUserInfo->QQ);
@@ -34,8 +40,12 @@ int ZFixString2UserInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSi
 		return -1;
 	}
 
+	std::string lPassword;
+	lFixApi.GetItem(ZFD_Password, lPassword);
+	lPassword = ZConvBase64ToData(lPassword.c_str(), lPassword.length(), ZUSER_SimpleChange);
+	strncpy(apUserInfo->Password, lPassword.c_str(), sizeof(apUserInfo->Password) - 1);
+
 	lFixApi.GetItem(ZFD_Name,       apUserInfo->UserName);
-	lFixApi.GetItem(ZFD_Password,   apUserInfo->Password);
 	lFixApi.GetItem(ZFD_Cipher,     apUserInfo->Cipher);
 	lFixApi.GetItem(ZFD_Telephone,  apUserInfo->Telephone);
 	lFixApi.GetItem(ZFD_QQ,         apUserInfo->QQ);

@@ -9,6 +9,9 @@
 #define ZSI_FLAG_NotPublish         2	        // 还未广播数据
 #define ZSI_FLAG_Deleted            4	        // 删除标记
 
+#define ZSTU_Version				10000
+#define ZSTU_SimpleChange			true
+
 typedef enum
 {
 	SSEX_Unknown    = 0,                        // 未知
