@@ -72,6 +72,7 @@ static void _InitMainListCtrl(CListCtrl& aList)
 static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuInfo)
 {
 	CString lString;
+	std::string lStdString;
 	if (aRow == -1)
 	{
 		aRow = aList.GetItemCount();
@@ -97,13 +98,19 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 
 	aList.SetItemText(aRow, MAINLIST_COL_Status,   apStuInfo->Status);
 	aList.SetItemText(aRow, MAINLIST_COL_Important, ZStuImportantDesc(apStuInfo->ImportantLevel));
-	aList.SetItemText(aRow, MAINLIST_COL_NextVisitTime, ZConvDateTimeStr(apStuInfo->NextVisitTime).c_str());
+
+	lStdString = ZConvStdTimeStr(apStuInfo->NextVisitTime);
+	aList.SetItemText(aRow, MAINLIST_COL_NextVisitTime, lStdString.c_str());
 
 	aList.SetItemText(aRow, MAINLIST_COL_Sex, ZStuSexDesc(apStuInfo->Sex));
 	aList.SetItemText(aRow, MAINLIST_COL_QQ, apStuInfo->QQ);
 	aList.SetItemText(aRow, MAINLIST_COL_Source, apStuInfo->Source);
-	aList.SetItemText(aRow, MAINLIST_COL_InsertTime, ZConvDateTimeStr(apStuInfo->InsertTime).c_str());
-	aList.SetItemText(aRow, MAINLIST_COL_UpdateTime, ZConvDateTimeStr(apStuInfo->UpdateTime).c_str());
+
+	lStdString = ZConvStdTimeStr(apStuInfo->InsertTime);
+	aList.SetItemText(aRow, MAINLIST_COL_InsertTime, lStdString.c_str());
+
+	lStdString = ZConvStdTimeStr(apStuInfo->UpdateTime);
+	aList.SetItemText(aRow, MAINLIST_COL_UpdateTime, lStdString.c_str());
 }
 
 static uint32_t _GetMainListColNum()

@@ -1,6 +1,8 @@
 // ZStuInfoDlg.cpp : implementation file
 //
 
+#include <time.h>
+
 #include "stdafx.h"
 #include "afxdialogex.h"
 
@@ -11,6 +13,8 @@
 #include "ZInfoDesc.h"
 
 #include "ZAppConfig.h"
+
+#include "ZUtility.h"
 
 // ZStuInfoDlg dialog
 
@@ -37,9 +41,9 @@ BOOL ZStuInfoDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// 
-	m_comboImportant.AddString("普通");
-	m_comboImportant.AddString("重要");
 	m_comboImportant.AddString("紧急");
+	m_comboImportant.AddString("重要");
+	m_comboImportant.AddString("普通");
 	m_comboImportant.SetCurSel(0);
 
 	CString lString;
@@ -58,6 +62,12 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		SetDlgItemText(IDC_EDIT_CLASS, m_StuInfo.Class);
 		SetDlgItemText(IDC_EDIT_COUNTRY, m_StuInfo.Country);
 		SetDlgItemText(IDC_EDIT_IDNumber, m_StuInfo.IDNumber);
+
+		std::string lTimeStr;
+		lTimeStr = ZConvStdTimeStr((time_t)m_StuInfo.InsertTime);
+		SetDlgItemText(IDC_EDIT_INSERTTIME, lTimeStr.c_str());
+		lTimeStr = ZConvStdTimeStr((time_t)m_StuInfo.UpdateTime);
+		SetDlgItemText(IDC_EDIT_UPDATETIME, lTimeStr.c_str());
 
 		double lScore = (m_StuInfo.LanguageScore / 10);
 		if (m_StuInfo.LanguageScore > 2000)
@@ -168,7 +178,7 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	lStuInfo.Sex = lpBtn->GetCheck() ? SSEX_Boy : SSEX_Girl;
 
 	// 比较数据
-	if (memcmp(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo)) == 0)
+	if (ZStuInfoEqual(&m_StuInfo, &lStuInfo))
 	{
 		AfxMessageBox(_T("未更新任何数据"), MB_OK | MB_ICONWARNING);
 		return;
@@ -185,6 +195,8 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	if (strcmp(m_StuInfo.Name, lStuInfo.Name) == 0 &&
 		strcmp(m_StuInfo.Telehone, lStuInfo.Telehone) == 0)
 	{
+		lStuInfo.UpdateTime = time(0);
+
 		// update
 		lRet = g_MemData.GetStuDB()->Update(&lStuInfo, sizeof(lStuInfo));
 		if (lRet != 0)
@@ -195,6 +207,8 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	}
 	else
 	{
+		lStuInfo.InsertTime = time(0);
+
 		// insert
 		lRet = g_MemData.GetStuDB()->Insert(&lStuInfo, sizeof(lStuInfo));
 		if (lRet != 0)

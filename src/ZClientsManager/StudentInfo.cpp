@@ -107,6 +107,37 @@ int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSiz
 void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
 {
 	uint32_t lOldNum = apDstInfo->Number;
+	int64_t lOldInsertTime = apDstInfo->InsertTime;
+
 	memcpy(apDstInfo, apSrcInfo, sizeof(ZStudentInfo));
 	apDstInfo->Number = lOldNum;
+
+	if (lOldInsertTime != 0)
+		apDstInfo->InsertTime = lOldInsertTime;
+}
+
+bool ZStuInfoEqual(ZStudentInfo* apStuInfoA, ZStudentInfo* apStuInfoB)
+{
+	if (strcmp(apStuInfoA->Name, apStuInfoB->Name) == 0 &&
+		strcmp(apStuInfoA->Telehone, apStuInfoB->Telehone) == 0 &&
+		strcmp(apStuInfoA->QQ, apStuInfoB->QQ) == 0 &&
+		strcmp(apStuInfoA->Class, apStuInfoB->Class) == 0 &&
+		strcmp(apStuInfoA->CollegeFrom, apStuInfoB->CollegeFrom) == 0 &&
+		strcmp(apStuInfoA->CollegeTo, apStuInfoB->CollegeTo) == 0 &&
+		strcmp(apStuInfoA->MajorFrom, apStuInfoB->MajorFrom) == 0 &&
+		strcmp(apStuInfoA->MajorTo, apStuInfoB->MajorTo) == 0 &&
+		strcmp(apStuInfoA->Country, apStuInfoB->Country) == 0 &&
+		strcmp(apStuInfoA->Source, apStuInfoB->Source) == 0 &&
+		strcmp(apStuInfoA->IDNumber, apStuInfoB->IDNumber) == 0 &&
+		strcmp(apStuInfoA->Comments, apStuInfoB->Comments) == 0 &&
+		apStuInfoA->LanguageScore == apStuInfoB->LanguageScore &&
+		apStuInfoA->Flag == apStuInfoB->Flag &&
+		apStuInfoA->ImportantLevel == apStuInfoB->ImportantLevel &&
+		apStuInfoA->GPA == apStuInfoB->GPA &&
+		apStuInfoA->Sex == apStuInfoB->Sex
+		) {
+		return true;
+	}
+
+	return false;
 }

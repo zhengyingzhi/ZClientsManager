@@ -74,3 +74,5 @@ extern int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint
 extern int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSize, ZStudentInfo* apStuInfo);
 
 extern void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo);
+
+extern bool ZStuInfoEqual(ZStudentInfo* apStuInfoA, ZStudentInfo* apStuInfoB);
