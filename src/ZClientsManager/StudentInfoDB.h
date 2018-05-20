@@ -33,6 +33,7 @@ bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExten
 bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareStatus(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend);
+bool ZQueryCompareEMail(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareStuIDNum(const void* apExpect, const void* apAcutal, int aExtend);
 
 

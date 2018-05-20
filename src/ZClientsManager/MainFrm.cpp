@@ -92,6 +92,14 @@ static bool _IsScoreString(const char* apFindStr)
 	return false;
 }
 
+static bool _IsEMailString(const char* apFindStr)
+{
+	if (strlen(apFindStr) > 6 && strstr(apFindStr, "@") && strstr(apFindStr, ".")) {
+		return true;
+	}
+	return false;
+}
+
 // CMainFrame ¹¹Ôì/Îö¹¹
 
 CMainFrame::CMainFrame()
@@ -445,13 +453,18 @@ void CMainFrame::VagueFind(const char* apFindStr)
 
 	if (_IsNumericString(apFindStr, lLength) && (lLength == 4 || lLength == 11))
 	{
-		strcpy(lStuInfo.Telehone, apFindStr);
+		strncpy(lStuInfo.Telehone, apFindStr, sizeof(lStuInfo.Telehone) - 1);
 		lStuVec =g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareNameAndTel, 0);
 	}
 	else if (_IsScoreString(apFindStr))
 	{
 		lStuInfo.LanguageScore = uint32_t(atof(apFindStr) * 10);
 		lStuVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareScore, CC_Equal);
+	}
+	else if (_IsEMailString(apFindStr))
+	{
+		strncpy(lStuInfo.EMail, apFindStr, sizeof(lStuInfo.Telehone) - 1);
+		lStuVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareEMail, 0);
 	}
 	else
 	{

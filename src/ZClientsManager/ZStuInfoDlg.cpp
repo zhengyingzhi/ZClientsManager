@@ -84,6 +84,7 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		SetDlgItemText(IDC_COMBO_IMPORTANT, ZStuImportantDesc(m_StuInfo.ImportantLevel));
 		SetDlgItemText(IDC_EDIT_SOURCE, m_StuInfo.Source);
 		SetDlgItemText(IDC_EDIT_STATUS, m_StuInfo.Status);
+		SetDlgItemText(IDC_EDIT_EMAIL, m_StuInfo.EMail);
 		SetDlgItemText(IDC_EDIT_COMMENT, m_StuInfo.Comments);
 
 		CButton* lpBtn;
@@ -162,6 +163,7 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	GetDlgItemValue(IDC_EDIT_COUNTRY, lStuInfo.Country, sizeof(lStuInfo.Country));
 	GetDlgItemValue(IDC_EDIT_SOURCE, lStuInfo.Source, sizeof(lStuInfo.Source));
 	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));
+	GetDlgItemValue(IDC_EDIT_EMAIL, lStuInfo.EMail, sizeof(lStuInfo.EMail));
 	GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
 
 	CString lString;

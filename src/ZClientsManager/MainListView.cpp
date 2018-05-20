@@ -31,6 +31,7 @@ MainListColDesc MLColums[] = {
 	{ MAINLIST_COL_Source,      160, _T("来源") },
 	{ MAINLIST_COL_InsertTime,  120, _T("插入时间") },
 	{ MAINLIST_COL_UpdateTime,  120, _T("更新时间") },
+	{ MAINLIST_COL_EMail,       120, _T("邮箱") },
 	{ 0, 0, 0 }
 };
 
@@ -111,6 +112,8 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 
 	lStdString = ZConvStdTimeStr(apStuInfo->UpdateTime);
 	aList.SetItemText(aRow, MAINLIST_COL_UpdateTime, lStdString.c_str());
+
+	aList.SetItemText(aRow, MAINLIST_COL_EMail, apStuInfo->EMail);
 }
 
 static uint32_t _GetMainListColNum()

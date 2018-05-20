@@ -65,10 +65,12 @@
 #define IDC_EDIT_ADDTIME                1016
 #define IDC_EDIT_STATUS                 1017
 #define IDC_RADIO_GIRL                  1018
+#define IDC_EDIT_STATUS2                1018
 #define IDC_DTPICKER_Date               1019
 #define IDC_DTPICKER_Time               1020
 #define IDC_EDIT_UPDATETIME             1021
 #define IDC_EDIT_COLLEGE_TO             1022
+#define IDC_EDIT_EMAIL                  1023
 #define IDC_EDIT_MAJOR_TO               1024
 #define IDC_EDIT_GPA                    1025
 #define ID_EDIT_INSERT                  32771

@@ -51,6 +51,7 @@ struct stZStudentInfo
 	char            Status[32];                 // 目前状态（由于用户自定义描述）
 	char            Recorder[12];               // 谁记录
 	char			IDNumber[20];               // 身份证号
+	char            EMail[32];                  // 邮箱地址
 
 	uint32_t        Number;                     // 编号
 	uint32_t        LanguageScore;              // 托福/雅思分数(* 10)

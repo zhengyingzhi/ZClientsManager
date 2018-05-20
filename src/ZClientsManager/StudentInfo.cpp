@@ -15,6 +15,7 @@ int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aP
 	std::string lTel    = ZConvDataToBase64(apStuInfo->Telehone, strlen(apStuInfo->Telehone), ZSTU_SimpleChange);
 	std::string lQQ     = ZConvDataToBase64(apStuInfo->QQ, strlen(apStuInfo->QQ), ZSTU_SimpleChange);
 	std::string lIDNum  = ZConvDataToBase64(apStuInfo->IDNumber, strlen(apStuInfo->IDNumber), ZSTU_SimpleChange);
+	std::string lEMail  = ZConvDataToBase64(apStuInfo->EMail, strlen(apStuInfo->EMail), ZSTU_SimpleChange);
 
 	// comments not use simple password change
 	std::string lComments = ZConvDataToBase64(apStuInfo->Comments, strlen(apStuInfo->Comments), false);
@@ -42,6 +43,7 @@ int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aP
 	lFixApi.SetItem(ZFD_InsertTime,     apStuInfo->InsertTime);
 	lFixApi.SetItem(ZFD_UpdateTime,     apStuInfo->UpdateTime);
 	lFixApi.SetItem(ZFD_NextVisitTime,  apStuInfo->NextVisitTime);
+	lFixApi.SetItem(ZFD_EMail,          apStuInfo->EMail);
 	lFixApi.SetItem(ZFD_Comment,        lComments);
 
 	return lFixApi.Length();
@@ -65,6 +67,7 @@ int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSiz
 	std::string lTel    = _ZGetRawData(lFixApi, ZFD_Telephone, ZSTU_SimpleChange);
 	std::string lQQ     = _ZGetRawData(lFixApi, ZFD_QQ, ZSTU_SimpleChange);
 	std::string lIDNum  = _ZGetRawData(lFixApi, ZFD_IDNumber, ZSTU_SimpleChange);
+	std::string lEMail  = _ZGetRawData(lFixApi, ZFD_EMail, ZSTU_SimpleChange);
 	// comments not use simple password change
 	std::string lComments = _ZGetRawData(lFixApi, ZFD_Comment, false);
 
@@ -77,6 +80,7 @@ int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSiz
 	strncpy(apStuInfo->Telehone, lTel.c_str(), sizeof(apStuInfo->Telehone) - 1);
 	strncpy(apStuInfo->QQ, lQQ.c_str(), sizeof(apStuInfo->QQ) - 1);
 	strncpy(apStuInfo->IDNumber, lIDNum.c_str(), sizeof(apStuInfo->IDNumber) - 1);
+	strncpy(apStuInfo->EMail, lEMail.c_str(), sizeof(apStuInfo->EMail) - 1);
 
 	lFixApi.GetItem(ZFD_Class,          apStuInfo->Class);
 	lFixApi.GetItem(ZFD_CollegeFrom,    apStuInfo->CollegeFrom);
@@ -129,6 +133,7 @@ bool ZStuInfoEqual(ZStudentInfo* apStuInfoA, ZStudentInfo* apStuInfoB)
 		strcmp(apStuInfoA->Country, apStuInfoB->Country) == 0 &&
 		strcmp(apStuInfoA->Source, apStuInfoB->Source) == 0 &&
 		strcmp(apStuInfoA->IDNumber, apStuInfoB->IDNumber) == 0 &&
+		strcmp(apStuInfoA->EMail, apStuInfoB->EMail) == 0 &&
 		strcmp(apStuInfoA->Comments, apStuInfoB->Comments) == 0 &&
 		apStuInfoA->LanguageScore == apStuInfoB->LanguageScore &&
 		apStuInfoA->Flag == apStuInfoB->Flag &&

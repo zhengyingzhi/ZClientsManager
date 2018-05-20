@@ -67,19 +67,22 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 {
 	ZStudentInfo lStuInfo = {};
 
-	CString lName, lTelephone, lCollge, lQQ, lStatus, lSource;
+	CString lName, lTelephone, lCollge, lQQ, lStatus, lSource, lEMail;
 	GetDlgItemText(IDC_EDIT_NAME, lName);
 	GetDlgItemText(IDC_EDIT_TELEPHONE, lTelephone);
 	GetDlgItemText(IDC_EDIT_COLLEGE, lCollge);
 	GetDlgItemText(IDC_EDIT_QQ, lQQ);
 	GetDlgItemText(IDC_EDIT_STATUS, lStatus);
 	GetDlgItemText(IDC_EDIT_SOURCE, lSource);
+	GetDlgItemText(IDC_EDIT_EMAIL, lEMail);
+
 	strncpy(lStuInfo.Name, (char*)(LPCSTR)lName, sizeof(lStuInfo.Name) - 1);
 	strncpy(lStuInfo.Telehone, (char*)(LPCSTR)lTelephone, sizeof(lStuInfo.Telehone) - 1);
 	strncpy(lStuInfo.CollegeFrom, (char*)(LPCSTR)lCollge, sizeof(lStuInfo.CollegeFrom) - 1);
 	strncpy(lStuInfo.QQ, (char*)(LPCSTR)lQQ, sizeof(lStuInfo.QQ) - 1);
 	strncpy(lStuInfo.Status, (char*)(LPCSTR)lStatus, sizeof(lStuInfo.Status) - 1);
 	strncpy(lStuInfo.Source, (char*)(LPCSTR)lSource, sizeof(lStuInfo.Source) - 1);
+	strncpy(lStuInfo.EMail, (char*)(LPCSTR)lEMail, sizeof(lStuInfo.Source) - 1);
 
 	vector<ZStudentInfo*> lVec;
 	if (!lName.IsEmpty() || !lTelephone.IsEmpty())
@@ -88,6 +91,8 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareCollege, 0);
 	else if (!lQQ.IsEmpty())
 		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareStuQQ, 0);
+	else if (!lEMail.IsEmpty())
+		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareEMail, 0);
 	else if (!lStatus.IsEmpty())
 		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareStatus, 0);
 	else if (!lSource.IsEmpty())
@@ -114,4 +119,5 @@ void ZStuQryDlg::OnBnClickedBtnClear()
 	SetDlgItemText(IDC_EDIT_NAME, "");
 	SetDlgItemText(IDC_EDIT_TELEPHONE, "");
 	SetDlgItemText(IDC_EDIT_COUNTRY, "");
+	SetDlgItemText(IDC_EDIT_EMAIL, "");
 }

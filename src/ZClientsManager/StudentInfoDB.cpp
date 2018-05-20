@@ -149,6 +149,21 @@ bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend
 	return false;
 }
 
+/* 比较邮箱地址 */
+bool ZQueryCompareEMail(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (strstr(lpActual->EMail, lpExpect->EMail))
+	{
+		return true;
+	}
+
+	return false;
+}
+
 /* 比较身份证号 */
 bool ZQueryCompareStuIDNum(const void* apExpect, const void* apAcutal, int aExtend)
 {

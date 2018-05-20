@@ -32,3 +32,4 @@
 #define ZFD_Flag            37
 #define ZFD_Sex             38
 #define ZFD_ImportantLevel  39
+#define ZFD_EMail           40

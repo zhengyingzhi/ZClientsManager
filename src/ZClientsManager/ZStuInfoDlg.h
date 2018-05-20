@@ -24,6 +24,7 @@
 #define MAINLIST_COL_Source         16          // À´Ô´
 #define MAINLIST_COL_InsertTime     17
 #define MAINLIST_COL_UpdateTime     18
+#define MAINLIST_COL_EMail          19
 
 typedef struct 
 {
