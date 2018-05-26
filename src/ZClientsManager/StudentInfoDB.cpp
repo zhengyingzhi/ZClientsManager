@@ -9,6 +9,19 @@
 using namespace std;
 
 
+/* 比较Number */
+bool ZQueryCompareNumber(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	(void)aExtend;
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+	if (lpExpect->Number == lpActual->Number)
+	{
+		return true;
+	}
+	return false;
+}
+
 /* 比较名字和电话 */
 bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aExtend)
 {
@@ -16,7 +29,7 @@ bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aEx
 	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
 	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
 
-	if (lpExpect->Name[0] && lpActual->Name[0])
+	if (lpExpect->Name[0] && lpExpect->Telehone[0])
 	{
 		// query by both
 		if (strcmp(lpExpect->Name, lpActual->Name) == 0 &&
@@ -87,11 +100,34 @@ bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExten
 	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
 	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
 
-	if (strstr(lpActual->CollegeFrom, lpExpect->CollegeFrom))
+	if (strstr(lpActual->CollegeFrom, lpExpect->CollegeFrom) ||
+		strstr(lpActual->CollegeTo, lpExpect->CollegeTo))
 	{
 		return true;
 	}
 
+	return false;
+}
+
+/* 比较时间，aExtend为比较条件*/
+bool ZQueryCompareTime(const void* apExpect, const void* apAcutal, int aExtend)
+{
+	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
+	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
+
+	if (aExtend == CC_BiggerThan && lpExpect->InsertTime > lpActual->InsertTime)
+	{
+		return true;
+	}
+	else if (aExtend == CC_SmallerThan && lpExpect->InsertTime < lpActual->InsertTime)
+	{
+		return true;
+	}
+	else
+	{
+		if (lpExpect->InsertTime == lpActual->InsertTime)
+			return true;
+	}
 	return false;
 }
 
@@ -101,15 +137,13 @@ bool ZQueryCompareScore(const void* apExpect, const void* apAcutal, int aExtend)
 	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
 	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
 
-	if (aExtend == CC_BiggerThan)
+	if (aExtend == CC_BiggerThan && lpExpect->LanguageScore > lpActual->LanguageScore)
 	{
-		if (lpExpect->LanguageScore > lpActual->LanguageScore)
-			return true;
+		return true;
 	}
-	else if (aExtend == CC_SmallerThan)
+	else if (aExtend == CC_SmallerThan && lpExpect->LanguageScore < lpActual->LanguageScore)
 	{
-		if (lpExpect->LanguageScore < lpActual->LanguageScore)
-			return true;
+		return true;
 	}
 	else
 	{

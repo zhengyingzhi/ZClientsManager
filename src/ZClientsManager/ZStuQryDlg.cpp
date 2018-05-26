@@ -26,6 +26,7 @@ ZStuQryDlg::~ZStuQryDlg()
 void ZStuQryDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_DATETIMEPICKER, m_DTCtrl);
 }
 
 BOOL ZStuQryDlg::OnInitDialog()
@@ -41,12 +42,21 @@ BOOL ZStuQryDlg::OnInitDialog()
 		SetDlgItemText(IDC_EDIT_TELEPHONE, m_StuInfo.Telehone);
 	}
 
+	m_DateTimeChanged = FALSE;
+
+	CComboBox* lpCombo = (CComboBox*)GetDlgItem(IDC_COMBO_TIMECOMP);
+	lpCombo->InsertString(0, _T("小于"));
+	lpCombo->InsertString(0, _T("等于"));
+	lpCombo->InsertString(0, _T("大于"));
+	lpCombo->InsertString(0, _T(""));
+
 	return TRUE;
 }
 
 BEGIN_MESSAGE_MAP(ZStuQryDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_QUERY, &ZStuQryDlg::OnBnClickedBtnQuery)
 	ON_BN_CLICKED(IDC_BTN_CLEAR, &ZStuQryDlg::OnBnClickedBtnClear)
+	ON_NOTIFY(DTN_DATETIMECHANGE, IDC_DATETIMEPICKER, &ZStuQryDlg::OnDtnDatetimechangeDatetimepicker)
 END_MESSAGE_MAP()
 
 
@@ -58,16 +68,21 @@ void ZStuQryDlg::SetMainFrame(CMainFrame* apMainFrame)
 	m_pMainFrame = apMainFrame;
 }
 
+/* 设置默认查询信息 */
 void ZStuQryDlg::SetStuInfo(const ZStudentInfo& aStuInfo)
 {
 	memcpy(&m_StuInfo, &aStuInfo, sizeof(ZStudentInfo));
 }
 
+
+/* 查询按钮事件 */
 void ZStuQryDlg::OnBnClickedBtnQuery()
 {
 	ZStudentInfo lStuInfo = {};
 
-	CString lName, lTelephone, lCollge, lQQ, lStatus, lSource, lEMail;
+	CComboBox* lpCombo = (CComboBox*)GetDlgItem(IDC_COMBO_TIMECOMP);
+
+	CString lName, lTelephone, lCollge, lQQ, lStatus, lSource, lEMail, lDateTime;
 	GetDlgItemText(IDC_EDIT_NAME, lName);
 	GetDlgItemText(IDC_EDIT_TELEPHONE, lTelephone);
 	GetDlgItemText(IDC_EDIT_COLLEGE, lCollge);
@@ -75,6 +90,7 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 	GetDlgItemText(IDC_EDIT_STATUS, lStatus);
 	GetDlgItemText(IDC_EDIT_SOURCE, lSource);
 	GetDlgItemText(IDC_EDIT_EMAIL, lEMail);
+	GetDlgItemText(IDC_DATETIMEPICKER, lDateTime);
 
 	strncpy(lStuInfo.Name, (char*)(LPCSTR)lName, sizeof(lStuInfo.Name) - 1);
 	strncpy(lStuInfo.Telehone, (char*)(LPCSTR)lTelephone, sizeof(lStuInfo.Telehone) - 1);
@@ -83,6 +99,7 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 	strncpy(lStuInfo.Status, (char*)(LPCSTR)lStatus, sizeof(lStuInfo.Status) - 1);
 	strncpy(lStuInfo.Source, (char*)(LPCSTR)lSource, sizeof(lStuInfo.Source) - 1);
 	strncpy(lStuInfo.EMail, (char*)(LPCSTR)lEMail, sizeof(lStuInfo.Source) - 1);
+
 
 	vector<ZStudentInfo*> lVec;
 	if (!lName.IsEmpty() || !lTelephone.IsEmpty())
@@ -97,6 +114,11 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareStatus, 0);
 	else if (!lSource.IsEmpty())
 		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareSource, 0);
+	else if (lpCombo->GetCurSel() != 0 && m_DateTimeChanged)
+	{
+		// TODO: query by time
+		m_DateTimeChanged = FALSE;
+	}
 
 	// todo: 支持按录入时间查询
 
@@ -113,11 +135,23 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 
 }
 
-
+/* 清空按钮事件 */
 void ZStuQryDlg::OnBnClickedBtnClear()
 {
 	SetDlgItemText(IDC_EDIT_NAME, "");
 	SetDlgItemText(IDC_EDIT_TELEPHONE, "");
 	SetDlgItemText(IDC_EDIT_COUNTRY, "");
+	SetDlgItemText(IDC_EDIT_COLLEGE, "");
+	SetDlgItemText(IDC_EDIT_STATUS, "");
 	SetDlgItemText(IDC_EDIT_EMAIL, "");
+}
+
+
+void ZStuQryDlg::OnDtnDatetimechangeDatetimepicker(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
+	
+	m_DateTimeChanged = TRUE;
+
+	*pResult = 0;
 }

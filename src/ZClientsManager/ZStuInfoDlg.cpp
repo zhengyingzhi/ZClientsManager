@@ -144,6 +144,7 @@ void ZStuInfoDlg::GetDlgItemValue(int nID, int64_t& aValue)
 	aValue = atoll((char*)(LPCSTR)lString);
 }
 
+// 点击保存按钮事件
 void ZStuInfoDlg::OnBnClickedBtnSave()
 {
 	/* TODO: 每更新一条消息时，应持久化该操作到一个文件中，便于查找历史 */
@@ -226,4 +227,8 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	memcpy(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo));
 
 	g_MemData.AddOrUpdateStuInfo(0, &m_StuInfo);
+
+	g_pMainFrame->UpdateStuToMainListView(&m_StuInfo, FALSE);
+
+	CDialogEx::OnOK();
 }

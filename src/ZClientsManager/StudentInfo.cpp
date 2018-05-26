@@ -116,6 +116,8 @@ void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
 	memcpy(apDstInfo, apSrcInfo, sizeof(ZStudentInfo));
 	apDstInfo->Number = lOldNum;
 
+	if (lOldNum != 0)
+		apDstInfo->Number = lOldNum;
 	if (lOldInsertTime != 0)
 		apDstInfo->InsertTime = lOldInsertTime;
 }

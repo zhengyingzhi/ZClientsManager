@@ -51,6 +51,7 @@ protected:
 
 public:
 	void UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec, BOOL aAppend);
+	void UpdateStuToMainListView(ZStudentInfo* apStuInfo, BOOL aAppend);
 
 	void VagueFind(const char* apFindStr);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StudentInfo.h"
+#include "afxdtctl.h"
 
 // ZStuQryDlg dialog
 
@@ -26,6 +27,8 @@ public:
 public:
 	CMainFrame*    m_pMainFrame;
 	ZStudentInfo   m_StuInfo;
+	CDateTimeCtrl  m_DTCtrl;
+	BOOL           m_DateTimeChanged;
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
@@ -36,4 +39,5 @@ protected:
 public:
 	afx_msg void OnBnClickedBtnQuery();
 	afx_msg void OnBnClickedBtnClear();
+	afx_msg void OnDtnDatetimechangeDatetimepicker(NMHDR *pNMHDR, LRESULT *pResult);
 };

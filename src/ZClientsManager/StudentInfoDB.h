@@ -25,6 +25,7 @@ typedef enum
 
 
 /* some default compare functions */
+bool ZQueryCompareNumber(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareNameAndTel(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareStuQQ(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareCountry(const void* apExpect, const void* apAcutal, int aExtend);

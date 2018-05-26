@@ -53,6 +53,10 @@ std::string ZConvDateTimeStr(uint64_t aTime)
 
 std::string ZConvStdTimeStr(time_t aTime)
 {
+	if (aTime == 0) {
+		return "";
+	}
+
 	char lBuffer[64] = "";
 	time_t lTime = (time_t)aTime;
 	struct tm ltm;

@@ -22,7 +22,7 @@ MainListColDesc MLColums[] = {
 	{ MAINLIST_COL_MajorTo,     140, _T("目标专业") },
 	{ MAINLIST_COL_Class,       60,  _T("年级") },
 	{ MAINLIST_COL_LangScore,   60,  _T("分数") },
-	{ MAINLIST_COL_LangScore,   60,  _T("GPA") },
+	{ MAINLIST_COL_GPA,         60,  _T("GPA") },
 	{ MAINLIST_COL_Status,      100, _T("状态") },
 	{ MAINLIST_COL_Important,   60,  _T("重要级别") },
 	{ MAINLIST_COL_NextVisitTime, 120, _T("回访时间") },
@@ -81,7 +81,8 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 
 	aList.InsertItem(aRow, _T(""));
 
-	lString.Format("%d", aRow + 1);
+	//lString.Format("%d", aRow + 1);
+	lString.Format("%d", apStuInfo->Number);
 	aList.SetItemText(aRow, MAINLIST_COL_Row,         lString);
 	aList.SetItemText(aRow, MAINLIST_COL_Name,        apStuInfo->Name);
 	aList.SetItemText(aRow, MAINLIST_COL_Telephone,   apStuInfo->Telehone);

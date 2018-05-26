@@ -175,7 +175,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.SetButtonInfo(index, ID_BUTTON_Combo, TBBS_SEPARATOR, 60);
 	m_wndToolBar.GetItemRect(index, &rect);
 	rect.left += 60;
-	rect.top  += 20;
+	rect.top  += 15;
 	rect.right += 160;
 	rect.bottom += 100;
 	m_comboBox.Create(CBS_DROPDOWN | WS_VISIBLE | WS_TABSTOP | CBS_AUTOHSCROLL, rect,
@@ -443,6 +443,16 @@ void CMainFrame::UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec, BOOL aA
 	}
 }
 
+void CMainFrame::UpdateStuToMainListView(ZStudentInfo* apStuInfo, BOOL aAppend)
+{
+	if (m_pMainView)
+	{
+		vector<ZStudentInfo*> lVec;
+		lVec.push_back(apStuInfo);
+		UpdateStuToMainListView(lVec, aAppend);
+	}
+}
+
 // 工具栏-模糊查询
 void CMainFrame::VagueFind(const char* apFindStr)
 {
@@ -494,6 +504,7 @@ void CMainFrame::OnEditInsert()
 // 学生信息编辑事件
 void CMainFrame::OnEditFind()
 {
+	m_StuQryDlg.SetMainFrame(this);
 	m_StuQryDlg.DoModal();
 }
 
