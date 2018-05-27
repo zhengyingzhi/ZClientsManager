@@ -144,7 +144,7 @@ int ZUdpComm::Init(const ZNetConfig& aNetConf)
 			return rv;
 		}
 		
-		if (aNetConf.m_GroupAddr > 0)
+		if (aNetConf.m_GroupAddr > 0 && !aNetConf.m_IsBroadcast)
 		{
 			//enable_multicast_loopback(m_Recver, false);
 			//set_multicase_interface(m_Recver, ZNET_DEFAULT_ANYIP);

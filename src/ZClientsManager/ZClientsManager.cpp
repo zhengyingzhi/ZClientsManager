@@ -385,7 +385,12 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		lNetConf.m_BindAddr		= string_to_inetaddr(ZNET_DEFAULT_ANYIP);
 		lNetConf.m_GroupAddr	= string_to_inetaddr(g_AppConfig.m_CastIP);
 
-		// todo: add callback
+		if (strstr(g_AppConfig.m_CastIP, "255.255."))
+		{
+			lNetConf.m_IsBroadcast = 1;
+		}
+
+		// add callback
 		lNetConf.m_pFunc = _ZOnNetMessage;
 		lNetConf.m_pUserData = this;
 

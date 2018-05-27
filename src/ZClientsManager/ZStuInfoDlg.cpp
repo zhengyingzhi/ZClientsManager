@@ -58,7 +58,9 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		SetDlgItemText(IDC_EDIT_NAME, m_StuInfo.Name);
 		SetDlgItemText(IDC_EDIT_TELEPHONE, m_StuInfo.Telehone);
 		SetDlgItemText(IDC_EDIT_COLLEGE, m_StuInfo.CollegeFrom);
+		SetDlgItemText(IDC_EDIT_COLLEGE_TO, m_StuInfo.CollegeTo);
 		SetDlgItemText(IDC_EDIT_MAJOR, m_StuInfo.MajorFrom);
+		SetDlgItemText(IDC_EDIT_MAJOR_TO, m_StuInfo.MajorTo);
 		SetDlgItemText(IDC_EDIT_CLASS, m_StuInfo.Class);
 		SetDlgItemText(IDC_EDIT_COUNTRY, m_StuInfo.Country);
 		SetDlgItemText(IDC_EDIT_IDNumber, m_StuInfo.IDNumber);

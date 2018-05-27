@@ -165,7 +165,7 @@ BOOL ZTaskManager::OnInitDialog()
 
 	m_SelectedRow = -1;
 
-	// TODO: load task from file
+	// load task from file
 	if (!InitTaskDB())
 	{
 		AfxMessageBox(_T("打开任务管理数据库失败"), MB_ICONERROR);
@@ -191,12 +191,13 @@ BOOL ZTaskManager::OnInitDialog()
 
 		if (lCount > 0)
 		{
-			CString lNote;
-			lNote.Format(_T("您有 [%d] 个定时任务到期，请查看"), lCount);
-			AfxMessageBox(lNote, MB_ICONWARNING);
+			//CString lNote;
+			//lNote.Format(_T("您有 [%d] 个定时任务到期，请查看"), lCount);
+			//AfxMessageBox(lNote, MB_ICONWARNING);
 		}
 	}
 
+	GetDlgItem(IDC_BTN_DELTASK)->EnableWindow(FALSE);
 	return TRUE;
 }
 
@@ -346,6 +347,8 @@ void ZTaskManager::OnNMClickListTasks(NMHDR *pNMHDR, LRESULT *pResult)
 	m_SelectedRow = pNMItemActivate->iItem;
 	if (m_SelectedRow >= 0)
 	{
+		GetDlgItem(IDC_BTN_DELTASK)->EnableWindow(TRUE);
+
 		CString lTaskName, lTaskContent, lTimeIntr;
 
 		time_t lTheTime = atol((char*)(LPCSTR)lTimeIntr);
@@ -359,7 +362,10 @@ void ZTaskManager::OnNMClickListTasks(NMHDR *pNMHDR, LRESULT *pResult)
 		SetDlgItemText(IDC_EDIT_TASKNAME, lTaskName);
 		SetDlgItemText(IDC_EDIT_TASKCONTENT, lTaskContent);
 	}
-
+	else
+	{
+		GetDlgItem(IDC_BTN_DELTASK)->EnableWindow(FALSE);
+	}
 	*pResult = 0;
 }
 
