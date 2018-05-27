@@ -21,11 +21,10 @@ public:
 	void Clear();
 
 	void SetBuffer(char* apRawBuffer);
-	void SetPrePaddingSize(uint32_t aPrePaddingSize);
+	void SetLength(uint32_t aRawLength);
 
 	char*       Data() const;
-	uint32_t    Length() const ;
-	uint32_t    PrePaddingSize() const ;
+	uint32_t    Length() const;
 
 public:
 	void SetItem(uint32_t aID, char aValue);
@@ -56,9 +55,8 @@ protected:
 private:
 	char        m_Buffer[ZFIX_BUF_SIZE];
 	char*       m_pBuff;
-	uint32_t    m_PrePaddingSize;
+	uint32_t    m_Length;       // data length without pre padding size
 	uint32_t	m_Capacity;
-	uint32_t    m_Length;
 
 	unordered_map<uint32_t, char*> m_FixMap;
 };

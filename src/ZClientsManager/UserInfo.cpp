@@ -8,8 +8,7 @@
 int ZUserInfoFixString(const ZUserInfo* apUserInfo, char* apBuffer, uint32_t aPrePaddingSize)
 {
 	ZFixApi lFixApi;
-	lFixApi.SetPrePaddingSize(aPrePaddingSize);
-	lFixApi.SetBuffer(apBuffer);
+	lFixApi.SetBuffer(apBuffer + aPrePaddingSize);
 
 	std::string lPassword = ZConvDataToBase64(apUserInfo->Password, strlen(apUserInfo->Password), ZUSER_SimpleChange);
 
@@ -27,14 +26,14 @@ int ZUserInfoFixString(const ZUserInfo* apUserInfo, char* apBuffer, uint32_t aPr
 	lFixApi.SetItem(ZFD_Flag,       apUserInfo->Flags);
 	lFixApi.SetItem(ZFD_Comment,    apUserInfo->Comment);
 
-	return lFixApi.Length();
+	return lFixApi.Length() + aPrePaddingSize;
 }
 
 int ZFixString2UserInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSize, ZUserInfo* apUserInfo)
 {
 	ZFixApi lFixApi;
-	lFixApi.SetPrePaddingSize(aPrePaddingSize);
-	lFixApi.SetBuffer(apString);
+	lFixApi.SetBuffer(apString + aPrePaddingSize);
+	lFixApi.SetLength(aLength - aPrePaddingSize);
 
 	if (!lFixApi.GetItem(ZFD_Number, apUserInfo->Number)) {
 		return -1;

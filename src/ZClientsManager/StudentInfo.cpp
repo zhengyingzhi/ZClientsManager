@@ -8,8 +8,7 @@
 int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aPrePaddingSize)
 {
 	ZFixApi lFixApi;
-	lFixApi.SetPrePaddingSize(aPrePaddingSize);
-	lFixApi.SetBuffer(apBuffer);
+	lFixApi.SetBuffer(apBuffer + aPrePaddingSize);
 
 	std::string lName   = ZConvDataToBase64(apStuInfo->Name, strlen(apStuInfo->Name), ZSTU_SimpleChange);
 	std::string lTel    = ZConvDataToBase64(apStuInfo->Telehone, strlen(apStuInfo->Telehone), ZSTU_SimpleChange);
@@ -46,22 +45,22 @@ int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aP
 	lFixApi.SetItem(ZFD_EMail,          apStuInfo->EMail);
 	lFixApi.SetItem(ZFD_Comment,        lComments);
 
-	return lFixApi.Length();
+	return lFixApi.Length() + aPrePaddingSize;
 }
 
 static std::string _ZGetRawData(ZFixApi& aFixApi, uint32_t aFixID, bool aDoSimpleChange)
 {
 	std::string lValue;
 	aFixApi.GetItem(aFixID, lValue);
-	lValue = ZConvDataToBase64(lValue.c_str(), lValue.length(), aDoSimpleChange);
+	lValue = ZConvBase64ToData(lValue.c_str(), lValue.length(), aDoSimpleChange);
 	return lValue;
 }
 
 int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSize, ZStudentInfo* apStuInfo)
 {
 	ZFixApi lFixApi;
-	lFixApi.SetPrePaddingSize(aPrePaddingSize);
-	lFixApi.SetBuffer(apString);
+	lFixApi.SetBuffer(apString + aPrePaddingSize);
+	lFixApi.SetLength(aLength - aPrePaddingSize);
 
 	std::string lName   = _ZGetRawData(lFixApi, ZFD_Name, ZSTU_SimpleChange);
 	std::string lTel    = _ZGetRawData(lFixApi, ZFD_Telephone, ZSTU_SimpleChange);

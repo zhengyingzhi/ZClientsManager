@@ -75,7 +75,7 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 		vector<ZStudentInfo*> lVec = g_MemData.QueryAllStudents();
 		for (size_t i = 0; i < lVec.size(); ++i)
 		{
-			lLength = ZStuInfoFixString(lVec[i], lBuffer, ZNetProtocol::NetMessagePreSize());
+			lLength = ZStuInfoFixString(lVec[i], lBuffer, 0);
 			lpMessageToSend = ZNetProtocol::MakeNetMessage(ZNET_T_QueryRsp, ZNET_MSG_StuInfo, lBuffer, lLength);
 
 			ZNetHead* lpNetHead = ZNetProtocol::GetMessageNetHead(lpMessageToSend);
@@ -380,7 +380,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		lNetConf.m_Type			= g_AppConfig.m_NetType;
 		lNetConf.m_IsBroadcast	= 0;
 		lNetConf.m_PeerAddr		= 0;
-		lNetConf.m_PeerPort		= 0;
+		lNetConf.m_PeerPort		= g_AppConfig.m_MainPort;
 		lNetConf.m_BindPort		= g_AppConfig.m_MainPort;
 		lNetConf.m_BindAddr		= string_to_inetaddr(ZNET_DEFAULT_ANYIP);
 		lNetConf.m_GroupAddr	= string_to_inetaddr(g_AppConfig.m_CastIP);

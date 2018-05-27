@@ -84,7 +84,7 @@ IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
 IDB_INFO                BITMAP                  "res\\info.bmp"
 IDB_BITMAP_AORUI        BITMAP                  "res\\AoruiBitmap.bmp"
-IDR_TOOLBAR_My          BITMAP                  "F:\\MyProjects\\ZClientsManager\\src\\ZClientsManager\\res\\toolbar1.bmp"
+IDR_TOOLBAR_My          BITMAP                  "res\\toolbar1.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -365,8 +365,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
+ FILEVERSION 1,0,1,0
+ PRODUCTVERSION 1,0,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -383,12 +383,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "傲睿教育"
             VALUE "FileDescription", "资源管理App"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "FileVersion", "1.0.1.0"
             VALUE "InternalName", "ZClientsManager.exe"
             VALUE "LegalCopyright", "(C) <傲睿教育>。  保留所有权利。"
             VALUE "OriginalFilename", "ZClientsManager.exe"
             VALUE "ProductName", "资源管理系统"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductVersion", "1.0.1.0"
         END
     END
     BLOCK "VarFileInfo"
