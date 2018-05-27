@@ -207,6 +207,7 @@
     <ClInclude Include="StudentInfo.h" />
     <ClInclude Include="StudentInfoDB.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TaskDB.h" />
     <ClInclude Include="UserInfo.h" />
     <ClInclude Include="UserInfoDB.h" />
     <ClInclude Include="ZAppConfig.h" />
@@ -224,6 +225,7 @@
     <ClInclude Include="ZNetwork.h" />
     <ClInclude Include="ZStuInfoDlg.h" />
     <ClInclude Include="ZStuQryDlg.h" />
+    <ClInclude Include="ZTaskManager.h" />
     <ClInclude Include="ZUserInfoDlg.h" />
     <ClInclude Include="ZUtility.h" />
   </ItemGroup>
@@ -238,6 +240,7 @@
     </ClCompile>
     <ClCompile Include="StudentInfo.cpp" />
     <ClCompile Include="StudentInfoDB.cpp" />
+    <ClCompile Include="TaskDB.cpp" />
     <ClCompile Include="UserInfo.cpp" />
     <ClCompile Include="UserInfoDB.cpp" />
     <ClCompile Include="ZAppConfig.cpp" />
@@ -252,6 +255,7 @@
     <ClCompile Include="ZNetwork.cpp" />
     <ClCompile Include="ZStuInfoDlg.cpp" />
     <ClCompile Include="ZStuQryDlg.cpp" />
+    <ClCompile Include="ZTaskManager.cpp" />
     <ClCompile Include="ZUserInfoDlg.cpp" />
     <ClCompile Include="ZUtility.cpp" />
   </ItemGroup>

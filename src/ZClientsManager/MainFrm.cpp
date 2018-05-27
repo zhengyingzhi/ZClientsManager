@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWndEx)
 	ON_COMMAND(ID_BUTTON_Modify, &CMainFrame::OnButtonModify)
 	ON_COMMAND(ID_BUTTON_Find, &CMainFrame::OnButtonFind)
 	ON_COMMAND(ID_BUTTON_Reset, &CMainFrame::OnButtonReset)
+	ON_COMMAND(ID_EDIT_TASKMAN, &CMainFrame::OnEditTaskman)
 END_MESSAGE_MAP()
 
 static UINT indicators[] =
@@ -174,9 +175,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 设置ComboBox属性，并显示到工具栏上
 	m_wndToolBar.SetButtonInfo(index, ID_BUTTON_Combo, TBBS_SEPARATOR, 60);
 	m_wndToolBar.GetItemRect(index, &rect);
-	rect.left += 60;
-	rect.top  += 15;
-	rect.right += 160;
+	rect.left += 20;
+	rect.top  += 5;
+	rect.right += 150;
 	rect.bottom += 100;
 	m_comboBox.Create(CBS_DROPDOWN | WS_VISIBLE | WS_TABSTOP | CBS_AUTOHSCROLL, rect,
 		&m_wndToolBar, ID_BUTTON_Combo);
@@ -542,7 +543,14 @@ void CMainFrame::OnEditManager()
 	lUIDlg.DoModal();
 }
 
+// 定时任务管理
+void CMainFrame::OnEditTaskman()
+{
+	m_TaskManager.DoModal();
+}
 
+
+/* 工具栏事件 */
 // 工具栏 - 添加
 void CMainFrame::OnButtonAdd()
 {
@@ -575,10 +583,10 @@ void CMainFrame::OnButtonFind()
 	else
 	{
 		// if text not changed
-		if (m_comboText == lContent)
+		/*if (m_comboText == lContent)
 		{
 			return;
-		}
+		}*/
 		m_comboText = lContent;
 
 		// try add one search condition to combobox
@@ -621,8 +629,19 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 	{
 		CString lContent;
 		m_comboBox.GetWindowText(lContent);
-		if (m_comboBox.IsChild(GetFocus()) && !lContent.IsEmpty() && lContent != m_comboText)
+		if (m_comboBox.IsChild(GetFocus()))
 		{
+			if (lContent.IsEmpty())
+			{
+				OnEditFind();
+				goto PreTransEnd;
+			}
+
+			/*if (lContent == m_comboText)
+			{
+				goto PreTransEnd;
+			}*/
+
 			m_comboText = lContent;
 
 			// 模糊查询搜索条件
@@ -632,6 +651,9 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 		}
 	}
 
+PreTransEnd:
 	return CFrameWndEx::PreTranslateMessage(pMsg);
 }
+
+
 

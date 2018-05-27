@@ -110,7 +110,7 @@ bool ZQueryCompareCollege(const void* apExpect, const void* apAcutal, int aExten
 }
 
 /* 比较时间，aExtend为比较条件*/
-bool ZQueryCompareTime(const void* apExpect, const void* apAcutal, int aExtend)
+bool ZQueryCompareStuTime(const void* apExpect, const void* apAcutal, int aExtend)
 {
 	ZStudentInfo* lpExpect = (ZStudentInfo*)apExpect;
 	ZStudentInfo* lpActual = (ZStudentInfo*)apAcutal;
@@ -336,6 +336,9 @@ int ZStudentInfoDBText::Insert(void* apDataInfo, uint32_t aDataSize)
 	int  lLength = ZStuInfoFixString(lpStuInfo, lFixString, 0);
 	lFixString[lLength] = '\0';
 	ztl_log_error(g_Logger, ZTL_LOG_INFO, "StudentInfoDB Insert\r\n%s", lFixString);
+
+	// got number after db inserted
+	lpStuInfo->Number = lpDstInfo->Number;
 
 	return 0;
 }

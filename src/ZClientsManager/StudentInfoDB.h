@@ -36,7 +36,7 @@ bool ZQueryCompareStatus(const void* apExpect, const void* apAcutal, int aExtend
 bool ZQueryCompareSource(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareEMail(const void* apExpect, const void* apAcutal, int aExtend);
 bool ZQueryCompareStuIDNum(const void* apExpect, const void* apAcutal, int aExtend);
-
+bool ZQueryCompareStuTime(const void* apExpect, const void* apAcutal, int aExtend);
 
 /* student info db implement by text file
  */

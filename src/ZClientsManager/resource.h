@@ -33,6 +33,7 @@
 #define IDI_ICON_AORUIBIG               329
 #define IDB_BITMAP_AORUI                330
 #define IDR_TOOLBAR_My                  334
+#define IDD_DLG_Reminder                337
 #define IDC_EDIT_NUMBER                 1000
 #define IDC_EDIT_COMMENT                1001
 #define IDC_COMBO_IMPORTANT             1002
@@ -54,6 +55,7 @@
 #define IDC_BUTTON1                     1011
 #define IDC_BTN_PASSWORD                1011
 #define IDC_BTN_QUERY                   1011
+#define IDC_BTN_DELTASK                 1011
 #define IDC_EDIT_LANGSCORE              1012
 #define IDC_LIST_USERINFO               1012
 #define IDC_EDIT_QQ                     1013
@@ -73,8 +75,11 @@
 #define IDC_DATETIMEPICKER1             1022
 #define IDC_DATETIMEPICKER              1022
 #define IDC_EDIT_EMAIL                  1023
+#define IDC_LIST_TASKS                  1023
 #define IDC_EDIT_MAJOR_TO               1024
+#define IDC_EDIT_TASKNAME               1024
 #define IDC_EDIT_GPA                    1025
+#define IDC_EDIT_TASKCONTENT            1025
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_DELETE                  32772
 #define ID_EDIT_INSERT2                 32773
@@ -107,14 +112,16 @@
 #define ID_EDIT_Sync                    32804
 #define ID_BUTTON32806                  32806
 #define ID_BUTTON_Reset                 32807
+#define ID_32808                        32808
+#define ID_EDIT_TASKMAN                 32809
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        337
-#define _APS_NEXT_COMMAND_VALUE         32808
-#define _APS_NEXT_CONTROL_VALUE         1023
+#define _APS_NEXT_RESOURCE_VALUE        339
+#define _APS_NEXT_COMMAND_VALUE         32810
+#define _APS_NEXT_CONTROL_VALUE         1025
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

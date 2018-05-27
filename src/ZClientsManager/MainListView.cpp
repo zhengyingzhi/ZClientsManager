@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////
 // list control operates
 MainListColDesc MLColums[] = {
-	{ MAINLIST_COL_Row,		    40,  _T("编号") },
+	{ MAINLIST_COL_Row,         40,  _T("编号") },
 	{ MAINLIST_COL_Name,        60,  _T("姓名") },
 	{ MAINLIST_COL_Telephone,   100, _T("电话") },
 	{ MAINLIST_COL_Country,     80,  _T("国家") },
@@ -25,12 +25,12 @@ MainListColDesc MLColums[] = {
 	{ MAINLIST_COL_GPA,         60,  _T("GPA") },
 	{ MAINLIST_COL_Status,      100, _T("状态") },
 	{ MAINLIST_COL_Important,   60,  _T("重要级别") },
-	{ MAINLIST_COL_NextVisitTime, 120, _T("回访时间") },
+	{ MAINLIST_COL_NextVisitTime, 130, _T("回访时间") },
 	{ MAINLIST_COL_Sex,         40,  _T("性别") },
 	{ MAINLIST_COL_QQ,          80,  _T("QQ") },
 	{ MAINLIST_COL_Source,      160, _T("来源") },
-	{ MAINLIST_COL_InsertTime,  120, _T("插入时间") },
-	{ MAINLIST_COL_UpdateTime,  120, _T("更新时间") },
+	{ MAINLIST_COL_InsertTime,  130, _T("插入时间") },
+	{ MAINLIST_COL_UpdateTime,  130, _T("更新时间") },
 	{ MAINLIST_COL_EMail,       120, _T("邮箱") },
 	{ 0, 0, 0 }
 };

@@ -105,6 +105,12 @@
     <ClInclude Include="ZFixApi.h">
       <Filter>Fix</Filter>
     </ClInclude>
+    <ClInclude Include="ZTaskManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaskDB.h">
+      <Filter>DataBase</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -168,6 +174,12 @@
       <Filter>DataBase</Filter>
     </ClCompile>
     <ClCompile Include="StudentInfo.cpp">
+      <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ZTaskManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TaskDB.cpp">
       <Filter>DataBase</Filter>
     </ClCompile>
   </ItemGroup>

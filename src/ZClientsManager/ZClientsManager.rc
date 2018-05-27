@@ -73,7 +73,9 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ICON_AORUIAPP       ICON                    "res\\AoruiApp.ico"
+
 IDI_ICON_AORUIBIG       ICON                    "res\\AoruiAppBig.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -81,10 +83,15 @@ IDI_ICON_AORUIBIG       ICON                    "res\\AoruiAppBig.ico"
 //
 
 IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
+
 IDR_MAINFRAME_256       BITMAP                  "res\\Toolbar256.bmp"
+
 IDB_INFO                BITMAP                  "res\\info.bmp"
+
 IDB_BITMAP_AORUI        BITMAP                  "res\\AoruiBitmap.bmp"
+
 IDR_TOOLBAR_My          BITMAP                  "res\\toolbar1.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -136,6 +143,8 @@ BEGIN
         MENUITEM "退出(&X)",                      ID_SYS_CLOSE,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
         MENUITEM "管理用户(&M)",                    ID_EDIT_MANAGER,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
         MENUITEM "修改密码(&U)",                    ID_EDIT_UPDATEPWD,MFT_STRING,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "任务管理(&T)",                    ID_EDIT_TASKMAN,MFT_STRING,MFS_ENABLED
     END
     POPUP "编辑(&E)",                         65535,MFT_STRING,MFS_ENABLED
     BEGIN
@@ -358,6 +367,25 @@ BEGIN
     LTEXT           "输入 'yes' 确认：",IDC_STATIC,7,14,161,8
 END
 
+IDD_DLG_Reminder DIALOGEX 0, 0, 353, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "您的定时任务"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "添加",IDOK,241,155,50,14
+    PUSHBUTTON      "取消",IDCANCEL,296,155,50,14
+    CONTROL         "",IDC_LIST_TASKS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,7,339,68
+    GROUPBOX        "添加任务",IDC_STATIC,7,77,339,73
+    LTEXT           "任务名字",IDC_STATIC,11,91,36,8
+    EDITTEXT        IDC_EDIT_TASKNAME,49,88,297,14,ES_AUTOHSCROLL
+    LTEXT           "任务内容",IDC_STATIC,11,106,36,8
+    EDITTEXT        IDC_EDIT_TASKCONTENT,49,105,297,26,ES_MULTILINE | ES_AUTOHSCROLL
+    LTEXT           "任务时间",IDC_STATIC,9,136,36,8
+    CONTROL         "",IDC_DTPICKER_Date,"SysDateTimePick32",DTS_RIGHTALIGN | WS_TABSTOP,49,133,72,15
+    CONTROL         "",IDC_DTPICKER_Time,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,121,133,54,15
+    PUSHBUTTON      "删除",IDC_BTN_DELTASK,296,132,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -453,6 +481,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 61
     END
+
+    IDD_DLG_Reminder, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 346
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -488,6 +524,11 @@ BEGIN
 END
 
 IDD_DIALOG_CONFIRM AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DLG_Reminder AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
@@ -623,13 +664,14 @@ BEGIN
     ID_BUTTON_Del           "仅界面上删除学生资源\n删除"
     ID_BUTTON_Modify        "修改一个学生资源信息\n修改"
     ID_BUTTON_Find          "查找学生资源信息\n查找"
-    ID_BUTTON_Combo         "输入关键字查询学生信息\\查询框"
+    ID_BUTTON_Combo         "输入关键字查询学生信息\n查询框"
 END
 
 STRINGTABLE
 BEGIN
     ID_EDIT_Sync            "尝试从其它机器同步最新学生资源信息\n同步"
     ID_BUTTON_Reset         "重置主界面信息\n重置"
+    ID_EDIT_TASKMAN         "管理用户定制的定时任务，可在到时间时提醒"
 END
 
 #endif    // Chinese (Simplified, PRC) resources

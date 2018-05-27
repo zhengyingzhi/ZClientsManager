@@ -117,10 +117,27 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 	else if (lpCombo->GetCurSel() != 0 && m_DateTimeChanged)
 	{
 		// TODO: query by time
+		CTime lCTm = 0;
+		m_DTCtrl.GetTime(lCTm);
+
+		struct tm ltm = { 0 };
+		ltm.tm_year = lCTm.GetYear() - 1900;
+		ltm.tm_mon = lCTm.GetMonth() - 1;
+		ltm.tm_mday = lCTm.GetDay();
+		time_t lTheTime = mktime(&ltm);
+
+		int lCmpExtend = CC_BiggerThan;
+		if (lpCombo->GetCurSel() == 1)
+			lCmpExtend == CC_BiggerThan;
+		else if (lpCombo->GetCurSel() == 3)
+			lCmpExtend == CC_SmallerThan;
+		else
+			lCmpExtend == CC_Equal;
+		lStuInfo.InsertTime = lTheTime;
+		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareStuTime, lCmpExtend);
+
 		m_DateTimeChanged = FALSE;
 	}
-
-	// todo: 支持按录入时间查询
 
 	if (lVec.empty())
 	{

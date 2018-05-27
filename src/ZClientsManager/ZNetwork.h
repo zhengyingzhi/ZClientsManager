@@ -53,6 +53,8 @@ public:
 
 typedef void(*ZOnNetMessagePtr)(void* apUserData, ZNetMessage* apMessage);
 
+typedef void(*ZOnLoopOncePtr)(void* apUserData);
+
 
 #define ZCOMM_DEFAULT_SIZE		2048
 #define ZCOMM_DEFAULT_SO_BUFSZ	(4 * 1024 * 1024)
@@ -95,8 +97,13 @@ public:
 	virtual int DirectRecv(char* apRawBuf, uint32_t* apBytesRecv) = 0;
 	virtual int DirectSend(const char* apRawData, uint32_t aRawSize) = 0;
 
+public:
+	void SetLoopOnceFunc(ZOnLoopOncePtr apFunc, void* apUserData);
+
 protected:
 	ZNetConfig			m_NetConf;
+	ZOnLoopOncePtr		m_LoopOnce;
+	void*				m_pUserData;
 };
 
 /* 基于UDP的通信封装

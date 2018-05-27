@@ -7,6 +7,8 @@
 
 #include "ZStuQryDlg.h"
 
+#include "ZTaskManager.h"
+
 class CMainFrame : public CFrameWndEx
 {
 	
@@ -48,6 +50,7 @@ protected:  // 控件条嵌入成员
 
 protected:
 	ZStuQryDlg        m_StuQryDlg;
+	ZTaskManager      m_TaskManager;
 
 public:
 	void UpdateStuToMainListView(vector<ZStudentInfo*>& aStuVec, BOOL aAppend);
@@ -82,6 +85,7 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	afx_msg void OnEditSync();
 	afx_msg void OnButtonReset();
+	afx_msg void OnEditTaskman();
 };
 
 

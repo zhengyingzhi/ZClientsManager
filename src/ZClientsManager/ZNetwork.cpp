@@ -78,11 +78,20 @@ ZNetMessage* ZNetMessage::Clone(ZNetMessage* apMessage)
 //////////////////////////////////////////////////////////////////////////
 ZNetCommBase::ZNetCommBase()
 	: m_NetConf()
+	, m_LoopOnce()
+	, m_pUserData()
 {}
 
 ZNetCommBase::~ZNetCommBase()
 {
 }
+
+void ZNetCommBase::SetLoopOnceFunc(ZOnLoopOncePtr apFunc, void* apUserData)
+{
+	m_LoopOnce = apFunc;
+	m_pUserData = apUserData;
+}
+
 
 
 ZUdpComm::ZUdpComm()
@@ -281,6 +290,7 @@ int ZUdpComm::DirectSend(const char* apRawData, uint32_t aRawSize)
 	return udp_send(m_Sender, apRawData, aRawSize, &lToAddr);
 }
 
+
 void ZUdpComm::Run()
 {
 	int rv = 0;
@@ -300,6 +310,8 @@ void ZUdpComm::Run()
 		if (rv <= 0)
 		{
 			// try auto reconnect if tcp
+			if (m_LoopOnce)
+				m_LoopOnce(m_pUserData);
 			continue;
 		}
 
