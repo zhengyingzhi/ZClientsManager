@@ -13,13 +13,15 @@
 #include <ZToolLib/ztl_utils.h>
 
 #define TASKLIST_COL_Time       0
-#define TASKLIST_COL_Status     2
-#define TASKLIST_COL_Name       3
-#define TASKLIST_COL_Content    4
-#define TASKLIST_COL_TimeInt    5
+#define TASKLIST_COL_Status     1
+#define TASKLIST_COL_Name       2
+#define TASKLIST_COL_Content    3
+#define TASKLIST_COL_TimeInt    4
 
 // ZTaskManager dialog
 extern ZNetCommBase*	g_pNetComm;
+
+static BOOL g_FirstCallExpire = TRUE;
 
 static void _NetLoopOnce(void* apUserData)
 {
@@ -30,23 +32,71 @@ static void _NetLoopOnce(void* apUserData)
 
 void ZTaskManager::TryExpireTimers()
 {
+	// try delay once
+	if (g_FirstCallExpire)
+	{
+		g_FirstCallExpire = FALSE;
+		return;
+	}
+
 	// 有线程安全问题，但不考虑
+	int rv;
 	time_t lNow = time(0);
 	ZTaskInfo* lpTask;
 	for (size_t i = 0; i < m_CacheTasks.size(); ++i)
 	{
+		lNow = time(0);
 		lpTask = m_CacheTasks[i];
 		if (lNow > lpTask->TaskTime && lpTask->TaskTime)
 		{
-			CString lNote;
-			lNote.Format(_T("%ld\n%s\n%s"), (long)lpTask->TaskTime,
-				lpTask->TaskName, lpTask->TaskContent);
-			AfxMessageBox(lNote, MB_OK);
+			// 同一任务最多提示3次
+			if (lpTask->Flag > 3) {
+				continue;
+			}
 
-			// mark as deleted
-			lpTask->Flag = 1;
+			// mark as notified
+			++lpTask->Flag;
+
+			CTime lCTm(lpTask->TaskTime);
+			CString lNote;
+			lNote.Format(_T("定时任务到期 %02d:%02d:%02d\n名称: %s\n内容:%s"), lCTm.GetHour(), lCTm.GetMinute(), lCTm.GetSecond(),
+				lpTask->TaskName, lpTask->TaskContent);
+
+			rv = AfxMessageBox(lNote, MB_YESNOCANCEL);
+			if (rv == IDYES)
+			{
+				// try delete this 
+				int lRow = FindRow(lpTask);
+				if (lRow >= 0)
+					m_ListTask.DeleteItem(lRow);
+
+				m_pTaskDB->Delete(&lpTask, sizeof(ZTaskInfo));
+
+				EraseOneTask(lpTask);
+				continue;
+			}
+
+			// delay 5 minutes
+			lpTask->TaskTime += 5 * 60;
 		}
 	}
+}
+
+int ZTaskManager::FindRow(ZTaskInfo* apTaskInfo)
+{
+	CString lName, lTimeIntr;
+	for (size_t i = 0; i < m_ListTask.GetItemCount(); ++i)
+	{
+		lName = m_ListTask.GetItemText(i, TASKLIST_COL_Name);
+		lTimeIntr = m_ListTask.GetItemText(i, TASKLIST_COL_TimeInt);
+
+		if (atol((char*)(LPCSTR)lTimeIntr) == apTaskInfo->TaskTime)
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 void ZTaskManager::ShowOnListCtrl(ZTaskInfo* apTaskInfo)
@@ -111,7 +161,7 @@ BOOL ZTaskManager::OnInitDialog()
 	m_ListTask.InsertColumn(TASKLIST_COL_Status, _T("状态"), LVCFMT_LEFT, 60);
 	m_ListTask.InsertColumn(TASKLIST_COL_Name, _T("名称"), LVCFMT_LEFT, 80);
 	m_ListTask.InsertColumn(TASKLIST_COL_Content, _T("内容"), LVCFMT_LEFT, 200);
-	m_ListTask.InsertColumn(TASKLIST_COL_Content, _T("Intr"), LVCFMT_LEFT, 60);
+	m_ListTask.InsertColumn(TASKLIST_COL_TimeInt, _T("Intr"), LVCFMT_LEFT, 60);
 
 	m_SelectedRow = -1;
 
@@ -155,12 +205,14 @@ BOOL ZTaskManager::InitTaskDB()
 	int rv;
 	if (m_pTaskDB == NULL)
 	{
-		m_pTaskDB = new ZTaskInfoDBText();
-		rv = m_pTaskDB->Open(TASKINFO_DB_DEFAULT_NAME, "", 0);
+		ZTaskInfoDBText* lpTaskDB = new ZTaskInfoDBText();
+		rv = lpTaskDB->Open(TASKINFO_DB_DEFAULT_NAME, "", 0);
 		if (rv != 0)
 		{
 			return FALSE;
 		}
+
+		m_pTaskDB = lpTaskDB;
 	}
 	else
 	{
@@ -280,6 +332,9 @@ void ZTaskManager::OnBnClickedOk()
 
 	ShowOnListCtrl(lpTaskInfo);
 
+	SetDlgItemText(IDC_EDIT_TASKNAME, "");
+	SetDlgItemText(IDC_EDIT_TASKCONTENT, "");
+
 	// CDialogEx::OnOK();
 }
 
@@ -323,11 +378,11 @@ void ZTaskManager::OnBnClickedBtnDeltask()
 	}
 
 	CString lTaskName, lNote, lTimeIntr;
-	m_ListTask.GetItemText(m_SelectedRow, TASKLIST_COL_Name);
-	m_ListTask.GetItemText(m_SelectedRow, TASKLIST_COL_TimeInt);
+	lTaskName = m_ListTask.GetItemText(m_SelectedRow, TASKLIST_COL_Name);
+	lTimeIntr = m_ListTask.GetItemText(m_SelectedRow, TASKLIST_COL_TimeInt);
 	lNote.Format(_T("是否删除该任务\n%s"), lTaskName);
 	int rv = AfxMessageBox(_T("请选择待删除的任务"), MB_YESNOCANCEL);
-	if (rv == IDOK)
+	if (rv == IDYES)
 	{
 		// remove from db and cache
 		ZTaskInfo lTaskInfo = { 0 };

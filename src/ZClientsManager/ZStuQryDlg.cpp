@@ -128,11 +128,11 @@ void ZStuQryDlg::OnBnClickedBtnQuery()
 
 		int lCmpExtend = CC_BiggerThan;
 		if (lpCombo->GetCurSel() == 1)
-			lCmpExtend == CC_BiggerThan;
+			lCmpExtend = CC_BiggerThan;
 		else if (lpCombo->GetCurSel() == 3)
-			lCmpExtend == CC_SmallerThan;
+			lCmpExtend = CC_SmallerThan;
 		else
-			lCmpExtend == CC_Equal;
+			lCmpExtend = CC_Equal;
 		lStuInfo.InsertTime = lTheTime;
 		lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareStuTime, lCmpExtend);
 

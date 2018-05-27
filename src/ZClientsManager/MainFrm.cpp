@@ -243,6 +243,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	lTitle.Format(_T("傲睿国际教育 - %s"), theApp.GetLoginUserID());
 	SetWindowText(lTitle);
 
+	// init task db
+	m_TaskManager.InitTaskDB();
+
 	return 0;
 }
 

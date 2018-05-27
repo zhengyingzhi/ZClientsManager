@@ -27,13 +27,15 @@ public:
 public:
 	void TryExpireTimers();
 	void ShowOnListCtrl(ZTaskInfo* apTaskInfo);
+	int  FindRow(ZTaskInfo* apTaskInfo);
+
+	BOOL InitTaskDB();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	virtual BOOL OnInitDialog();
 
-	BOOL InitTaskDB();
 	void ClearCaches();
 	void EraseOneTask(const ZTaskInfo* apTaskInfo);
 

@@ -193,7 +193,7 @@ int ZTaskInfoDBText::Delete(void* apDataInfo, uint32_t aDataSize)
 	ZTaskInfo* lpTaskInfo;
 	lpTaskInfo = (ZTaskInfo*)apDataInfo;
 
-	lpQryRs = Query(lpTaskInfo, ZQueryCompareTaskTime, 0);
+	lpQryRs = Query(lpTaskInfo, ZQueryCompareTaskTime, ZTASKTIME_CMP_EQUAL);
 	if (!lpQryRs)
 	{
 		ztl_log_error(g_Logger, ZTL_LOG_WARN, "TaskInfoDB Delete not find %s",
