@@ -16,6 +16,10 @@
 
 #include "ZUtility.h"
 
+#include <ZToolLib/ztl_logger.h>
+extern ztl_log_t* g_Logger;
+
+
 // ZStuInfoDlg dialog
 
 IMPLEMENT_DYNAMIC(ZStuInfoDlg, CDialogEx)
@@ -34,17 +38,33 @@ void ZStuInfoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_IMPORTANT, m_comboImportant);
+	DDX_Control(pDX, IDC_DTPICKER_Date, m_DatePick);
+	DDX_Control(pDX, IDC_DTPICKER_Time, m_TimePick);
 }
 
 BOOL ZStuInfoDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// 
-	m_comboImportant.AddString("紧急");
-	m_comboImportant.AddString("重要");
-	m_comboImportant.AddString("普通");
+	m_comboImportant.InsertString(SIM_Normal, _T("普通"));      // 0
+	m_comboImportant.InsertString(SIM_Important, _T("重要"));   // 1
+	m_comboImportant.InsertString(SIM_Emergency, _T("紧急"));   // 2
 	m_comboImportant.SetCurSel(0);
+
+	CString lText;
+	switch (m_OperateType)
+	{
+	case ZOT_Update:
+		lText = _T("更新");
+		break;
+	case ZOT_Delete:
+		lText = _T("删除");
+		break;
+	default:
+		lText = _T("保存");
+		break;
+	}
+	GetDlgItem(IDC_BTN_SAVE)->SetWindowText(lText);
 
 	CString lString;
 	if (m_StuInfo.Name[0])
@@ -53,10 +73,11 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		//SetWindowText(lString);
 
 		lString.Format("%d", m_StuInfo.Number);
-		SetDlgItemText(IDC_EDIT_NAME, lString);
+		SetDlgItemText(IDC_EDIT_NUMBER, lString);
 
 		SetDlgItemText(IDC_EDIT_NAME, m_StuInfo.Name);
 		SetDlgItemText(IDC_EDIT_TELEPHONE, m_StuInfo.Telehone);
+		SetDlgItemText(IDC_EDIT_QQ, m_StuInfo.QQ);
 		SetDlgItemText(IDC_EDIT_COLLEGE, m_StuInfo.CollegeFrom);
 		SetDlgItemText(IDC_EDIT_COLLEGE_TO, m_StuInfo.CollegeTo);
 		SetDlgItemText(IDC_EDIT_MAJOR, m_StuInfo.MajorFrom);
@@ -71,6 +92,10 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		lTimeStr = ZConvStdTimeStr((time_t)m_StuInfo.UpdateTime);
 		SetDlgItemText(IDC_EDIT_UPDATETIME, lTimeStr.c_str());
 
+		CTime lVisitTime((time_t)m_StuInfo.NextVisitTime);
+		m_DatePick.SetTime(&lVisitTime);
+		m_TimePick.SetTime(&lVisitTime);
+
 		double lScore = (m_StuInfo.LanguageScore / 10);
 		if (m_StuInfo.LanguageScore > 2000)
 			lString.Format("%.0f", lScore);
@@ -82,12 +107,13 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		lString.Format("%.1f", lGPA);
 		SetDlgItemText(IDC_EDIT_GPA, lString);
 
-		SetDlgItemText(IDC_EDIT_QQ, m_StuInfo.QQ);
-		SetDlgItemText(IDC_COMBO_IMPORTANT, ZStuImportantDesc(m_StuInfo.ImportantLevel));
+		//SetDlgItemText(IDC_COMBO_IMPORTANT, ZStuImportantDesc(m_StuInfo.ImportantLevel));
 		SetDlgItemText(IDC_EDIT_SOURCE, m_StuInfo.Source);
 		SetDlgItemText(IDC_EDIT_STATUS, m_StuInfo.Status);
 		SetDlgItemText(IDC_EDIT_EMAIL, m_StuInfo.EMail);
 		SetDlgItemText(IDC_EDIT_COMMENT, m_StuInfo.Comments);
+
+		m_comboImportant.SetCurSel(m_StuInfo.ImportantLevel);
 
 		CButton* lpBtn;
 		if (m_StuInfo.Sex == SSEX_Boy) {
@@ -98,8 +124,13 @@ BOOL ZStuInfoDlg::OnInitDialog()
 			lpBtn = (CButton*)GetDlgItem(IDC_RADIO_GIRL);
 			lpBtn->SetCheck(1);
 		}
-
-		m_comboImportant.SetCurSel(m_StuInfo.ImportantLevel);
+	}
+	else
+	{
+// 		time_t lNow = time(0) + (30 * 60);
+// 		CTime lVisitTime(lNow);
+// 		m_DatePick.SetTime(&lVisitTime);
+// 		m_TimePick.SetTime(&lVisitTime);
 	}
 
 	return TRUE;
@@ -115,7 +146,10 @@ END_MESSAGE_MAP()
 
 void ZStuInfoDlg::SetStudentInfo(ZStudentInfo* apStuInfo)
 {
-	memcpy(&m_StuInfo, apStuInfo, sizeof(m_StuInfo));
+	if (apStuInfo)
+		memcpy(&m_StuInfo, apStuInfo, sizeof(m_StuInfo));
+	else
+		memset(&m_StuInfo, 0, sizeof(m_StuInfo));
 }
 
 void ZStuInfoDlg::GetDlgItemValue(int nID, char aBuffer[], int aBufSize)
@@ -154,9 +188,9 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	ZStudentInfo lStuInfo;
 	memset(&lStuInfo, 0, sizeof(lStuInfo));
 
+	GetDlgItemValue(IDC_EDIT_NUMBER, lStuInfo.Number);
 	GetDlgItemValue(IDC_EDIT_NAME, lStuInfo.Name, sizeof(lStuInfo.Name));
 	GetDlgItemValue(IDC_EDIT_TELEPHONE, lStuInfo.Telehone, sizeof(lStuInfo.Telehone));
-	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
 	GetDlgItemValue(IDC_EDIT_QQ, lStuInfo.QQ, sizeof(lStuInfo.QQ));
 	GetDlgItemValue(IDC_EDIT_CLASS, lStuInfo.Class, sizeof(lStuInfo.Class));
 	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.CollegeFrom, sizeof(lStuInfo.CollegeFrom));
@@ -166,8 +200,11 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	GetDlgItemValue(IDC_EDIT_COUNTRY, lStuInfo.Country, sizeof(lStuInfo.Country));
 	GetDlgItemValue(IDC_EDIT_SOURCE, lStuInfo.Source, sizeof(lStuInfo.Source));
 	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));
+	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
 	GetDlgItemValue(IDC_EDIT_EMAIL, lStuInfo.EMail, sizeof(lStuInfo.EMail));
 	GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
+
+	lStuInfo.ImportantLevel = (StuImportant)m_comboImportant.GetCurSel();
 
 	CString lString;
 	double lScore;
@@ -196,6 +233,10 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	if (IDNO == lRet) {
 		return;
 	}
+
+	char lFixString[4096] = "";
+	ZStuInfoFixString(&lStuInfo, lFixString, 0);
+	ztl_log_error(g_Logger, ZTL_LOG_INFO, lFixString);
 
 	if (strcmp(m_StuInfo.Name, lStuInfo.Name) == 0 &&
 		strcmp(m_StuInfo.Telehone, lStuInfo.Telehone) == 0)

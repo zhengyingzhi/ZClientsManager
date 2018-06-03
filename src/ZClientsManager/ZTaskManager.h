@@ -5,6 +5,7 @@
 #include "TaskDB.h"
 
 #include <thread>
+#include <mutex>
 #include <vector>
 
 class ZTaskInfoDBText;
@@ -37,7 +38,7 @@ protected:
 	virtual BOOL OnInitDialog();
 
 	void ClearCaches();
-	void EraseOneTask(const ZTaskInfo* apTaskInfo);
+	void EraseOneTask(const ZTaskInfo* apTaskInfo, bool aDoLock);
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -52,4 +53,5 @@ public:
 	ZTaskInfoDBText* m_pTaskDB;
 	std::unique_ptr<std::thread> m_pThread;
 	std::vector<ZTaskInfo*> m_CacheTasks;
+	std::mutex m_Mutex;
 };

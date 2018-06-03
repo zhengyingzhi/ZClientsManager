@@ -237,6 +237,8 @@ int ZUdpComm::Stop()
 
 	m_Running = 0;
 
+	m_LoopOnce = NULL;
+
 	if (m_Recver != INVALID_SOCKET)
 	{
 		close_socket(m_Recver);
@@ -260,6 +262,10 @@ int ZUdpComm::DirectRecv(char* apRawBuf, uint32_t* apBytesRecv)
 	int rv = udp_recv(m_Recver, apRawBuf, *apBytesRecv, (sockaddr_in*)&lPeerAddr, 1000);
 	if (rv > 0)
 	{
+		char lPeerIP[32] = "";
+		uint16_t lPeerPort = ntohs(lPeerAddr.sin_port);
+		inet_ntop(AF_INET, &lPeerAddr.sin_addr, lPeerIP, sizeof(lPeerIP));
+
 		*apBytesRecv = rv;
 		return rv;
 	}
@@ -310,8 +316,9 @@ void ZUdpComm::Run()
 		if (rv <= 0)
 		{
 			// try auto reconnect if tcp
-			if (m_LoopOnce)
-				m_LoopOnce(m_pUserData);
+			ZOnLoopOncePtr LoopOnce = m_LoopOnce;
+			if (LoopOnce)
+				LoopOnce(m_pUserData);
 			continue;
 		}
 

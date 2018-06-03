@@ -3,6 +3,7 @@
 #include "StudentInfoDB.h"
 #include "ZCommon.h"
 #include "afxwin.h"
+#include "afxdtctl.h"
 
 
 #define MAINLIST_COL_Row            0           // 仅是列表编号
@@ -52,6 +53,10 @@ public:
 	ZEnumOperateType    m_OperateType;   // 操作类型
 	ZStudentInfo        m_StuInfo;
 
+	CComboBox           m_comboImportant;
+	CDateTimeCtrl       m_DatePick;
+	CDateTimeCtrl       m_TimePick;
+
 public:
 	void SetOperateType(ZEnumOperateType aOperateType) { m_OperateType = aOperateType; }
 
@@ -70,5 +75,4 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnSave();
-	CComboBox m_comboImportant;
 };

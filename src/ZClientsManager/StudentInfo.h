@@ -50,7 +50,7 @@ struct stZStudentInfo
 	char            Source[32];                 // 学生来源：活动/推荐等
 	char            Status[32];                 // 目前状态（由于用户自定义描述）
 	char            Recorder[12];               // 谁记录
-	char			IDNumber[20];               // 身份证号
+	char            IDNumber[20];               // 身份证号
 	char            EMail[32];                  // 邮箱地址
 
 	uint32_t        Number;                     // 编号

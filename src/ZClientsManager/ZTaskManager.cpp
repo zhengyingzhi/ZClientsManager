@@ -23,6 +23,7 @@ extern ZNetCommBase*	g_pNetComm;
 
 static BOOL g_FirstCallExpire = TRUE;
 
+/* IO线程定时回调 */
 static void _NetLoopOnce(void* apUserData)
 {
 	ZTaskManager* lpTaskMgr = (ZTaskManager*)apUserData;
@@ -39,7 +40,9 @@ void ZTaskManager::TryExpireTimers()
 		return;
 	}
 
-	// 有线程安全问题，但不考虑
+
+	std::lock_guard<std::mutex> lk(m_Mutex);
+
 	int rv;
 	time_t lNow = time(0);
 	ZTaskInfo* lpTask;
@@ -65,14 +68,14 @@ void ZTaskManager::TryExpireTimers()
 			rv = AfxMessageBox(lNote, MB_YESNOCANCEL);
 			if (rv == IDYES)
 			{
-				// try delete this 
+				// try delete this if clicked YES
 				int lRow = FindRow(lpTask);
 				if (lRow >= 0)
 					m_ListTask.DeleteItem(lRow);
 
 				m_pTaskDB->Delete(&lpTask, sizeof(ZTaskInfo));
 
-				EraseOneTask(lpTask);
+				EraseOneTask(lpTask, false);
 				continue;
 			}
 
@@ -85,7 +88,7 @@ void ZTaskManager::TryExpireTimers()
 int ZTaskManager::FindRow(ZTaskInfo* apTaskInfo)
 {
 	CString lName, lTimeIntr;
-	for (size_t i = 0; i < m_ListTask.GetItemCount(); ++i)
+	for (int i = 0; i < m_ListTask.GetItemCount(); ++i)
 	{
 		lName = m_ListTask.GetItemText(i, TASKLIST_COL_Name);
 		lTimeIntr = m_ListTask.GetItemText(i, TASKLIST_COL_TimeInt);
@@ -201,6 +204,7 @@ BOOL ZTaskManager::OnInitDialog()
 	return TRUE;
 }
 
+/* 初始化任务DB */
 BOOL ZTaskManager::InitTaskDB()
 {
 	int rv;
@@ -250,6 +254,7 @@ BOOL ZTaskManager::InitTaskDB()
 
 void ZTaskManager::ClearCaches()
 {
+	std::lock_guard<std::mutex> lk(m_Mutex);
 	for (size_t i = 0; i < m_CacheTasks.size(); ++i)
 	{
 		free(m_CacheTasks[i]);
@@ -257,11 +262,16 @@ void ZTaskManager::ClearCaches()
 	m_CacheTasks.clear();
 }
 
-void ZTaskManager::EraseOneTask(const ZTaskInfo* apTaskInfo)
+/* 从任务中移除指定任务 */
+void ZTaskManager::EraseOneTask(const ZTaskInfo* apTaskInfo, bool aDoLock)
 {
 	if (m_CacheTasks.empty())
 	{
 		return;
+	}
+
+	if (aDoLock) {
+		m_Mutex.lock();
 	}
 
 	std::vector<ZTaskInfo*>::iterator iter = m_CacheTasks.begin();
@@ -274,6 +284,10 @@ void ZTaskManager::EraseOneTask(const ZTaskInfo* apTaskInfo)
 			free(lpTask);
 			break;
 		}
+	}
+
+	if (aDoLock) {
+		m_Mutex.unlock();
 	}
 }
 
@@ -339,7 +353,7 @@ void ZTaskManager::OnBnClickedOk()
 	// CDialogEx::OnOK();
 }
 
-
+/* 从列表中单击某任务 */
 void ZTaskManager::OnNMClickListTasks(NMHDR *pNMHDR, LRESULT *pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
@@ -369,7 +383,7 @@ void ZTaskManager::OnNMClickListTasks(NMHDR *pNMHDR, LRESULT *pResult)
 	*pResult = 0;
 }
 
-
+/* 删除指定任务事件 */
 void ZTaskManager::OnBnClickedBtnDeltask()
 {
 	if (m_SelectedRow < 0)
@@ -395,7 +409,7 @@ void ZTaskManager::OnBnClickedBtnDeltask()
 		lTaskInfo.TaskTime = atol((char*)(LPCSTR)lTimeIntr);
 		m_pTaskDB->Delete(&lTaskInfo, sizeof(lTaskInfo));
 
-		EraseOneTask(&lTaskInfo);
+		EraseOneTask(&lTaskInfo, true);
 
 		SetDlgItemText(IDC_EDIT_TASKNAME, "");
 		SetDlgItemText(IDC_EDIT_TASKCONTENT, "");

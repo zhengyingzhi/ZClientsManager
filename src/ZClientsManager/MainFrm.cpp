@@ -256,6 +256,9 @@ void CMainFrame::OnClose()
 		return;
 	}
 
+	if (g_pNetComm)
+		g_pNetComm->Stop();
+
 	// save data
 	g_AppConfig.WriteAppConfig(ZAPP_CONFIG_NAME);
 
@@ -505,7 +508,7 @@ void CMainFrame::OnEditInsert()
 	lSIDlg.DoModal();
 }
 
-// 学生信息编辑事件
+// 学生信息查找事件
 void CMainFrame::OnEditFind()
 {
 	m_StuQryDlg.SetMainFrame(this);
