@@ -20,6 +20,11 @@
 extern ztl_log_t* g_Logger;
 
 
+#define COMMENTSLIST_COL_Row        0
+#define COMMENTSLIST_COL_ByName     1
+#define COMMENTSLIST_COL_Time       2
+#define COMMENTSLIST_COL_Content    3
+
 // ZStuInfoDlg dialog
 
 IMPLEMENT_DYNAMIC(ZStuInfoDlg, CDialogEx)
@@ -40,6 +45,7 @@ void ZStuInfoDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO_IMPORTANT, m_comboImportant);
 	DDX_Control(pDX, IDC_DTPICKER_Date, m_DatePick);
 	DDX_Control(pDX, IDC_DTPICKER_Time, m_TimePick);
+	DDX_Control(pDX, IDC_LIST_COMMENTS, m_ListComments);
 }
 
 BOOL ZStuInfoDlg::OnInitDialog()
@@ -50,6 +56,17 @@ BOOL ZStuInfoDlg::OnInitDialog()
 	m_comboImportant.InsertString(SIM_Important, _T("重要"));   // 1
 	m_comboImportant.InsertString(SIM_Emergency, _T("紧急"));   // 2
 	m_comboImportant.SetCurSel(0);
+
+	DWORD dwStyle;
+	m_ListComments.ModifyStyle(0, LVS_REPORT | LVS_SHOWSELALWAYS);
+	dwStyle = m_ListComments.GetExtendedStyle() | LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT;
+	//dwStyle |= LVS_EX_CHECKBOXES;
+	m_ListComments.SetExtendedStyle(dwStyle);
+
+	m_ListComments.InsertColumn(COMMENTSLIST_COL_Row, _T("编号"), LVCFMT_LEFT, 20);
+	m_ListComments.InsertColumn(COMMENTSLIST_COL_ByName, _T("姓名"), LVCFMT_LEFT, 60);
+	m_ListComments.InsertColumn(COMMENTSLIST_COL_Time, _T("时间"), LVCFMT_LEFT, 120);
+	m_ListComments.InsertColumn(COMMENTSLIST_COL_Content, _T("内容"), LVCFMT_LEFT, 200);
 
 	CString lText;
 	switch (m_OperateType)
@@ -111,7 +128,6 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		SetDlgItemText(IDC_EDIT_SOURCE, m_StuInfo.Source);
 		SetDlgItemText(IDC_EDIT_STATUS, m_StuInfo.Status);
 		SetDlgItemText(IDC_EDIT_EMAIL, m_StuInfo.EMail);
-		SetDlgItemText(IDC_EDIT_COMMENT, m_StuInfo.Comments);
 
 		m_comboImportant.SetCurSel(m_StuInfo.ImportantLevel);
 
@@ -123,6 +139,25 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		else {
 			lpBtn = (CButton*)GetDlgItem(IDC_RADIO_GIRL);
 			lpBtn->SetCheck(1);
+		}
+
+		// split comments by \r\n
+		std::vector<std::string> lCommVec = ZStringSplit(m_StuInfo.Comments, '\n');
+		for (size_t i = 0; i < lCommVec.size(); ++i)
+		{
+			// data vec: number,name,time,content
+			std::vector<std::string> lDataVec = ZStringSplit(lCommVec[i], '|');
+			if (lDataVec.size() < 4) {
+				continue;
+			}
+
+			m_ListComments.InsertItem(i, _T(""));
+
+			lString.Format("%d", i + 1);
+			m_ListComments.SetItemText(i, COMMENTSLIST_COL_Row, lString);
+			m_ListComments.SetItemText(i, COMMENTSLIST_COL_ByName, lDataVec[1].c_str());
+			m_ListComments.SetItemText(i, COMMENTSLIST_COL_Time, lDataVec[2].c_str());
+			m_ListComments.SetItemText(i, COMMENTSLIST_COL_Content, lDataVec[3].c_str());
 		}
 	}
 	else
@@ -139,6 +174,8 @@ BOOL ZStuInfoDlg::OnInitDialog()
 
 BEGIN_MESSAGE_MAP(ZStuInfoDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_SAVE, &ZStuInfoDlg::OnBnClickedBtnSave)
+	ON_BN_CLICKED(IDC_BTN_AddComment, &ZStuInfoDlg::OnBnClickedBtnAddcomment)
+	ON_NOTIFY(NM_CLICK, IDC_LIST_COMMENTS, &ZStuInfoDlg::OnNMClickListComments)
 END_MESSAGE_MAP()
 
 
@@ -202,7 +239,21 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));
 	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
 	GetDlgItemValue(IDC_EDIT_EMAIL, lStuInfo.EMail, sizeof(lStuInfo.EMail));
-	GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
+
+	//GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
+
+	CString lComments;
+	for (int i = 0; i < m_ListComments.GetItemCount(); ++i)
+	{
+		CString lData;
+		lData.Format("%s|%s|%s|%s\n", m_ListComments.GetItemText(i, COMMENTSLIST_COL_Row),
+			m_ListComments.GetItemText(i, COMMENTSLIST_COL_ByName),
+			m_ListComments.GetItemText(i, COMMENTSLIST_COL_Time),
+			m_ListComments.GetItemText(i, COMMENTSLIST_COL_Content));
+
+		lComments.Append(lData);
+	}
+	strncpy(lStuInfo.Comments, (char*)(LPCSTR)lComments, sizeof(lStuInfo.Comments) - 1);
 
 	lStuInfo.ImportantLevel = (StuImportant)m_comboImportant.GetCurSel();
 
@@ -274,4 +325,53 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	g_pMainFrame->UpdateStuToMainListView(&m_StuInfo, FALSE);
 
 	CDialogEx::OnOK();
+}
+
+/* 添加一行备注 */
+void ZStuInfoDlg::OnBnClickedBtnAddcomment()
+{
+	CString lOneComment;
+	GetDlgItemText(IDC_EDIT_COMMENT, lOneComment);
+	if (lOneComment.IsEmpty())
+	{
+		AfxMessageBox(_T("添加备注不能为空"), MB_ICONWARNING);
+		return;
+	}
+
+	if (lOneComment == m_LastOneComment)
+	{
+		AfxMessageBox(_T("未编辑新备注内容，不能添加"), MB_ICONWARNING);
+		return;
+	}
+	m_LastOneComment = lOneComment;
+
+	time_t lNow = time(0);
+	std::string lTimeString = ZConvStdTimeStr(time(0));
+
+	int lRow = m_ListComments.GetItemCount();
+	CString lRowString;
+	lRowString.Format("%d", lRow + 1);
+
+	m_ListComments.InsertItem(lRow, _T(""));
+	m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Row, lRowString);
+	m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_ByName, g_AppConfig.m_UserID);
+	m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Time,  lTimeString.c_str());
+	m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Content, lOneComment);
+}
+
+
+
+void ZStuInfoDlg::OnNMClickListComments(NMHDR *pNMHDR, LRESULT *pResult)
+{
+	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
+
+	int lRow = pNMItemActivate->iItem;
+	if (lRow > 0)
+	{
+		m_LastOneComment = m_ListComments.GetItemText(lRow, COMMENTSLIST_COL_Content);
+
+		SetDlgItemText(IDC_EDIT_COMMENT, m_LastOneComment);
+	}
+
+	*pResult = 0;
 }

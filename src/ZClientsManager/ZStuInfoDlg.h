@@ -4,6 +4,7 @@
 #include "ZCommon.h"
 #include "afxwin.h"
 #include "afxdtctl.h"
+#include "afxcmn.h"
 
 
 #define MAINLIST_COL_Row            0           // 仅是列表编号
@@ -56,6 +57,8 @@ public:
 	CComboBox           m_comboImportant;
 	CDateTimeCtrl       m_DatePick;
 	CDateTimeCtrl       m_TimePick;
+	CListCtrl           m_ListComments;
+	CString             m_LastOneComment;
 
 public:
 	void SetOperateType(ZEnumOperateType aOperateType) { m_OperateType = aOperateType; }
@@ -75,4 +78,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedBtnSave();
+	afx_msg void OnBnClickedBtnAddcomment();
+	afx_msg void OnNMClickListComments(NMHDR *pNMHDR, LRESULT *pResult);
 };

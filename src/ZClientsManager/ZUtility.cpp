@@ -4,6 +4,12 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <algorithm>
+#include <cassert>
+#include <cctype>
+#include <functional>
+#include <sstream>
+
 #include <Windows.h>
 
 #include "ZUtility.h"
@@ -155,3 +161,13 @@ uint32_t ZGetCheckSum(const void* apRawData, uint32_t aRawSize, int aRefNum)
 	return lSum & (lModNum - 1);
 }
 
+std::vector<std::string>
+ZStringSplit(const std::string& subject, char delimiter)
+{
+	std::vector<std::string> items;
+	std::istringstream stream(subject);
+	std::string item;
+	while (std::getline(stream, item, delimiter))
+		items.push_back(std::move(item));
+	return items;
+}

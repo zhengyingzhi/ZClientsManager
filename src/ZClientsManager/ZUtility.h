@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -27,4 +28,6 @@ std::string ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDo
 std::string ZConvBase64ToData(const char* apBaseData, uint32_t aBaseDataSize, bool aDoSimpleChange);
 
 uint32_t ZGetCheckSum(const void* apRawData, uint32_t aRawSize, int aRefNum);
+
+std::vector<std::string> ZStringSplit(const std::string& subject, char delimiter);
 
