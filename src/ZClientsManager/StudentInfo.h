@@ -76,4 +76,6 @@ extern int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePad
 
 extern void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo);
 
+extern void ZMergeComments(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo);
+
 extern bool ZStuInfoEqual(ZStudentInfo* apStuInfoA, ZStudentInfo* apStuInfoB);

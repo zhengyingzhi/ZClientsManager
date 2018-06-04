@@ -63,10 +63,10 @@ BOOL ZStuInfoDlg::OnInitDialog()
 	//dwStyle |= LVS_EX_CHECKBOXES;
 	m_ListComments.SetExtendedStyle(dwStyle);
 
-	m_ListComments.InsertColumn(COMMENTSLIST_COL_Row, _T("编号"), LVCFMT_LEFT, 20);
-	m_ListComments.InsertColumn(COMMENTSLIST_COL_ByName, _T("姓名"), LVCFMT_LEFT, 60);
+	m_ListComments.InsertColumn(COMMENTSLIST_COL_Row, _T("编号"), LVCFMT_LEFT, 40);
+	m_ListComments.InsertColumn(COMMENTSLIST_COL_ByName, _T("备注人"), LVCFMT_LEFT, 60);
 	m_ListComments.InsertColumn(COMMENTSLIST_COL_Time, _T("时间"), LVCFMT_LEFT, 120);
-	m_ListComments.InsertColumn(COMMENTSLIST_COL_Content, _T("内容"), LVCFMT_LEFT, 200);
+	m_ListComments.InsertColumn(COMMENTSLIST_COL_Content, _T("内容"), LVCFMT_LEFT, 300);
 
 	CString lText;
 	switch (m_OperateType)
@@ -151,13 +151,12 @@ BOOL ZStuInfoDlg::OnInitDialog()
 				continue;
 			}
 
-			m_ListComments.InsertItem(i, _T(""));
-
-			lString.Format("%d", i + 1);
-			m_ListComments.SetItemText(i, COMMENTSLIST_COL_Row, lString);
-			m_ListComments.SetItemText(i, COMMENTSLIST_COL_ByName, lDataVec[1].c_str());
-			m_ListComments.SetItemText(i, COMMENTSLIST_COL_Time, lDataVec[2].c_str());
-			m_ListComments.SetItemText(i, COMMENTSLIST_COL_Content, lDataVec[3].c_str());
+			int lRow = i;
+			m_ListComments.InsertItem(lRow, _T(""));
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Row, lDataVec[0].c_str());
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_ByName, lDataVec[1].c_str());
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Time, lDataVec[2].c_str());
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Content, lDataVec[3].c_str());
 		}
 	}
 	else
@@ -243,13 +242,13 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	//GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
 
 	CString lComments;
-	for (int i = 0; i < m_ListComments.GetItemCount(); ++i)
+	for (int row = 0; row < m_ListComments.GetItemCount(); ++row)
 	{
 		CString lData;
-		lData.Format("%s|%s|%s|%s\n", m_ListComments.GetItemText(i, COMMENTSLIST_COL_Row),
-			m_ListComments.GetItemText(i, COMMENTSLIST_COL_ByName),
-			m_ListComments.GetItemText(i, COMMENTSLIST_COL_Time),
-			m_ListComments.GetItemText(i, COMMENTSLIST_COL_Content));
+		lData.Format("%s|%s|%s|%s\n", m_ListComments.GetItemText(row, COMMENTSLIST_COL_Row),
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_ByName),
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Time),
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Content));
 
 		lComments.Append(lData);
 	}
@@ -348,9 +347,10 @@ void ZStuInfoDlg::OnBnClickedBtnAddcomment()
 	time_t lNow = time(0);
 	std::string lTimeString = ZConvStdTimeStr(time(0));
 
-	int lRow = m_ListComments.GetItemCount();
+	//int lRow = m_ListComments.GetItemCount();
+	int lRow = 0;   // add to first row
 	CString lRowString;
-	lRowString.Format("%d", lRow + 1);
+	lRowString.Format("%d", m_ListComments.GetItemCount() + 1);
 
 	m_ListComments.InsertItem(lRow, _T(""));
 	m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Row, lRowString);

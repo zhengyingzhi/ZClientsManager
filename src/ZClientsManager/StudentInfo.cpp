@@ -1,3 +1,8 @@
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+
 #include "StudentInfo.h"
 
 #include "ZFixApi.h"
@@ -111,6 +116,7 @@ void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
 {
 	uint32_t lOldNum = apDstInfo->Number;
 	int64_t lOldInsertTime = apDstInfo->InsertTime;
+    std::string lOldComments = apDstInfo->Comments;
 
 	memcpy(apDstInfo, apSrcInfo, sizeof(ZStudentInfo));
 	apDstInfo->Number = lOldNum;
@@ -119,6 +125,66 @@ void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
 		apDstInfo->Number = lOldNum;
 	if (lOldInsertTime != 0)
 		apDstInfo->InsertTime = lOldInsertTime;
+    if (lOldComments.compare(apSrcInfo->Comments) != 0)
+        ZMergeComments(apDstInfo, apSrcInfo);
+}
+
+void ZMergeComments(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
+{
+    // split comments by \r\n
+    std::vector<std::string> lDstVec = ZStringSplit(apDstInfo->Comments, '\n');
+    std::vector<std::string> lSrcVec = ZStringSplit(apSrcInfo->Comments, '\n');
+
+    // remove the repeat records
+    std::map <std::string, std::string> lMap;
+    for (size_t i = 0; i < lSrcVec.size(); ++i)
+    {
+        std::vector<std::string> lSrcData = ZStringSplit(lSrcVec[i], '|');
+        if (lSrcData[2].empty() || lSrcData[3].empty())
+        {
+            ZDebug("ZMergeComments empty src string data %s", lSrcVec[i].c_str());
+            continue;
+        }
+
+        lMap.insert(std::make_pair(lSrcData[1], lSrcVec[i]));
+    }
+    for (size_t i = 0; i < lDstVec.size(); ++i)
+    {
+        std::vector<std::string> lDstData = ZStringSplit(lDstVec[i], '|');
+        if (lDstData[2].empty() || lDstData[3].empty())
+        {
+            ZDebug("ZMergeComments empty dst string data %s", lDstVec[i].c_str());
+            continue;
+        }
+
+        lMap.insert(std::make_pair(lDstData[1], lDstVec[i]));
+    }
+
+    // sort them
+    vector<string> lVecKey;
+    map<string, string>::iterator iter = lMap.begin();
+    for (; iter != lMap.end(); ++iter)
+        lVecKey.push_back(iter->first);
+    std::sort(lVecKey.begin(), lVecKey.end());
+
+    vector<string> lVecString;
+    for (size_t i = 0; i < lVecKey.size(); ++i)
+    {
+        std::string lKey = lVecKey[i];
+        std::string lData = lMap[lKey];
+        if (lData.empty())
+        {
+            ZDebug("ZMergeComments got unexpected empty string data for %s", lKey.c_str());
+            continue;
+        }
+
+        lVecString.push_back(lData);
+    }
+
+    for (size_t i = 0; i < lVecString.size(); ++i)
+    {
+        // TODO: 将 lVecString 的所有字符串拼接为一个字符串，且编号可能需要重新组织
+    }
 }
 
 bool ZStuInfoEqual(ZStudentInfo* apStuInfoA, ZStudentInfo* apStuInfoB)

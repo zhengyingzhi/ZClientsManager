@@ -17,7 +17,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Chinese (Simplified, PRC) resources
+// 中文(简体，中国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -274,12 +274,12 @@ BEGIN
     LTEXT           "插入时间",IDC_STATIC,9,174,33,8
     EDITTEXT        IDC_EDIT_ADDTIME,44,172,127,14,ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "更新时间",IDC_STATIC,180,174,33,8
-    EDITTEXT        IDC_EDIT_UPDATETIME,216,171,116,14,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_UPDATETIME,220,171,111,14,ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "备        注",IDC_STATIC,9,191,33,8
-    EDITTEXT        IDC_EDIT_COMMENT,7,203,325,20,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    EDITTEXT        IDC_EDIT_COMMENT,7,203,325,15,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN
     PUSHBUTTON      "保存",IDC_BTN_SAVE,229,281,50,18
     PUSHBUTTON      "取消",IDCANCEL,283,281,50,18
-    CONTROL         "",IDC_LIST_COMMENTS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,224,325,56
+    CONTROL         "",IDC_LIST_COMMENTS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,219,325,60
     PUSHBUTTON      "添加备注",IDC_BTN_AddComment,43,189,50,14
 END
 
@@ -676,7 +676,7 @@ BEGIN
     ID_EDIT_TASKMAN         "管理用户定制的定时任务，可在到时间时提醒"
 END
 
-#endif    // Chinese (Simplified, PRC) resources
+#endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
