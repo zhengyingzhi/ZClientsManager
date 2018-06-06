@@ -111,6 +111,9 @@
     <ClInclude Include="TaskDB.h">
       <Filter>DataBase</Filter>
     </ClInclude>
+    <ClInclude Include="ZComments.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ZClientsManager.cpp">
@@ -181,6 +184,9 @@
     </ClCompile>
     <ClCompile Include="TaskDB.cpp">
       <Filter>DataBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ZComments.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

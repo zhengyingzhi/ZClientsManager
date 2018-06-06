@@ -20,11 +20,6 @@
 extern ztl_log_t* g_Logger;
 
 
-#define COMMENTSLIST_COL_Row        0
-#define COMMENTSLIST_COL_ByName     1
-#define COMMENTSLIST_COL_Time       2
-#define COMMENTSLIST_COL_Content    3
-
 // ZStuInfoDlg dialog
 
 IMPLEMENT_DYNAMIC(ZStuInfoDlg, CDialogEx)
@@ -146,8 +141,8 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		for (size_t i = 0; i < lCommVec.size(); ++i)
 		{
 			// data vec: number,name,time,content
-			std::vector<std::string> lDataVec = ZStringSplit(lCommVec[i], '|');
-			if (lDataVec.size() < 4) {
+            ZCommentLine lDataVec(lCommVec[i], '|');
+			if (lDataVec.GetSize() < 4) {
 				continue;
 			}
 

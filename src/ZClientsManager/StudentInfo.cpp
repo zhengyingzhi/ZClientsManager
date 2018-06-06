@@ -9,6 +9,8 @@
 
 #include "ZUtility.h"
 
+#include "ZComments.h"
+
 
 int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aPrePaddingSize)
 {
@@ -181,9 +183,24 @@ void ZMergeComments(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
         lVecString.push_back(lData);
     }
 
+    int  lLength = 0;
+    char lBuffer[4096] = "";
     for (size_t i = 0; i < lVecString.size(); ++i)
     {
-        // TODO: 将 lVecString 的所有字符串拼接为一个字符串，且编号可能需要重新组织
+        // 将 lVecString 的所有字符串拼接为一个字符串，且编号需要重新组织
+        ZCommentLine lCL(lVecString[i], '|');
+        lCL.UpdateNumber(i + 1);
+
+        lLength += sprintf(lBuffer, "%s", lCL.GetCommentLine().c_str());
+        if (i != lVecString.size() - 1)
+        {
+            lBuffer[lLength++] = '\r\n';
+        }
+    }
+
+    if (lLength > 0)
+    {
+        strncpy(apDstInfo->Comments, lBuffer, sizeof(apDstInfo->Comments) - 1);
     }
 }
 

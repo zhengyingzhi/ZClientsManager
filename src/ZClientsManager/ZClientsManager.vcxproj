@@ -212,6 +212,7 @@
     <ClInclude Include="UserInfoDB.h" />
     <ClInclude Include="ZAppConfig.h" />
     <ClInclude Include="ZClientsManager.h" />
+    <ClInclude Include="ZComments.h" />
     <ClInclude Include="ZCommon.h" />
     <ClInclude Include="ZConfirmDlg.h" />
     <ClInclude Include="ZDataBase.h" />
@@ -245,6 +246,7 @@
     <ClCompile Include="UserInfoDB.cpp" />
     <ClCompile Include="ZAppConfig.cpp" />
     <ClCompile Include="ZClientsManager.cpp" />
+    <ClCompile Include="ZComments.cpp" />
     <ClCompile Include="ZConfirmDlg.cpp" />
     <ClCompile Include="ZDataBase.cpp" />
     <ClCompile Include="ZFixApi.cpp" />

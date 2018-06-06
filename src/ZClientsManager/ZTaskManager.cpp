@@ -62,7 +62,7 @@ void ZTaskManager::TryExpireTimers()
 
 			CTime lCTm(lpTask->TaskTime);
 			CString lNote;
-			lNote.Format(_T("定时任务到期 %02d:%02d:%02d\n名称: %s\n内容:%s"), lCTm.GetHour(), lCTm.GetMinute(), lCTm.GetSecond(),
+			lNote.Format(_T("定时任务到期 %02d:%02d:%02d (点击Yes不再提示)\n名称: %s\n内容: %s"), lCTm.GetHour(), lCTm.GetMinute(), lCTm.GetSecond(),
 				lpTask->TaskName, lpTask->TaskContent);
 
 			rv = AfxMessageBox(lNote, MB_YESNOCANCEL);
@@ -80,7 +80,7 @@ void ZTaskManager::TryExpireTimers()
 			}
 
 			// delay 5 minutes
-			lpTask->TaskTime += 5 * 60;
+			lpTask->TaskTime = (uint32_t)time(0) + 5 * 60;
 		}
 	}
 }

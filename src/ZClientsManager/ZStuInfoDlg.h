@@ -6,6 +6,8 @@
 #include "afxdtctl.h"
 #include "afxcmn.h"
 
+#include "ZComments.h"
+
 
 #define MAINLIST_COL_Row            0           // 仅是列表编号
 #define MAINLIST_COL_Name           1           // 名字
