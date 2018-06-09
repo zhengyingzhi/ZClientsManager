@@ -232,12 +232,48 @@ void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec, BOOL aAp
 	if (!aAppend) {
 		m_list.DeleteAllItems();
 	}
-	int lRowOff = m_list.GetItemCount();
+	else
+	{
+		// 待优化，应当有个地方保存界面信息的容器（考虑可用g_MemData），不用每次遍历所有数据行
+		for (size_t k = 0; k < aStuVec.size(); ++k)
+		{
+			ZStudentInfo* lpCurStu = aStuVec[k];
+
+			BOOL lFind = FALSE;
+			int row = 0;
+			CString lName, lTelephone;
+			for (row = 0; row < m_list.GetItemCount(); ++row)
+			{
+				lName = m_list.GetItemText(row, MAINLIST_COL_Name);
+				lTelephone = m_list.GetItemText(row, MAINLIST_COL_Telephone);
+				if (lName == lpCurStu->Name && lTelephone == lpCurStu->Telehone)
+				{
+					lFind = TRUE;
+					break;
+				}
+			}
+
+			if (lFind)
+			{
+				ZDebug("UpdateStuToListView update %d,%s", lpCurStu->Number, lpCurStu->Name);
+				_UpdateMainListCtrl(row, m_list, lpCurStu);
+			
+				// mark as null
+				aStuVec[k] = NULL;
+			}
+		}
+	}
+	//int lRowOff = m_list.GetItemCount();
 
 	for (size_t i = 0; i < aStuVec.size(); ++i)
 	{
+		if (!aStuVec[i]) {
+			continue;
+		}
+
 		//_UpdateMainListCtrl(lRowOff + i, m_list, aStuVec[i]);
-		_UpdateMainListCtrl(lRowOff + i, m_list, aStuVec[aStuVec.size() - i - 1]);
+		//_UpdateMainListCtrl(lRowOff + i, m_list, aStuVec[aStuVec.size() - i - 1]);
+		_UpdateMainListCtrl(0, m_list, aStuVec[i]);
 	}
 }
 
@@ -350,7 +386,8 @@ void CMainListView::OnEditExport()
 		return;
 	}
 
-	if (m_list.GetSelectedCount() <= 0)
+	//if (m_list.GetSelectedCount() <= 0)
+    if (m_list.GetItemCount() == 0)
 	{
 		CString lNote;
 		lNote.Format("请选择要导出的数据");
@@ -382,7 +419,7 @@ void CMainListView::OnEditExport()
 	CString lLine;
 	POSITION pos;
 
-	FILE* fp = fopen((char*)(LPCSTR)lFilePath, "w");
+	FILE* fp = fopen((char*)(LPCSTR)lFilePath, "wb");
 	if (fp == NULL)
 	{
 		lLine.Format("导出数据的文件[%s]打开失败:%d", lFilePath, GetLastError());
@@ -390,29 +427,45 @@ void CMainListView::OnEditExport()
 		return;
 	}
 
+    // TODO: 导出记录是否要包含 Comments 中的记录，此处未包含
 	lLine = _GetMainListHeaderLine();
 	lLine.Append("\r\n");
 	fwrite((char*)(LPCSTR)lLine, lLine.GetLength(), 1, fp);
 
 	pos = m_list.GetFirstSelectedItemPosition();
+    if (pos == NULL)
+    {
+        for (int row = 0; row < m_list.GetItemCount(); ++row)
+        {		// get data
+            lLine = _GetMainListCtrlLine(row, m_list);
+            if (lLine.IsEmpty()) {
+                continue;
+            }
 
-	// get data and save into file
-	while (pos)
-	{
-		int lSelItem = m_list.GetNextSelectedItem(pos);
-		if (lSelItem < 0 || lSelItem >= m_list.GetItemCount()) {
-			break;
-		}
+            lLine.Append("\r\n");
+            fwrite((char*)(LPCSTR)lLine, lLine.GetLength(), 1, fp);
+        }
+    }
+    else
+    {
+        // get selected data and save into file
+        while (pos)
+        {
+            int lSelItem = m_list.GetNextSelectedItem(pos);
+            if (lSelItem < 0 || lSelItem >= m_list.GetItemCount()) {
+                break;
+            }
 
-		// get data
-		lLine = _GetMainListCtrlLine(lSelItem, m_list);
-		if (lLine.IsEmpty()) {
-			continue;
-		}
+            // get data
+            lLine = _GetMainListCtrlLine(lSelItem, m_list);
+            if (lLine.IsEmpty()) {
+                continue;
+            }
 
-		lLine.Append("\r\n");
-		fwrite((char*)(LPCSTR)lLine, lLine.GetLength(), 1, fp);
-	}
+            lLine.Append("\r\n");
+            fwrite((char*)(LPCSTR)lLine, lLine.GetLength(), 1, fp);
+        }
+    }
 
 	fflush(fp);
 	fclose(fp);

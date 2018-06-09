@@ -295,6 +295,8 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 			AfxMessageBox(_T("插入学生信息数据失败"), MB_OK | MB_ICONWARNING);
 			return;
 		}
+
+		g_MemData.AddOrUpdateStuInfo(0, &lStuInfo);
 	}
 	else
 	{
@@ -308,16 +310,16 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 			return;
 		}
 
-		vector<ZStudentInfo*> lVec;
-		lVec.push_back(&lStuInfo);
-		g_pMainFrame->UpdateStuToMainListView(lVec, TRUE);
+		g_MemData.AddOrUpdateStuInfo(0, &lStuInfo);
 	}
 	memcpy(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo));
 
-	g_MemData.AddOrUpdateStuInfo(0, &m_StuInfo);
+	// update to main list view
+	vector<ZStudentInfo*> lVec;
+	lVec.push_back(&lStuInfo);
+	g_pMainFrame->UpdateStuToMainListView(lVec, TRUE);
 
-	g_pMainFrame->UpdateStuToMainListView(&m_StuInfo, FALSE);
-
+	// exit this dialog or show a message box
 	CDialogEx::OnOK();
 }
 
