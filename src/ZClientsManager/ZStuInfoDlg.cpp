@@ -2,6 +2,7 @@
 //
 
 #include <time.h>
+#include <assert.h>
 
 #include "stdafx.h"
 #include "afxdialogex.h"
@@ -100,7 +101,7 @@ BOOL ZStuInfoDlg::OnInitDialog()
 
 		std::string lTimeStr;
 		lTimeStr = ZConvStdTimeStr((time_t)m_StuInfo.InsertTime);
-		SetDlgItemText(IDC_EDIT_INSERTTIME, lTimeStr.c_str());
+		SetDlgItemText(IDC_EDIT_ADDTIME, lTimeStr.c_str());
 		lTimeStr = ZConvStdTimeStr((time_t)m_StuInfo.UpdateTime);
 		SetDlgItemText(IDC_EDIT_UPDATETIME, lTimeStr.c_str());
 
@@ -137,21 +138,18 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		}
 
 		// split comments by \r\n
-		std::vector<std::string> lCommVec = ZStringSplit(m_StuInfo.Comments, '\n');
-		for (size_t i = 0; i < lCommVec.size(); ++i)
+		ZComments lCommVec(m_StuInfo.Comments, "\r\n");
+		for (int i = 0; i < lCommVec.GetCount(); ++i)
 		{
-			// data vec: number,name,time,content
-            ZCommentLine lDataVec(lCommVec[i], '|');
-			if (lDataVec.GetSize() < 4) {
-				continue;
-			}
+			assert(lCommVec[i]);
+			ZCommentLine& lCommLine = *lCommVec[i];
 
 			int lRow = i;
 			m_ListComments.InsertItem(lRow, _T(""));
-			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Row, lDataVec[0].c_str());
-			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_ByName, lDataVec[1].c_str());
-			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Time, lDataVec[2].c_str());
-			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Content, lDataVec[3].c_str());
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Row, lCommLine[0].c_str());
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_ByName, lCommLine[1].c_str());
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Time, lCommLine[2].c_str());
+			m_ListComments.SetItemText(lRow, COMMENTSLIST_COL_Content, lCommLine[3].c_str());
 		}
 	}
 	else
@@ -234,13 +232,20 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
 	GetDlgItemValue(IDC_EDIT_EMAIL, lStuInfo.EMail, sizeof(lStuInfo.EMail));
 
+	CString lAddTime, lUpdateTime;
+	GetDlgItemText(IDC_EDIT_ADDTIME, lAddTime);
+	GetDlgItemText(IDC_EDIT_UPDATETIME, lUpdateTime);
+	lStuInfo.InsertTime = ZConvStr2StdTime((char*)(LPCSTR)lAddTime);
+	lStuInfo.UpdateTime = ZConvStr2StdTime((char*)(LPCSTR)lUpdateTime);
+
 	//GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
 
 	CString lComments;
 	for (int row = 0; row < m_ListComments.GetItemCount(); ++row)
 	{
 		CString lData;
-		lData.Format("%s|%s|%s|%s\n", m_ListComments.GetItemText(row, COMMENTSLIST_COL_Row),
+		lData.Format("%s|%s|%s|%s", 
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Row),
 			m_ListComments.GetItemText(row, COMMENTSLIST_COL_ByName),
 			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Time),
 			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Content));
@@ -289,35 +294,19 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 		lStuInfo.UpdateTime = time(0);
 
 		// update
-		lRet = g_MemData.GetStuDB()->Update(&lStuInfo, sizeof(lStuInfo));
-		if (lRet != 0)
-		{
-			AfxMessageBox(_T("插入学生信息数据失败"), MB_OK | MB_ICONWARNING);
-			return;
-		}
-
-		g_MemData.AddOrUpdateStuInfo(0, &lStuInfo);
+		g_MemData.AddOrUpdateStuInfo(ZMD_DATA_Update, &lStuInfo);
 	}
 	else
 	{
 		lStuInfo.InsertTime = time(0);
 
 		// insert
-		lRet = g_MemData.GetStuDB()->Insert(&lStuInfo, sizeof(lStuInfo));
-		if (lRet != 0)
-		{
-			AfxMessageBox(_T("插入学生信息数据失败"), MB_OK | MB_ICONWARNING);
-			return;
-		}
-
-		g_MemData.AddOrUpdateStuInfo(0, &lStuInfo);
+		g_MemData.AddOrUpdateStuInfo(ZMD_DATA_Add, &lStuInfo);
 	}
 	memcpy(&m_StuInfo, &lStuInfo, sizeof(ZStudentInfo));
 
 	// update to main list view
-	vector<ZStudentInfo*> lVec;
-	lVec.push_back(&lStuInfo);
-	g_pMainFrame->UpdateStuToMainListView(lVec, TRUE);
+	g_pMainFrame->UpdateStuToMainListView(&lStuInfo, TRUE);
 
 	// exit this dialog or show a message box
 	CDialogEx::OnOK();
@@ -334,15 +323,29 @@ void ZStuInfoDlg::OnBnClickedBtnAddcomment()
 		return;
 	}
 
+	if (lOneComment.Find("\r\n", 0) >= 0)
+	{
+		AfxMessageBox(_T("备注内容中不能输入多行内容，请检查"), MB_ICONERROR);
+		return;
+	}
+
+	// auto append line feed
+	lOneComment.Append("\r\n");
 	if (lOneComment == m_LastOneComment)
 	{
 		AfxMessageBox(_T("未编辑新备注内容，不能添加"), MB_ICONWARNING);
 		return;
 	}
+
+	if (lOneComment.Find('|', 0) >= 0)
+	{
+		AfxMessageBox(_T("备注内容不能包含字符: '|' ，请替换其它字符"), MB_ICONERROR);
+		return;
+	}
 	m_LastOneComment = lOneComment;
 
 	time_t lNow = time(0);
-	std::string lTimeString = ZConvStdTimeStr(time(0));
+	std::string lTimeString = ZConvStdTimeStr(lNow);
 
 	//int lRow = m_ListComments.GetItemCount();
 	int lRow = 0;   // add to first row

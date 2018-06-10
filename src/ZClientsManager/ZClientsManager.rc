@@ -17,7 +17,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// Chinese (Simplified, PRC) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
@@ -233,9 +233,9 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "编号",IDC_STATIC,10,13,17,8
     EDITTEXT        IDC_EDIT_NUMBER,29,11,77,14,ES_AUTOHSCROLL | ES_READONLY
-    LTEXT           "姓名",IDC_STATIC,123,13,17,8
+    LTEXT           "*姓名",IDC_STATIC,120,13,21,8
     EDITTEXT        IDC_EDIT_NAME,143,11,77,14,ES_AUTOHSCROLL
-    LTEXT           "电话",IDC_STATIC,234,14,17,8
+    LTEXT           "*电话",IDC_STATIC,230,14,21,8
     EDITTEXT        IDC_EDIT_TELEPHONE,254,11,77,14,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "就读大学",IDC_STATIC,10,34,33,8
     EDITTEXT        IDC_EDIT_COLLEGE,46,31,111,14,ES_AUTOHSCROLL
@@ -395,8 +395,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,1,0
- PRODUCTVERSION 1,0,1,0
+ FILEVERSION 1,0,2,0
+ PRODUCTVERSION 1,0,2,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -413,12 +413,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "傲睿教育"
             VALUE "FileDescription", "资源管理App"
-            VALUE "FileVersion", "1.0.1.0"
+            VALUE "FileVersion", "1.0.2.0"
             VALUE "InternalName", "ZClientsManager.exe"
             VALUE "LegalCopyright", "(C) <傲睿教育>。  保留所有权利。"
             VALUE "OriginalFilename", "ZClientsManager.exe"
             VALUE "ProductName", "资源管理系统"
-            VALUE "ProductVersion", "1.0.1.0"
+            VALUE "ProductVersion", "1.0.2.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -676,7 +676,7 @@ BEGIN
     ID_EDIT_TASKMAN         "管理用户定制的定时任务，可在到时间时提醒"
 END
 
-#endif    // 中文(简体，中国) resources
+#endif    // Chinese (Simplified, PRC) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

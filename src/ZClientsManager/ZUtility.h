@@ -15,6 +15,8 @@ uint32_t ZCurrentTime();
 std::string ZConvDateTimeStr(uint64_t aTime);
 std::string ZConvStdTimeStr(time_t aTime);
 
+time_t ZConvStr2StdTime(const std::string& aTimeStr);
+
 void ZLog2DebugView(const char* fmt, ...);
 #define ZDebug(fmt,...) ZLog2DebugView(fmt,__VA_ARGS__)
 

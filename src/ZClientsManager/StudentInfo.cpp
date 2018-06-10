@@ -118,7 +118,7 @@ void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
 {
 	uint32_t lOldNum = apDstInfo->Number;
 	int64_t lOldInsertTime = apDstInfo->InsertTime;
-    std::string lOldComments = apDstInfo->Comments;
+	std::string lOldComments = apDstInfo->Comments;
 
 	memcpy(apDstInfo, apSrcInfo, sizeof(ZStudentInfo));
 	apDstInfo->Number = lOldNum;
@@ -127,81 +127,86 @@ void ZStuInfoCopy(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
 		apDstInfo->Number = lOldNum;
 	if (lOldInsertTime != 0)
 		apDstInfo->InsertTime = lOldInsertTime;
-    if (lOldComments.compare(apSrcInfo->Comments) != 0)
-        ZMergeComments(apDstInfo, apSrcInfo);
+	if (lOldComments.compare(apSrcInfo->Comments) != 0)
+	{
+		strncpy(apDstInfo->Comments, lOldComments.c_str(), sizeof(apDstInfo->Comments) - 1);
+		ZMergeComments(apDstInfo, apSrcInfo);
+	}
 }
 
 void ZMergeComments(ZStudentInfo* apDstInfo, const ZStudentInfo* apSrcInfo)
 {
-    // split comments by \r\n
-    std::vector<std::string> lDstVec = ZStringSplit(apDstInfo->Comments, '\n');
-    std::vector<std::string> lSrcVec = ZStringSplit(apSrcInfo->Comments, '\n');
+	// split comments by \r\n
+	ZComments lDstVec(apDstInfo->Comments);
+	ZComments lSrcVec(apSrcInfo->Comments);
 
-    // remove the repeat records
-    std::map <std::string, std::string> lMap;
-    for (size_t i = 0; i < lSrcVec.size(); ++i)
-    {
-        std::vector<std::string> lSrcData = ZStringSplit(lSrcVec[i], '|');
-        if (lSrcData[2].empty() || lSrcData[3].empty())
-        {
-            ZDebug("ZMergeComments empty src string data %s", lSrcVec[i].c_str());
-            continue;
-        }
+	// remove the repeat records
+	std::map <std::string, std::string> lMap;
+	for (int i = 0; i < lSrcVec.GetCount(); ++i)
+	{
+		ZCommentLine& lSrcLine = *lSrcVec[i];
+		if (lSrcLine[COMMENTSLIST_COL_Time].empty() || lSrcLine[COMMENTSLIST_COL_Content].empty())
+		{
+			ZDebug("ZMergeComments empty src string data %s", lSrcLine[i].c_str());
+			continue;
+		}
 
-        lMap.insert(std::make_pair(lSrcData[1], lSrcVec[i]));
-    }
-    for (size_t i = 0; i < lDstVec.size(); ++i)
-    {
-        std::vector<std::string> lDstData = ZStringSplit(lDstVec[i], '|');
-        if (lDstData[2].empty() || lDstData[3].empty())
-        {
-            ZDebug("ZMergeComments empty dst string data %s", lDstVec[i].c_str());
-            continue;
-        }
+		lMap.insert(std::make_pair(lSrcLine[COMMENTSLIST_COL_Time], lSrcLine.GetCommentLine()));
+	}
+	for (int i = 0; i < lDstVec.GetCount(); ++i)
+	{
+		ZCommentLine& lDstLine = *lDstVec[i];
+		if (lDstLine[COMMENTSLIST_COL_Time].empty() || lDstLine[COMMENTSLIST_COL_Content].empty())
+		{
+			ZDebug("ZMergeComments empty dst string data %s", lDstLine[i].c_str());
+			continue;
+		}
 
-        lMap.insert(std::make_pair(lDstData[1], lDstVec[i]));
-    }
+		lMap.insert(std::make_pair(lDstLine[COMMENTSLIST_COL_Time], lDstLine.GetCommentLine()));
+	}
 
-    // sort them
-    vector<string> lVecKey;
-    map<string, string>::iterator iter = lMap.begin();
-    for (; iter != lMap.end(); ++iter)
-        lVecKey.push_back(iter->first);
-    std::sort(lVecKey.begin(), lVecKey.end());
+	// sort them
+	vector<string> lVecKey;
+	map<string, string>::iterator iter = lMap.begin();
+	for (; iter != lMap.end(); ++iter)
+		lVecKey.push_back(iter->first);
+	std::sort(lVecKey.begin(), lVecKey.end());
 
-    vector<string> lVecString;
-    for (size_t i = 0; i < lVecKey.size(); ++i)
-    {
-        std::string lKey = lVecKey[i];
-        std::string lData = lMap[lKey];
-        if (lData.empty())
-        {
-            ZDebug("ZMergeComments got unexpected empty string data for %s", lKey.c_str());
-            continue;
-        }
+	vector<string> lVecString;
+	for (size_t i = 0; i < lVecKey.size(); ++i)
+	{
+		std::string lKey = lVecKey[i];
+		std::string lData = lMap[lKey];
+		if (lData.empty())
+		{
+			ZDebug("ZMergeComments got unexpected empty string data for %s", lKey.c_str());
+			continue;
+		}
 
-        lVecString.push_back(lData);
-    }
+		lVecString.push_back(lData);
+	}
 
-    int  lLength = 0;
-    char lBuffer[4096] = "";
-    for (size_t i = 0; i < lVecString.size(); ++i)
-    {
-        // 将 lVecString 的所有字符串拼接为一个字符串，且编号需要重新组织
-        ZCommentLine lCL(lVecString[i], '|');
-        lCL.UpdateNumber(i + 1);
+	// update each line's new number
+	for (size_t i = 0; i < lVecString.size(); ++i)
+	{
+		// 将 lVecString 的所有字符串拼接为一个字符串，且编号需要重新组织
+		ZCommentLine lCL(lVecString[i]);
+		lCL.UpdateNumber(i + 1);
+		lVecString[i] = lCL.GetCommentLine();
+	}
 
-        lLength += sprintf(lBuffer, "%s", lCL.GetCommentLine().c_str());
-        if (i != lVecString.size() - 1)
-        {
-            lBuffer[lLength++] = '\r\n';
-        }
-    }
+	// make a new comments
+	int  lLength = 0;
+	char lBuffer[4096] = "";
+	for (int i = (int)lVecString.size() - 1; i >= 0; --i)
+	{
+		lLength += sprintf(lBuffer + lLength, "%s", lVecString[i].c_str());
+	}
 
-    if (lLength > 0)
-    {
-        strncpy(apDstInfo->Comments, lBuffer, sizeof(apDstInfo->Comments) - 1);
-    }
+	if (lLength > 0)
+	{
+		strncpy(apDstInfo->Comments, lBuffer, sizeof(apDstInfo->Comments) - 1);
+	}
 }
 
 bool ZStuInfoEqual(ZStudentInfo* apStuInfoA, ZStudentInfo* apStuInfoB)

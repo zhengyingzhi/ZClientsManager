@@ -177,7 +177,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_wndToolBar.GetItemRect(index, &rect);
 	rect.left += 20;
 	rect.top  += 5;
-	rect.right += 150;
+	rect.right += 120;
 	rect.bottom += 100;
 	m_comboBox.Create(CBS_DROPDOWN | WS_VISIBLE | WS_TABSTOP | CBS_AUTOHSCROLL, rect,
 		&m_wndToolBar, ID_BUTTON_Combo);

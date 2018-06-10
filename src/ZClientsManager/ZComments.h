@@ -16,31 +16,48 @@ using namespace std;
 class ZCommentLine
 {
 public:
-    ZCommentLine(const std::string& aCommentLine, char aDelemeter);
-    ~ZCommentLine();
+	ZCommentLine(const std::string& aCommentLine, char aDelemeter = '|');
+	~ZCommentLine();
 
 public:
-    void UpdateNumber(std::string& aNumberStr);
-    void UpdateNumber(int aNumber);
+	void UpdateNumber(std::string& aNumberStr);
+	void UpdateNumber(int aNumber);
 
-    std::string GetValue(int aIndex);
+	std::string GetValue(int aIndex);
 
-    std::string GetCommentLine();
+	std::string GetCommentLine();
 
-    size_t GetSize();
+	size_t GetSize();
 
-    std::string operator [](int aIndex) {
-        return GetValue(aIndex);
-    }
+	std::string operator [](int aIndex) {
+		return GetValue(aIndex);
+	}
 
 private:
-    std::string m_CommentLine;
-    std::vector<std::string> m_CommentVec;
-    char m_Delemeter;
+	std::string m_CommentLine;
+	std::vector<std::string> m_CommentVec;
+	char m_Delemeter;
 };
 
 class ZComments
 {
 public:
-    // 
+	ZComments(const std::string& aComments, const char* apDelemeter = "\r\n");
+	~ZComments();
+
+	ZCommentLine* GetCommentLine(int aIndex);
+
+	ZCommentLine* operator [](int aIndex) {
+		return GetCommentLine(aIndex);
+	}
+
+	std::string GetComments();
+
+	int GetCount();
+
+	void Reset(const std::string& aComments, const char* apDelemeter);
+
+private:
+	std::string m_Comments;
+	vector<ZCommentLine*> m_CommentLines;
 };

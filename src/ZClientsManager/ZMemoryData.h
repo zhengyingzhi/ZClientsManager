@@ -13,6 +13,9 @@ using namespace std;
 
 #define ZMD_DEFAULT_SIZE    (16 * 1024)
 
+#define ZMD_DATA_Add        1
+#define ZMD_DATA_Update     2
+
 typedef vector<ZUserInfo*>      ZUserInfoContainer;
 typedef vector<ZStudentInfo*>   ZStuInfoContainer;
 

@@ -70,7 +70,7 @@ static void _InitMainListCtrl(CListCtrl& aList)
 }
 
 /* 更新信息到指定行中 */
-static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuInfo)
+static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuInfo, BOOL aIsUpdate)
 {
 	CString lString;
 	std::string lStdString;
@@ -79,7 +79,9 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 		aRow = aList.GetItemCount();
 	}
 
-	aList.InsertItem(aRow, _T(""));
+	if (!aIsUpdate) {
+		aList.InsertItem(aRow, _T(""));
+	}
 
 	//lString.Format("%d", aRow + 1);
 	lString.Format("%d", apStuInfo->Number);
@@ -219,7 +221,7 @@ void CMainListView::OnInitialUpdate()
 	for (size_t i = 0; i < lVec.size(); ++i)
 	{
 		ZStudentInfo* lpStuInfo = lVec[i];
-		_UpdateMainListCtrl(0, m_list, lpStuInfo);
+		_UpdateMainListCtrl(0, m_list, lpStuInfo, FALSE);
 	}
 
 }
@@ -256,7 +258,7 @@ void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec, BOOL aAp
 			if (lFind)
 			{
 				ZDebug("UpdateStuToListView update %d,%s", lpCurStu->Number, lpCurStu->Name);
-				_UpdateMainListCtrl(row, m_list, lpCurStu);
+				_UpdateMainListCtrl(row, m_list, lpCurStu, TRUE);
 			
 				// mark as null
 				aStuVec[k] = NULL;
@@ -273,7 +275,7 @@ void CMainListView::UpdateStuToListView(vector<ZStudentInfo*>& aStuVec, BOOL aAp
 
 		//_UpdateMainListCtrl(lRowOff + i, m_list, aStuVec[i]);
 		//_UpdateMainListCtrl(lRowOff + i, m_list, aStuVec[aStuVec.size() - i - 1]);
-		_UpdateMainListCtrl(0, m_list, aStuVec[i]);
+		_UpdateMainListCtrl(0, m_list, aStuVec[i], FALSE);
 	}
 }
 

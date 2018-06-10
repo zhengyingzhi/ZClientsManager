@@ -74,6 +74,25 @@ std::string ZConvStdTimeStr(time_t aTime)
 	return std::string(lBuffer);
 }
 
+/* convert 2018-06-10 13:21:45 to time_t */
+time_t ZConvStr2StdTime(const std::string& aTimeStr)
+{
+	if (aTimeStr.length() < 16) {
+		return 0;
+	}
+
+	const char* lpstr = aTimeStr.c_str();
+	struct tm ltm = { 0 };
+	ltm.tm_year = atoi(lpstr + 0) - 1900;
+	ltm.tm_mon = atoi(lpstr + 5) - 1;
+	ltm.tm_mday = atoi(lpstr + 8);
+	ltm.tm_hour = atoi(lpstr + 11);
+	ltm.tm_min = atoi(lpstr + 14);
+	ltm.tm_sec = atoi(lpstr + 17);
+	time_t lTheTime = mktime(&ltm);
+	return lTheTime;
+}
+
 void ZLog2DebugView(const char* fmt, ...)
 {
 	std::string lNowStr = ZConvStdTimeStr(time_t(0));

@@ -317,7 +317,7 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 		// insert new
 		m_pStuDB->Insert((void*)apStuInfo, sizeof(ZStudentInfo));
 
-		AddStuInfo(apStuInfo, FALSE);
+		AddStuInfo(apStuInfo, TRUE);
 	}
 	else
 	{
@@ -325,9 +325,9 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 		//uint32_t lLocalCS = ZGetCheckSum(lVec[0], sizeof(ZStudentInfo), 0);
 		//uint32_t lNewCS = ZGetCheckSum(apStuInfo, sizeof(ZStudentInfo), 0);
 		//if (lLocalCS == lNewCS)
-        if (strcmp(apStuInfo->Name, lVec[0]->Name) == 0 &&
-            strcmp(apStuInfo->Telehone, lVec[0]->Telehone) == 0 &&
-            apStuInfo->UpdateTime == lVec[0]->UpdateTime)
+		if (strcmp(apStuInfo->Name, lVec[0]->Name) == 0 &&
+			strcmp(apStuInfo->Telehone, lVec[0]->Telehone) == 0 &&
+			apStuInfo->UpdateTime == lVec[0]->UpdateTime)
 		{
 			ztl_log_error(g_Logger, ZTL_LOG_DEBUG, "ZMemoryData::AddOrUpdateStuInfo same checksum for name:%s", apStuInfo->Name);
 			return;
