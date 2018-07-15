@@ -639,7 +639,7 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 		{
 			if (lContent.IsEmpty())
 			{
-				OnEditFind();
+				//OnEditFind();
 				goto PreTransEnd;
 			}
 

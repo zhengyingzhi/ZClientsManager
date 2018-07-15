@@ -20,21 +20,21 @@
 #define new DEBUG_NEW
 #endif
 
-ZNetCommBase*	g_pNetComm = NULL;
-ZMemoryData		g_MemData;
+ZNetCommBase*   g_pNetComm = NULL;
+ZMemoryData     g_MemData;
 
-ztl_log_t*		g_Logger = NULL;
+ztl_log_t*      g_Logger = NULL;
 
-ZAppConfigs		g_AppConfig;
+ZAppConfigs     g_AppConfig;
 
 extern BOOL     g_DoSyncStuRequest;
 
 /* 收到网络消息 */
 static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 {
-	ZNetHead*	lpNetHead;
-	ZMsgDesc*	lpMsgHead;
-	void*		lpRawMessage;
+	ZNetHead*   lpNetHead;
+	ZMsgDesc*   lpMsgHead;
+	void*       lpRawMessage;
 
 	ZNetProtocol::ExtractNetMessage(apMessage, &lpNetHead, &lpMsgHead, &lpRawMessage);
 
@@ -54,13 +54,13 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 		{
 			ZUserInfo lUserInfo = { 0 };
 			ZFixString2UserInfo((char*)lpRawMessage, lpMsgHead->m_DataSize, ZNetProtocol::NetMessagePreSize(), &lUserInfo);
-			g_MemData.AddOrUpdateUserInfo(lpNetHead->m_Type, &lUserInfo);
+			g_MemData.AddOrUpdateUserInfo(lpNetHead->m_Type, &lUserInfo, FALSE);
 		}
 		else if (lpMsgHead->m_MsgType == ZNET_MSG_StuInfo)
 		{
 			ZStudentInfo lStuInfo = { 0 };
 			ZFixString2StuInfo((char*)lpRawMessage, lpMsgHead->m_DataSize, ZNetProtocol::NetMessagePreSize(), &lStuInfo);
-			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo);
+			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo, FALSE);
 		}
 	}
 	else if (lpNetHead->m_Type == ZNET_T_Query)
@@ -75,6 +75,7 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 		vector<ZStudentInfo*> lVec = g_MemData.QueryAllStudents();
 		for (size_t i = 0; i < lVec.size(); ++i)
 		{
+			memset(lBuffer, 0, sizeof(lBuffer));
 			lLength = ZStuInfoFixString(lVec[i], lBuffer, 0);
 			lpMessageToSend = ZNetProtocol::MakeNetMessage(ZNET_T_QueryRsp, ZNET_MSG_StuInfo, lBuffer, lLength);
 
@@ -103,7 +104,7 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 
 			ZStudentInfo lStuInfo = {};
 			ZFixString2StuInfo(apMessage->GetRawBegin(), apMessage->Size(), ZNetProtocol::NetMessagePreSize(), &lStuInfo);
-			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo);
+			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo, FALSE);
 		}
 	}
 
@@ -357,7 +358,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			strcpy(lUserInfo.Comment, "    超级管理员账户，具有最高管理权限，可管理一切其它账户信息和学生资源信息。");
 
 			g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo));
-			g_MemData.AddOrUpdateUserInfo(0, &lUserInfo);
+			g_MemData.AddOrUpdateUserInfo(0, &lUserInfo, FALSE);
 
 			// add a normal user which can only browse data
 			strcpy(lUserInfo.UserName, "Guess");
@@ -369,7 +370,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 			strcpy(lUserInfo.Comment, "    普通账户，只具有浏览学生资源信息的权限，不可管理其它账户信息和学生资源信息。");
 
 			g_MemData.GetUserDB()->Insert(&lUserInfo, sizeof(lUserInfo));
-			g_MemData.AddOrUpdateUserInfo(0, &lUserInfo);
+			g_MemData.AddOrUpdateUserInfo(0, &lUserInfo, FALSE);
 		}
 	}
 

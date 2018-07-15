@@ -16,7 +16,7 @@
 #define ZFD_ExpireDate      21
 #define ZFD_InsertTime      22
 #define ZFD_UpdateTime      23
-#define ZFD_NextVisitTime   24
+#define ZFD_NextVisitTime   24  // deprecated
 #define ZFD_Deleted         25
 #define ZFD_Comment         26
 #define ZFD_Class           27

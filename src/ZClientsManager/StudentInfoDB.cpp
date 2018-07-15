@@ -1,6 +1,8 @@
 #include "StdAfx.h"
 #include "StudentInfoDB.h"
 
+#include "ZUtility.h"
+
 #include <ZToolLib/ztl_utils.h>
 
 #include "ZAppConfig.h"
@@ -125,7 +127,10 @@ bool ZQueryCompareStuTime(const void* apExpect, const void* apAcutal, int aExten
 	}
 	else
 	{
-		if (lpExpect->InsertTime == lpActual->InsertTime)
+		// only compare with date
+		std::string lExpectDate = ZConvStr2StdDate(lpExpect->InsertTime);
+		std::string lActualDate = ZConvStr2StdDate(lpActual->InsertTime);
+		if (lExpectDate == lActualDate)
 			return true;
 	}
 	return false;

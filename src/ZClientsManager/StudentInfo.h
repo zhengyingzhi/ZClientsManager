@@ -5,12 +5,12 @@
 
 
 #define ZSI_FLAG_None               0
-#define ZSI_FLAG_Backup             1	        // 备份数据标志志
-#define ZSI_FLAG_NotPublish         2	        // 还未广播数据
-#define ZSI_FLAG_Deleted            4	        // 删除标记
+#define ZSI_FLAG_Backup             1           // 备份数据标志志
+#define ZSI_FLAG_NotPublish         2           // 还未广播数据
+#define ZSI_FLAG_Deleted            4           // 删除标记
 
-#define ZSTU_Version				10000
-#define ZSTU_SimpleChange			true
+#define ZSTU_Version                10000
+#define ZSTU_SimpleChange           true
 
 typedef enum
 {
@@ -61,9 +61,8 @@ struct stZStudentInfo
 	uint32_t        GPA;                        // 绩点（* 10）
 	uint32_t        Reserve2;                   // 预留字段1
 	uint32_t        Reserve3;                   // 预留字段2
-	int64_t         InsertTime;                 // 录入时间
+	int64_t         InsertTime;                 // 录入时间 20180601143025
 	int64_t         UpdateTime;                 // 更新时间
-	int64_t         NextVisitTime;              // 下次回访时间
 
 	char            Comments[1024];             // 备注
 };

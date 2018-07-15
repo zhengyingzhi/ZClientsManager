@@ -25,9 +25,9 @@ ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType
 	lpMessage->AddUsed(lSize);
 
 	// fill header fields
-	ZNetHead*	lpProtoHead;
-	ZMsgDesc*	lpMsgDesc;
-	void*		lpDataInfo;
+	ZNetHead*   lpProtoHead;
+	ZMsgDesc*   lpMsgDesc;
+	void*       lpDataInfo;
 	ExtractNetMessage(lpMessage, &lpProtoHead, &lpMsgDesc, (void**)&lpDataInfo);
 
 	lpProtoHead->m_StartType	= ZNET_STARTTYPE_CM;
@@ -38,7 +38,7 @@ ZNetMessage* ZNetProtocol::MakeNetMessage(uint32_t aProtoType, uint32_t aMsgType
 
 	lpMsgDesc->m_DataSize		= aDataSize;
 	lpMsgDesc->m_Count			= 1;
-	lpMsgDesc->m_MsgType			= aMsgType;
+	lpMsgDesc->m_MsgType		= aMsgType;
 	lpMsgDesc->m_BegSeq			= 1;
 
 	if (apDataInfo && aDataSize > 0) {

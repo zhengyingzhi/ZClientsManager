@@ -74,6 +74,22 @@ std::string ZConvStdTimeStr(time_t aTime)
 	return std::string(lBuffer);
 }
 
+std::string ZConvStr2StdDate(uint64_t aTime)
+{
+	if (aTime == 0) {
+		return "";
+	}
+
+	char lBuffer[64] = "";
+	time_t lTime = (time_t)aTime;
+	struct tm ltm;
+	localtime_s(&ltm, &lTime);
+	sprintf(lBuffer, "%04d-%02d-%02d",
+		ltm.tm_year + 1900, ltm.tm_mon + 1, ltm.tm_mday);
+
+	return std::string(lBuffer);
+}
+
 /* convert 2018-06-10 13:21:45 to time_t */
 time_t ZConvStr2StdTime(const std::string& aTimeStr)
 {

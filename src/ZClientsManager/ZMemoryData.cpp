@@ -44,7 +44,7 @@ int ZMemoryData::OpenUserDB(const string& aDBName, const string& aServerIP, uint
 	// query all when opened db
 	ZQueryResult*   lpQryRs;
 	ZUserInfo       lQryCond = {};
-	lpQryRs = m_pUserDB->Query(&lQryCond, ZQueryCompareNothing, 0);
+	lpQryRs = m_pUserDB->Query(&lQryCond, ZQueryCompareNothing, CC_WithDeleted);
 
 	if (lpQryRs)
 	{
@@ -119,7 +119,7 @@ vector<ZUserInfo*> ZMemoryData::QueryUserInfo(const ZUserInfo* apExpect, ZQueryC
 }
 
 
-void ZMemoryData::AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo)
+void ZMemoryData::AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo, BOOL aPublishToNet)
 {
 	vector<ZUserInfo*> lVec = QueryUserInfo(apUserInfo, ZQueryCompareUserName);
 
@@ -135,6 +135,8 @@ void ZMemoryData::AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInf
 		memcpy(lpDstData, apUserInfo, sizeof(ZUserInfo));
 		m_CacheUserData.push_back(lpDstData);
 	}
+
+	// TODO: publish to net if possible
 }
 
 
@@ -259,35 +261,15 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo, BOOL aPublishToNet)
 {
 	ZLockScope lk(&m_StuLock);
 
-	int rv;
-
 	ZStudentInfo* lpDstData;
 	lpDstData = (ZStudentInfo*)ztl_pcalloc(m_Pool, sizeof(ZStudentInfo));
 	memcpy(lpDstData, apStuInfo, sizeof(ZStudentInfo));
 	m_CacheStuData.push_back(lpDstData);
 
-	if (aPublishToNet && g_pNetComm)
-	{
-		// make a net message packet, and send out
-		char lMessagePacket[4096] = "";
-		int  lLength = ZStuInfoFixString(apStuInfo, lMessagePacket, ZNetProtocol::NetMessagePreSize());
-
-		ZNetMessage* lpMessage;
-		lpMessage = ZNetProtocol::MakeNetMessage(ZNET_T_PublishAdd, ZNET_MSG_StuInfo, lMessagePacket, lLength);
-
-		rv = g_pNetComm->DirectSend(lpMessage->GetRawBegin(), lpMessage->Size());
-		if (rv < 0)
-		{
-			char lErrorMsg[512] = "";
-			sprintf(lErrorMsg, "AddStuInfo DirectSend() failed %d", get_errno());
-			OutputDebugString(lErrorMsg);
-		}
-
-		ZNetMessage::Release(lpMessage);
-	}
+	PublishToNetwork(apStuInfo, ZNET_T_PublishAdd);
 }
 
-void ZMemoryData::UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo)
+void ZMemoryData::UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo, BOOL aPublishToNet)
 {
 	if (apTobeUpdated == NULL)
 	{
@@ -303,10 +285,15 @@ void ZMemoryData::UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo*
 		ZLockScope lk(&m_StuLock);
 		ZStuInfoCopy(apTobeUpdated, apNewStuInfo);
 	}
+
+	if (aPublishToNet)
+	{
+		PublishToNetwork(apNewStuInfo, ZNET_T_PublishUpdate);
+	}
 }
 
 
-void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo)
+void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo, BOOL aPublishToNet)
 {
 	// search firstly and add or update
 	vector<ZStudentInfo*> lVec;
@@ -317,7 +304,8 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 		// insert new
 		m_pStuDB->Insert((void*)apStuInfo, sizeof(ZStudentInfo));
 
-		AddStuInfo(apStuInfo, TRUE);
+		// 添加到本地缓存中，并发布到网络上
+		AddStuInfo(apStuInfo, aPublishToNet);
 	}
 	else
 	{
@@ -335,6 +323,31 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 
 		m_pStuDB->Update((void*)apStuInfo, sizeof(ZStudentInfo));
 
-		UpdateStuInfo(lVec[0], apStuInfo);
+		UpdateStuInfo(lVec[0], apStuInfo, aPublishToNet);
 	}
+}
+
+int ZMemoryData::PublishToNetwork(const ZStudentInfo* apStuInfo, uint32_t aType)
+{
+	int rv = -1;
+	if (g_pNetComm)
+	{
+		// make a net message packet, and send out
+		char lMessagePacket[4096] = "";
+		int  lLength = ZStuInfoFixString(apStuInfo, lMessagePacket, ZNetProtocol::NetMessagePreSize());
+
+		ZNetMessage* lpMessage;
+		lpMessage = ZNetProtocol::MakeNetMessage(aType, ZNET_MSG_StuInfo, lMessagePacket, lLength);
+
+		rv = g_pNetComm->DirectSend(lpMessage->GetRawBegin(), lpMessage->Size());
+		if (rv < 0)
+		{
+			char lErrorMsg[512] = "";
+			sprintf(lErrorMsg, "PublishToNetwork DirectSend() failed %d", get_errno());
+			OutputDebugString(lErrorMsg);
+		}
+
+		ZNetMessage::Release(lpMessage);
+	}
+	return rv;
 }

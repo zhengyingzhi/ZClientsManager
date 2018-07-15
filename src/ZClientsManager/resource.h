@@ -82,6 +82,7 @@
 #define IDC_EDIT_TASKCONTENT            1025
 #define IDC_LIST_COMMENTS               1026
 #define IDC_BTN_AddComment              1027
+#define IDC_BTN_FINISH                  1028
 #define ID_EDIT_INSERT                  32771
 #define ID_EDIT_DELETE                  32772
 #define ID_EDIT_INSERT2                 32773
@@ -123,7 +124,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        339
 #define _APS_NEXT_COMMAND_VALUE         32810
-#define _APS_NEXT_CONTROL_VALUE         1028
+#define _APS_NEXT_CONTROL_VALUE         1029
 #define _APS_NEXT_SYMED_VALUE           310
 #endif
 #endif

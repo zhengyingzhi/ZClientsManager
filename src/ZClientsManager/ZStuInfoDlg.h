@@ -22,13 +22,12 @@
 #define MAINLIST_COL_GPA            10          // GPA
 #define MAINLIST_COL_Status         11          // 状态
 #define MAINLIST_COL_Important      12          // 重要级别
-#define MAINLIST_COL_NextVisitTime  13          // 下次回访时间
-#define MAINLIST_COL_Sex            14          // 性别
-#define MAINLIST_COL_QQ             15          // QQ
-#define MAINLIST_COL_Source         16          // 来源
-#define MAINLIST_COL_InsertTime     17
-#define MAINLIST_COL_UpdateTime     18
-#define MAINLIST_COL_EMail          19
+#define MAINLIST_COL_Sex            13          // 性别
+#define MAINLIST_COL_QQ             14          // QQ
+#define MAINLIST_COL_Source         15          // 来源
+#define MAINLIST_COL_InsertTime     16
+#define MAINLIST_COL_UpdateTime     17
+#define MAINLIST_COL_EMail          18
 
 typedef struct 
 {
@@ -57,8 +56,6 @@ public:
 	ZStudentInfo        m_StuInfo;
 
 	CComboBox           m_comboImportant;
-	CDateTimeCtrl       m_DatePick;
-	CDateTimeCtrl       m_TimePick;
 	CListCtrl           m_ListComments;
 	CString             m_LastOneComment;
 
@@ -67,6 +64,7 @@ public:
 
 	void SetStudentInfo(ZStudentInfo* apStuInfo);
 
+	void GetStuInfoFromDlg(ZStudentInfo* apStuInfo);
 	void GetDlgItemValue(int nID, char aBuffer[], int aBufSize);
 	void GetDlgItemValue(int nID, int32_t& aValue);
 	void GetDlgItemValue(int nID, uint32_t& aValue);
@@ -82,4 +80,5 @@ public:
 	afx_msg void OnBnClickedBtnSave();
 	afx_msg void OnBnClickedBtnAddcomment();
 	afx_msg void OnNMClickListComments(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnBnClickedBtnFinish();
 };

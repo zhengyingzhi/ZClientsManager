@@ -29,6 +29,7 @@ ZStuInfoDlg::ZStuInfoDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_DIALOG_STUINFO, pParent)
 {
 	memset(&m_StuInfo, 0, sizeof(m_StuInfo));
+	m_OperateType = ZOT_Show;
 }
 
 ZStuInfoDlg::~ZStuInfoDlg()
@@ -39,8 +40,6 @@ void ZStuInfoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_IMPORTANT, m_comboImportant);
-	DDX_Control(pDX, IDC_DTPICKER_Date, m_DatePick);
-	DDX_Control(pDX, IDC_DTPICKER_Time, m_TimePick);
 	DDX_Control(pDX, IDC_LIST_COMMENTS, m_ListComments);
 }
 
@@ -105,10 +104,6 @@ BOOL ZStuInfoDlg::OnInitDialog()
 		lTimeStr = ZConvStdTimeStr((time_t)m_StuInfo.UpdateTime);
 		SetDlgItemText(IDC_EDIT_UPDATETIME, lTimeStr.c_str());
 
-		CTime lVisitTime((time_t)m_StuInfo.NextVisitTime);
-		m_DatePick.SetTime(&lVisitTime);
-		m_TimePick.SetTime(&lVisitTime);
-
 		double lScore = (m_StuInfo.LanguageScore / 10);
 		if (m_StuInfo.LanguageScore > 2000)
 			lString.Format("%.0f", lScore);
@@ -168,6 +163,7 @@ BEGIN_MESSAGE_MAP(ZStuInfoDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_SAVE, &ZStuInfoDlg::OnBnClickedBtnSave)
 	ON_BN_CLICKED(IDC_BTN_AddComment, &ZStuInfoDlg::OnBnClickedBtnAddcomment)
 	ON_NOTIFY(NM_CLICK, IDC_LIST_COMMENTS, &ZStuInfoDlg::OnNMClickListComments)
+	ON_BN_CLICKED(IDC_BTN_FINISH, &ZStuInfoDlg::OnBnClickedBtnFinish)
 END_MESSAGE_MAP()
 
 
@@ -179,6 +175,67 @@ void ZStuInfoDlg::SetStudentInfo(ZStudentInfo* apStuInfo)
 		memcpy(&m_StuInfo, apStuInfo, sizeof(m_StuInfo));
 	else
 		memset(&m_StuInfo, 0, sizeof(m_StuInfo));
+
+	if (m_StuInfo.Name[0] && m_StuInfo.Telehone[0])
+	{
+		m_OperateType = ZOT_Update;
+	}
+}
+
+void ZStuInfoDlg::GetStuInfoFromDlg(ZStudentInfo* apStuInfo)
+{
+	ZStudentInfo& lStuInfo = *apStuInfo;
+	GetDlgItemValue(IDC_EDIT_NUMBER, lStuInfo.Number);
+	GetDlgItemValue(IDC_EDIT_NAME, lStuInfo.Name, sizeof(lStuInfo.Name));
+	GetDlgItemValue(IDC_EDIT_TELEPHONE, lStuInfo.Telehone, sizeof(lStuInfo.Telehone));
+
+	GetDlgItemValue(IDC_EDIT_QQ, lStuInfo.QQ, sizeof(lStuInfo.QQ));
+	GetDlgItemValue(IDC_EDIT_CLASS, lStuInfo.Class, sizeof(lStuInfo.Class));
+	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.CollegeFrom, sizeof(lStuInfo.CollegeFrom));
+	GetDlgItemValue(IDC_EDIT_COLLEGE_TO, lStuInfo.CollegeTo, sizeof(lStuInfo.CollegeTo));
+	GetDlgItemValue(IDC_EDIT_MAJOR, lStuInfo.MajorFrom, sizeof(lStuInfo.MajorFrom));
+	GetDlgItemValue(IDC_EDIT_MAJOR_TO, lStuInfo.MajorTo, sizeof(lStuInfo.MajorTo));
+	GetDlgItemValue(IDC_EDIT_COUNTRY, lStuInfo.Country, sizeof(lStuInfo.Country));
+	GetDlgItemValue(IDC_EDIT_SOURCE, lStuInfo.Source, sizeof(lStuInfo.Source));
+	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));
+	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
+	GetDlgItemValue(IDC_EDIT_EMAIL, lStuInfo.EMail, sizeof(lStuInfo.EMail));
+
+	CString lAddTime, lUpdateTime;
+	GetDlgItemText(IDC_EDIT_ADDTIME, lAddTime);
+	GetDlgItemText(IDC_EDIT_UPDATETIME, lUpdateTime);
+	lStuInfo.InsertTime = ZConvStr2StdTime((char*)(LPCSTR)lAddTime);
+	lStuInfo.UpdateTime = ZConvStr2StdTime((char*)(LPCSTR)lUpdateTime);
+
+	CString lComments;
+	for (int row = 0; row < m_ListComments.GetItemCount(); ++row)
+	{
+		CString lData;
+		lData.Format("%s|%s|%s|%s",
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Row),
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_ByName),
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Time),
+			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Content));
+
+		lComments.Append(lData);
+	}
+	strncpy(lStuInfo.Comments, (char*)(LPCSTR)lComments, sizeof(lStuInfo.Comments) - 1);
+
+	lStuInfo.ImportantLevel = (StuImportant)m_comboImportant.GetCurSel();
+
+	CString lString;
+	double lScore;
+	GetDlgItemText(IDC_EDIT_LANGSCORE, lString);
+	lScore = atof((char*)(LPCSTR)lString);
+	lStuInfo.LanguageScore = uint32_t(lScore * 10);
+
+	GetDlgItemText(IDC_EDIT_GPA, lString);
+	lScore = atof((char*)(LPCSTR)lString);
+	lStuInfo.GPA = uint32_t(lScore * 10);
+
+	CButton* lpBtn = (CButton*)GetDlgItem(IDC_RADIO_BOY);
+	lStuInfo.Sex = lpBtn->GetCheck() ? SSEX_Boy : SSEX_Girl;
+
 }
 
 void ZStuInfoDlg::GetDlgItemValue(int nID, char aBuffer[], int aBufSize)
@@ -216,58 +273,19 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 
 	ZStudentInfo lStuInfo;
 	memset(&lStuInfo, 0, sizeof(lStuInfo));
-
-	GetDlgItemValue(IDC_EDIT_NUMBER, lStuInfo.Number);
-	GetDlgItemValue(IDC_EDIT_NAME, lStuInfo.Name, sizeof(lStuInfo.Name));
-	GetDlgItemValue(IDC_EDIT_TELEPHONE, lStuInfo.Telehone, sizeof(lStuInfo.Telehone));
-	GetDlgItemValue(IDC_EDIT_QQ, lStuInfo.QQ, sizeof(lStuInfo.QQ));
-	GetDlgItemValue(IDC_EDIT_CLASS, lStuInfo.Class, sizeof(lStuInfo.Class));
-	GetDlgItemValue(IDC_EDIT_COLLEGE, lStuInfo.CollegeFrom, sizeof(lStuInfo.CollegeFrom));
-	GetDlgItemValue(IDC_EDIT_COLLEGE_TO, lStuInfo.CollegeTo, sizeof(lStuInfo.CollegeTo));
-	GetDlgItemValue(IDC_EDIT_MAJOR, lStuInfo.MajorFrom, sizeof(lStuInfo.MajorFrom));
-	GetDlgItemValue(IDC_EDIT_MAJOR_TO, lStuInfo.MajorTo, sizeof(lStuInfo.MajorTo));
-	GetDlgItemValue(IDC_EDIT_COUNTRY, lStuInfo.Country, sizeof(lStuInfo.Country));
-	GetDlgItemValue(IDC_EDIT_SOURCE, lStuInfo.Source, sizeof(lStuInfo.Source));
-	GetDlgItemValue(IDC_EDIT_STATUS, lStuInfo.Status, sizeof(lStuInfo.Status));
-	GetDlgItemValue(IDC_EDIT_IDNumber, lStuInfo.IDNumber, sizeof(lStuInfo.IDNumber));
-	GetDlgItemValue(IDC_EDIT_EMAIL, lStuInfo.EMail, sizeof(lStuInfo.EMail));
-
-	CString lAddTime, lUpdateTime;
-	GetDlgItemText(IDC_EDIT_ADDTIME, lAddTime);
-	GetDlgItemText(IDC_EDIT_UPDATETIME, lUpdateTime);
-	lStuInfo.InsertTime = ZConvStr2StdTime((char*)(LPCSTR)lAddTime);
-	lStuInfo.UpdateTime = ZConvStr2StdTime((char*)(LPCSTR)lUpdateTime);
-
-	//GetDlgItemValue(IDC_EDIT_COMMENT, lStuInfo.Comments, sizeof(lStuInfo.Comments));
-
-	CString lComments;
-	for (int row = 0; row < m_ListComments.GetItemCount(); ++row)
+	GetStuInfoFromDlg(&lStuInfo);
+	if (!lStuInfo.Name[0] || !lStuInfo.Telehone[0])
 	{
-		CString lData;
-		lData.Format("%s|%s|%s|%s", 
-			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Row),
-			m_ListComments.GetItemText(row, COMMENTSLIST_COL_ByName),
-			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Time),
-			m_ListComments.GetItemText(row, COMMENTSLIST_COL_Content));
-
-		lComments.Append(lData);
+		AfxMessageBox(_T("用户名和电话为必填项"), MB_OK | MB_ICONWARNING);
+		return;
 	}
-	strncpy(lStuInfo.Comments, (char*)(LPCSTR)lComments, sizeof(lStuInfo.Comments) - 1);
 
-	lStuInfo.ImportantLevel = (StuImportant)m_comboImportant.GetCurSel();
-
-	CString lString;
-	double lScore;
-	GetDlgItemText(IDC_EDIT_LANGSCORE, lString);
-	lScore = atof((char*)(LPCSTR)lString);
-	lStuInfo.LanguageScore = uint32_t(lScore * 10);
-
-	GetDlgItemText(IDC_EDIT_GPA, lString);
-	lScore = atof((char*)(LPCSTR)lString);
-	lStuInfo.GPA = uint32_t(lScore * 10);
-
-	CButton* lpBtn = (CButton*)GetDlgItem(IDC_RADIO_BOY);
-	lStuInfo.Sex = lpBtn->GetCheck() ? SSEX_Boy : SSEX_Girl;
+	std::vector<ZStudentInfo*> lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareNameAndTel, 0);
+	if (!lVec.empty() && !m_StuInfo.Name[0])
+	{
+		AfxMessageBox(_T("已存在该用户名和其电话，请检查"), MB_OK | MB_ICONWARNING);
+		return;
+	}
 
 	// 比较数据
 	if (ZStuInfoEqual(&m_StuInfo, &lStuInfo))
@@ -293,7 +311,7 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	{
 		lStuInfo.UpdateTime = time(0);
 
-		// update
+		// update (will write to db and network)
 		g_MemData.AddOrUpdateStuInfo(ZMD_DATA_Update, &lStuInfo);
 	}
 	else
@@ -308,8 +326,10 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 	// update to main list view
 	g_pMainFrame->UpdateStuToMainListView(&lStuInfo, TRUE);
 
+	AfxMessageBox(_T("添加或更新数据成功"), MB_OK | MB_ICONINFORMATION);
+
 	// exit this dialog or show a message box
-	CDialogEx::OnOK();
+	//CDialogEx::OnOK();
 }
 
 /* 添加一行备注 */
@@ -374,4 +394,29 @@ void ZStuInfoDlg::OnNMClickListComments(NMHDR *pNMHDR, LRESULT *pResult)
 	}
 
 	*pResult = 0;
+}
+
+
+void ZStuInfoDlg::OnBnClickedBtnFinish()
+{
+	ZStudentInfo lStuInfo;
+	memset(&lStuInfo, 0, sizeof(lStuInfo));
+	GetStuInfoFromDlg(&lStuInfo);
+
+	if (!lStuInfo.Name[0] || !lStuInfo.Telehone[0])
+	{
+		AfxMessageBox(_T("用户名或电话为空"), MB_OK | MB_ICONWARNING);
+		return;
+	}
+
+	std::vector<ZStudentInfo*> lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareNameAndTel, 0);
+	if (lVec.empty())
+	{
+		AfxMessageBox(_T("数据库中未找到该用户名和其电话信息，请检查"), MB_OK | MB_ICONWARNING);
+		return;
+	}
+
+	lStuInfo.UpdateTime = time(0);
+	lStuInfo.Flag |= ZSI_FLAG_Deleted;
+	g_MemData.AddOrUpdateStuInfo(0, &lStuInfo, TRUE);
 }

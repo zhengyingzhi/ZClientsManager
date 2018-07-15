@@ -25,7 +25,6 @@ MainListColDesc MLColums[] = {
 	{ MAINLIST_COL_GPA,         60,  _T("GPA") },
 	{ MAINLIST_COL_Status,      100, _T("状态") },
 	{ MAINLIST_COL_Important,   60,  _T("重要级别") },
-	{ MAINLIST_COL_NextVisitTime, 130, _T("回访时间") },
 	{ MAINLIST_COL_Sex,         40,  _T("性别") },
 	{ MAINLIST_COL_QQ,          80,  _T("QQ") },
 	{ MAINLIST_COL_Source,      160, _T("来源") },
@@ -57,7 +56,6 @@ static void _InitMainListCtrl(CListCtrl& aList)
 	aList.InsertColumn(MAINLIST_COL_QQ,         _T("QQ"),       LVCFMT_LEFT, 80);
 	aList.InsertColumn(MAINLIST_COL_Status,     _T("状态"),     LVCFMT_LEFT, 100);
 	aList.InsertColumn(MAINLIST_COL_Important,  _T("重要级别"), LVCFMT_LEFT, 60);
-	aList.InsertColumn(MAINLIST_COL_NextVisitTime, _T("回访时间"), LVCFMT_LEFT, 120);
 	aList.InsertColumn(MAINLIST_COL_InsertTime, _T("插入时间"), LVCFMT_LEFT, 120);
 	aList.InsertColumn(MAINLIST_COL_UpdateTime, _T("更新时间"), LVCFMT_LEFT, 120);
 	aList.InsertColumn(MAINLIST_COL_Source,     _T("来源"),     LVCFMT_LEFT, 160);
@@ -102,9 +100,6 @@ static void _UpdateMainListCtrl(int aRow, CListCtrl& aList, ZStudentInfo* apStuI
 
 	aList.SetItemText(aRow, MAINLIST_COL_Status,   apStuInfo->Status);
 	aList.SetItemText(aRow, MAINLIST_COL_Important, ZStuImportantDesc(apStuInfo->ImportantLevel));
-
-	lStdString = ZConvStdTimeStr(apStuInfo->NextVisitTime);
-	aList.SetItemText(aRow, MAINLIST_COL_NextVisitTime, lStdString.c_str());
 
 	aList.SetItemText(aRow, MAINLIST_COL_Sex, ZStuSexDesc(apStuInfo->Sex));
 	aList.SetItemText(aRow, MAINLIST_COL_QQ, apStuInfo->QQ);

@@ -52,7 +52,7 @@ public:
 	vector<ZUserInfo*> QueryUserInfo(const ZUserInfo* apExpect, ZQueryComparePtr apCompFunc);
 
 	/* 添加或更新数据 */
-	void AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo);
+	void AddOrUpdateUserInfo(uint32_t aType, const ZUserInfo* apUserInfo, BOOL aPublishToNet = TRUE);
 
 public:
 	int OpenStuDB(const string& aDBName, const string& aServerIP, uint16_t aPort);
@@ -66,15 +66,18 @@ public:
 	vector<ZStudentInfo*> QueryStuInfoVague(const char* apFindStr);
 
 	void AddStuInfo(const ZStudentInfo* apStuInfo, BOOL aPublishToNet);
-	void UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo);
+	void UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo, BOOL aPublishToNet = TRUE);
 
 	/* 添加或更新数据 */
-	void AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo);
+	void AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuInfo, BOOL aPublishToNet = TRUE);
+
+	/* 更新到网络中 */
+	int PublishToNetwork(const ZStudentInfo* apStuInfo, uint32_t aType);
 
 private:
 	ztl_pool_t*             m_Pool;
 
-	volatile uint32_t		m_UserLock;
+	volatile uint32_t       m_UserLock;
 	ZDataBase*              m_pUserDB;
 	vector<ZUserInfo*>      m_CacheUserData;
 
