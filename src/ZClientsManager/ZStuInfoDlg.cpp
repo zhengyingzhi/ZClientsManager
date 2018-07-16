@@ -280,6 +280,12 @@ void ZStuInfoDlg::OnBnClickedBtnSave()
 		return;
 	}
 
+    if (strchr(lStuInfo.Name, ':') || strchr(lStuInfo.QQ, ':') || strchr(lStuInfo.EMail, ':'))
+    {
+        AfxMessageBox(_T("用户名、QQ、邮箱中不能包含':'字符"), MB_OK | MB_ICONWARNING);
+        return;
+    }
+
 	std::vector<ZStudentInfo*> lVec = g_MemData.QueryStuInfo(&lStuInfo, ZQueryCompareNameAndTel, 0);
 	if (!lVec.empty() && !m_StuInfo.Name[0])
 	{

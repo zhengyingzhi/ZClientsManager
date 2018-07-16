@@ -63,6 +63,7 @@ struct stZStudentInfo
 	uint32_t        Reserve3;                   // 预留字段2
 	int64_t         InsertTime;                 // 录入时间 20180601143025
 	int64_t         UpdateTime;                 // 更新时间
+	int64_t         NextVisitTime;              // 下次回访时间(已废弃)
 
 	char            Comments[1024];             // 备注
 };

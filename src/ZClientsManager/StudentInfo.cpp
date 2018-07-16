@@ -12,19 +12,26 @@
 #include "ZComments.h"
 
 
+static std::string _ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDoSimpleChange)
+{
+    return std::string(apRawData);
+    //return ZConvDataToBase64(apRawData, aRawSize, aDoSimpleChange);
+}
+
 int ZStuInfoFixString(const ZStudentInfo* apStuInfo, char* apBuffer, uint32_t aPrePaddingSize)
 {
 	ZFixApi lFixApi;
 	lFixApi.SetBuffer(apBuffer + aPrePaddingSize);
 
-	std::string lName   = ZConvDataToBase64(apStuInfo->Name, strlen(apStuInfo->Name), ZSTU_SimpleChange);
-	std::string lTel    = ZConvDataToBase64(apStuInfo->Telehone, strlen(apStuInfo->Telehone), ZSTU_SimpleChange);
-	std::string lQQ     = ZConvDataToBase64(apStuInfo->QQ, strlen(apStuInfo->QQ), ZSTU_SimpleChange);
-	std::string lIDNum  = ZConvDataToBase64(apStuInfo->IDNumber, strlen(apStuInfo->IDNumber), ZSTU_SimpleChange);
-	std::string lEMail  = ZConvDataToBase64(apStuInfo->EMail, strlen(apStuInfo->EMail), ZSTU_SimpleChange);
+	std::string lName   = _ZConvDataToBase64(apStuInfo->Name, strlen(apStuInfo->Name), ZSTU_SimpleChange);
+	std::string lTel    = _ZConvDataToBase64(apStuInfo->Telehone, strlen(apStuInfo->Telehone), ZSTU_SimpleChange);
+	std::string lQQ     = _ZConvDataToBase64(apStuInfo->QQ, strlen(apStuInfo->QQ), ZSTU_SimpleChange);
+	std::string lIDNum  = _ZConvDataToBase64(apStuInfo->IDNumber, strlen(apStuInfo->IDNumber), ZSTU_SimpleChange);
+	std::string lEMail  = _ZConvDataToBase64(apStuInfo->EMail, strlen(apStuInfo->EMail), ZSTU_SimpleChange);
 
 	// comments not use simple password change
-	std::string lComments = ZConvDataToBase64(apStuInfo->Comments, strlen(apStuInfo->Comments), false);
+	//std::string lComments = _ZConvDataToBase64(apStuInfo->Comments, strlen(apStuInfo->Comments), false);
+    std::string lComments = apStuInfo->Comments;
 
 	lFixApi.SetItem(ZFD_Version,        ZSTU_Version);
 
@@ -58,7 +65,9 @@ static std::string _ZGetRawData(ZFixApi& aFixApi, uint32_t aFixID, bool aDoSimpl
 {
 	std::string lValue;
 	aFixApi.GetItem(aFixID, lValue);
-	lValue = ZConvBase64ToData(lValue.c_str(), lValue.length(), aDoSimpleChange);
+	
+    //lValue = ZConvBase64ToData(lValue.c_str(), lValue.length(), aDoSimpleChange);
+
 	return lValue;
 }
 
@@ -74,8 +83,7 @@ int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSiz
 	std::string lIDNum  = _ZGetRawData(lFixApi, ZFD_IDNumber, ZSTU_SimpleChange);
 	std::string lEMail  = _ZGetRawData(lFixApi, ZFD_EMail, ZSTU_SimpleChange);
 	// comments not use simple password change
-	std::string lComments = _ZGetRawData(lFixApi, ZFD_Comment, false);
-
+	//std::string lComments = _ZGetRawData(lFixApi, ZFD_Comment, false);
 
 	if (!lFixApi.GetItem(ZFD_Number, apStuInfo->Number)) {
 		return -1;
@@ -100,6 +108,7 @@ int ZFixString2StuInfo(char* apString, uint32_t aLength, uint32_t aPrePaddingSiz
 	lFixApi.GetItem(ZFD_Flag,           apStuInfo->Flag);
 	lFixApi.GetItem(ZFD_InsertTime,     apStuInfo->InsertTime);
 	lFixApi.GetItem(ZFD_UpdateTime,     apStuInfo->UpdateTime);
+	lFixApi.GetItem(ZFD_Comment,        apStuInfo->Comments);
 
 	uint32_t lTempVal = 0;
 	lFixApi.GetItem(ZFD_Sex, lTempVal);

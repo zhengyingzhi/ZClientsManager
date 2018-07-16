@@ -97,13 +97,18 @@ public:
 	virtual int DirectRecv(char* apRawBuf, uint32_t* apBytesRecv) = 0;
 	virtual int DirectSend(const char* apRawData, uint32_t aRawSize) = 0;
 
+    virtual bool IsRunning() {
+        return m_Running > 0;
+    }
+
 public:
 	void SetLoopOnceFunc(ZOnLoopOncePtr apFunc, void* apUserData);
 
 protected:
 	ZNetConfig			m_NetConf;
 	ZOnLoopOncePtr		m_LoopOnce;
-	void*				m_pUserData;
+    void*				m_pUserData;
+    volatile int32_t	m_Running;
 };
 
 /* 基于UDP的通信封装
@@ -126,7 +131,6 @@ protected:
 	virtual void Run();
 
 protected:
-	volatile int32_t	m_Running;
 	unique_ptr<thread>	m_pIOThread;
 	sockhandle_t		m_Sender;
 	sockhandle_t		m_Recver;

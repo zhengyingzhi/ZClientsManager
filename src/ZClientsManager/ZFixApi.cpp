@@ -54,27 +54,27 @@ uint32_t ZFixApi::Length() const
 /* -------- setter ---------*/
 void ZFixApi::SetItem(uint32_t aID, char aValue)
 {
-	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d=%c%c", aID, aValue, ZFIX_DELIMITER);
+	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d:%c%c", aID, aValue, ZFIX_DELIMITER);
 }
 
 void ZFixApi::SetItem(uint32_t aID, const uint16_t aValue)
 {
-	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d=%d%c", aID, aValue, ZFIX_DELIMITER);
+	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d:%d%c", aID, aValue, ZFIX_DELIMITER);
 }
 
 void ZFixApi::SetItem(uint32_t aID, const int32_t aValue)
 {
-	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d=%d%c", aID, aValue, ZFIX_DELIMITER);
+	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d:%d%c", aID, aValue, ZFIX_DELIMITER);
 }
 
 void ZFixApi::SetItem(uint32_t aID, const uint32_t aValue)
 {
-	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d=%u%c", aID, aValue, ZFIX_DELIMITER);
+	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d:%u%c", aID, aValue, ZFIX_DELIMITER);
 }
 
 void ZFixApi::SetItem(uint32_t aID, int64_t aValue)
 {
-	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d=%lld%d", aID, aValue, ZFIX_DELIMITER);
+	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d:%lld%c", aID, aValue, ZFIX_DELIMITER);
 }
 
 void ZFixApi::SetItem(uint32_t aID, const char* apValue, int aLength)
@@ -86,7 +86,7 @@ void ZFixApi::SetItem(uint32_t aID, const char* apValue, int aLength)
 		return;
 	}
 
-	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d=", aID);
+	m_Length += snprintf(m_pBuff + Length(), AvailSize(), "%d:", aID);
 	memcpy(m_pBuff + m_Length, apValue, aLength);
 	m_Length += aLength;
 	m_pBuff[m_Length] = ZFIX_DELIMITER;
@@ -196,7 +196,7 @@ char* ZFixApi::GetValueFromMap(uint32_t aID)
 
 bool ZFixApi::GetKeyAndValue(char* apData, char** appValue)
 {
-	char* lpFind = strchr(apData, '=');
+	char* lpFind = strchr(apData, ':');
 	if (!lpFind) {
 		return false;
 	}

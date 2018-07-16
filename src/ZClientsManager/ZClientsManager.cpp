@@ -36,6 +36,10 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 	ZMsgDesc*   lpMsgHead;
 	void*       lpRawMessage;
 
+    if (g_pNetComm && !g_pNetComm->IsRunning()) {
+        return;
+    }
+
 	ZNetProtocol::ExtractNetMessage(apMessage, &lpNetHead, &lpMsgHead, &lpRawMessage);
 
 	// got unrecognized message

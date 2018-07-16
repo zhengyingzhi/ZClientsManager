@@ -151,6 +151,8 @@ char* ZPasswordChange(char* apData)
 
 std::string ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDoSimpleChange)
 {
+    //return std::string(apRawData);  // some issue
+
 	char lRawData[4096] = "";
 	memcpy(lRawData, apRawData, aRawSize);
 	if (aDoSimpleChange) {
@@ -166,6 +168,8 @@ std::string ZConvDataToBase64(const char* apRawData, uint32_t aRawSize, bool aDo
 
 std::string ZConvBase64ToData(const char* apBaseData, uint32_t aBaseDataSize, bool aDoSimpleChange)
 {
+    //return std::string(apBaseData);
+
 	char lOutData[4096] = "";
 	uint32_t lOutSize = sizeof(lOutData);
 	ztl_base64_decode(apBaseData, strlen(apBaseData), lOutData, &lOutSize);

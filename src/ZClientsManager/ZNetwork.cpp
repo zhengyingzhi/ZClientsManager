@@ -80,6 +80,7 @@ ZNetCommBase::ZNetCommBase()
 	: m_NetConf()
 	, m_LoopOnce()
 	, m_pUserData()
+    , m_Running(0)
 {}
 
 ZNetCommBase::~ZNetCommBase()
@@ -95,8 +96,7 @@ void ZNetCommBase::SetLoopOnceFunc(ZOnLoopOncePtr apFunc, void* apUserData)
 
 
 ZUdpComm::ZUdpComm()
-	: m_Running(0)
-	, m_pIOThread()
+	: m_pIOThread()
 	, m_Sender(INVALID_SOCKET)
 	, m_Recver(INVALID_SOCKET)
 {}

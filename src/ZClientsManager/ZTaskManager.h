@@ -26,7 +26,7 @@ public:
 #endif
 
 public:
-	void TryExpireTimers();
+	void TryExpireTimers(BOOL aIsIOThread);
 	void ShowOnListCtrl(ZTaskInfo* apTaskInfo);
 	int  FindRow(ZTaskInfo* apTaskInfo);
 

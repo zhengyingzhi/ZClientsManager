@@ -28,10 +28,10 @@ static void _NetLoopOnce(void* apUserData)
 {
 	ZTaskManager* lpTaskMgr = (ZTaskManager*)apUserData;
 	if (lpTaskMgr)
-		lpTaskMgr->TryExpireTimers();
+		lpTaskMgr->TryExpireTimers(TRUE);
 }
 
-void ZTaskManager::TryExpireTimers()
+void ZTaskManager::TryExpireTimers(BOOL aIsIOThread)
 {
 	// try delay once
 	if (g_FirstCallExpire)
@@ -69,11 +69,14 @@ void ZTaskManager::TryExpireTimers()
 			if (rv == IDYES)
 			{
 				// try delete this if clicked YES
-				int lRow = FindRow(lpTask);
-				if (lRow >= 0)
-					m_ListTask.DeleteItem(lRow);
+                if (!aIsIOThread)
+                {
+                    int lRow = FindRow(lpTask);
+                    if (lRow >= 0)
+                        m_ListTask.DeleteItem(lRow);
+                }
 
-				m_pTaskDB->Delete(&lpTask, sizeof(ZTaskInfo));
+				m_pTaskDB->Delete(lpTask, sizeof(ZTaskInfo));
 
 				EraseOneTask(lpTask, false);
 				continue;

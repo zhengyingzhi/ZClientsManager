@@ -257,7 +257,7 @@ vector<ZStudentInfo*> ZMemoryData::QueryStuInfoVague(const char* apFindStr)
 }
 
 
-void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo, BOOL aPublishToNet)
+void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo)
 {
 	ZLockScope lk(&m_StuLock);
 
@@ -265,11 +265,9 @@ void ZMemoryData::AddStuInfo(const ZStudentInfo* apStuInfo, BOOL aPublishToNet)
 	lpDstData = (ZStudentInfo*)ztl_pcalloc(m_Pool, sizeof(ZStudentInfo));
 	memcpy(lpDstData, apStuInfo, sizeof(ZStudentInfo));
 	m_CacheStuData.push_back(lpDstData);
-
-	PublishToNetwork(apStuInfo, ZNET_T_PublishAdd);
 }
 
-void ZMemoryData::UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo, BOOL aPublishToNet)
+void ZMemoryData::UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo* apNewStuInfo)
 {
 	if (apTobeUpdated == NULL)
 	{
@@ -284,11 +282,6 @@ void ZMemoryData::UpdateStuInfo(ZStudentInfo* apTobeUpdated, const ZStudentInfo*
 	{
 		ZLockScope lk(&m_StuLock);
 		ZStuInfoCopy(apTobeUpdated, apNewStuInfo);
-	}
-
-	if (aPublishToNet)
-	{
-		PublishToNetwork(apNewStuInfo, ZNET_T_PublishUpdate);
 	}
 }
 
@@ -305,7 +298,11 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 		m_pStuDB->Insert((void*)apStuInfo, sizeof(ZStudentInfo));
 
 		// 添加到本地缓存中，并发布到网络上
-		AddStuInfo(apStuInfo, aPublishToNet);
+		AddStuInfo(apStuInfo);
+
+        if (aPublishToNet) {
+            PublishToNetwork(apStuInfo, ZNET_T_PublishAdd);
+        }
 	}
 	else
 	{
@@ -321,9 +318,13 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 			return;
 		}
 
+        UpdateStuInfo(lVec[0], apStuInfo);
+
 		m_pStuDB->Update((void*)apStuInfo, sizeof(ZStudentInfo));
 
-		UpdateStuInfo(lVec[0], apStuInfo, aPublishToNet);
+        if (aPublishToNet) {
+            PublishToNetwork(apStuInfo, ZNET_T_PublishUpdate);
+        }
 	}
 }
 
