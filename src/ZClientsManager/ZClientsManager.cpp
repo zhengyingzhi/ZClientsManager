@@ -381,7 +381,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	/* network */
 	if (g_pNetComm == NULL)
 	{
-		ZNetConfig lNetConf;
+		ZNetConfig lNetConf     = {};
 		lNetConf.m_Type         = g_AppConfig.m_NetType;
 		lNetConf.m_IsBroadcast  = 0;
 		lNetConf.m_PeerAddr     = 0;
@@ -393,6 +393,9 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		if (strstr(g_AppConfig.m_CastIP, "255.255."))
 		{
 			lNetConf.m_IsBroadcast = 1;
+			//lNetConf.m_PeerAddr = string_to_inetaddr(g_AppConfig.m_CastIP);
+			lNetConf.m_PeerAddr = htonl(INADDR_BROADCAST);
+			lNetConf.m_GroupAddr = 0;
 		}
 
 		// add callback

@@ -209,6 +209,10 @@ int ZUdpComm::Init(const ZNetConfig& aNetConf)
 			}
 		}
 	}
+	else if (aNetConf.m_IsBroadcast)
+	{
+		set_broadcast(m_Sender, true);
+	}
 
 	return 0;
 }

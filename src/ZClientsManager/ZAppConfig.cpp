@@ -95,7 +95,7 @@ void ZAppConfigs::WriteAppConfig(const string& aConfName)
 	string lString;
 	lString = ToString();
 
-	FILE* fp = fopen(aConfName.c_str(), "w");
+	FILE* fp = fopen(aConfName.c_str(), "wb");
 	if (fp)
 	{
 		fputs(lString.c_str(), fp);
