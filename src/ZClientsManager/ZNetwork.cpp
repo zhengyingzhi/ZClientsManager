@@ -180,6 +180,8 @@ int ZUdpComm::Init(const ZNetConfig& aNetConf)
 		if (aNetConf.m_IsBroadcast)
 		{
 			set_broadcast(m_Sender, true);
+			enable_multicast_loopback(m_Sender, false);
+			set_multicast_ttl(m_Sender, 4);
 		}
 		else
 		{
@@ -212,6 +214,8 @@ int ZUdpComm::Init(const ZNetConfig& aNetConf)
 	else if (aNetConf.m_IsBroadcast)
 	{
 		set_broadcast(m_Sender, true);
+		enable_multicast_loopback(m_Sender, false);
+		set_multicast_ttl(m_Sender, 4);
 	}
 
 	return 0;

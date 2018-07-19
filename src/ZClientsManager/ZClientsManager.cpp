@@ -65,6 +65,9 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 			ZStudentInfo lStuInfo = { 0 };
 			ZFixString2StuInfo((char*)lpRawMessage, lpMsgHead->m_DataSize, ZNetProtocol::NetMessagePreSize(), &lStuInfo);
 			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo, FALSE);
+
+			if (g_pMainFrame)
+				g_pMainFrame->UpdateStuToMainListView(&lStuInfo, TRUE);
 		}
 	}
 	else if (lpNetHead->m_Type == ZNET_T_Query)
@@ -390,11 +393,11 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		lNetConf.m_BindAddr     = string_to_inetaddr(ZNET_DEFAULT_ANYIP);
 		lNetConf.m_GroupAddr    = string_to_inetaddr(g_AppConfig.m_CastIP);
 
-		if (strstr(g_AppConfig.m_CastIP, "255.255."))
+		if (strstr(g_AppConfig.m_CastIP, "255") || strstr(g_AppConfig.m_CastIP, "192."))
 		{
 			lNetConf.m_IsBroadcast = 1;
-			//lNetConf.m_PeerAddr = string_to_inetaddr(g_AppConfig.m_CastIP);
-			lNetConf.m_PeerAddr = htonl(INADDR_BROADCAST);
+			lNetConf.m_PeerAddr = string_to_inetaddr(g_AppConfig.m_CastIP);
+			//lNetConf.m_PeerAddr = htonl(INADDR_BROADCAST);
 			lNetConf.m_GroupAddr = 0;
 		}
 

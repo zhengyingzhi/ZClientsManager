@@ -300,9 +300,9 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 		// 添加到本地缓存中，并发布到网络上
 		AddStuInfo(apStuInfo);
 
-        if (aPublishToNet) {
-            PublishToNetwork(apStuInfo, ZNET_T_PublishAdd);
-        }
+		if (aPublishToNet) {
+			PublishToNetwork(apStuInfo, ZNET_T_PublishAdd);
+		}
 	}
 	else
 	{
@@ -318,13 +318,13 @@ void ZMemoryData::AddOrUpdateStuInfo(uint32_t aType, const ZStudentInfo* apStuIn
 			return;
 		}
 
-        UpdateStuInfo(lVec[0], apStuInfo);
+		UpdateStuInfo(lVec[0], apStuInfo);
 
 		m_pStuDB->Update((void*)apStuInfo, sizeof(ZStudentInfo));
 
-        if (aPublishToNet) {
-            PublishToNetwork(apStuInfo, ZNET_T_PublishUpdate);
-        }
+		if (aPublishToNet) {
+			PublishToNetwork(apStuInfo, ZNET_T_PublishUpdate);
+		}
 	}
 }
 

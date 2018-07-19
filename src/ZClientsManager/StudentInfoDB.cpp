@@ -372,6 +372,9 @@ int ZStudentInfoDBText::Update(void* apDataInfo, uint32_t aDataSize)
 	// FIXME: update some fields
 	ZStuInfoCopy(lpDstInfo, lpStuInfo);
 
+	// update the recved number in db
+	lpStuInfo->Number = lpDstInfo->Number;
+
 	ztl_shm_flush_to_file(m_pShmObj, true, lpDstInfo, sizeof(ZStudentInfo));
 
 	char lFixString[4096] = "";
