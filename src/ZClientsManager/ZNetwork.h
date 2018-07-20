@@ -61,22 +61,21 @@ typedef void(*ZOnLoopOncePtr)(void* apUserData);
 
 #define ZNET_DEFAULT_PORT		40594
 #define ZNET_DEFAULT_ANYIP		"0.0.0.0"
-#define ZNET_DEFAULT_GROUPIP	"229.5.9.4"
+#define ZNET_DEFAULT_GROUPIP	"224.5.9.4"
 
-#define ZNET_TYPE_UDP_MULTICAST 0
-#define ZNET_TYPE_UDP_BROADCAST 1
-#define ZNET_TYPE_TCP			2
+#define ZNET_TYPE_UDP_MULTICAST 1
+#define ZNET_TYPE_UDP_BROADCAST 2
+#define ZNET_TYPE_UDP_PEERCAST  3
+#define ZNET_TYPE_TCP           4
 class ZNetConfig
 {
 public:
 	uint32_t	m_Type;			// 0:udp 1:tcp
-	uint32_t	m_IsBroadcast;	// is udp broadcast
+	uint32_t	m_Broadcast;	// is udp broadcast
 	uint32_t	m_PeerAddr;		// for sender peer inet address
 	uint16_t	m_PeerPort;		// for sender peer port default is 40594
 	uint16_t	m_BindPort;		// for receiver bind port
 	uint32_t	m_BindAddr;		// for receiver 
-
-	uint32_t	m_GroupAddr;	// for receiver, default group ip 229.5.9.4
 
 	void*				m_pUserData;
 	ZOnNetMessagePtr	m_pFunc;

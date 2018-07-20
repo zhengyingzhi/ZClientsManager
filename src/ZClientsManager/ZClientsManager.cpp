@@ -386,19 +386,32 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 	{
 		ZNetConfig lNetConf     = {};
 		lNetConf.m_Type         = g_AppConfig.m_NetType;
-		lNetConf.m_IsBroadcast  = 0;
-		lNetConf.m_PeerAddr     = 0;
+		lNetConf.m_Broadcast    = 0;
+		lNetConf.m_PeerAddr     = string_to_inetaddr(g_AppConfig.m_CastIP);
 		lNetConf.m_PeerPort     = g_AppConfig.m_MainPort;
 		lNetConf.m_BindPort     = g_AppConfig.m_MainPort;
 		lNetConf.m_BindAddr     = string_to_inetaddr(ZNET_DEFAULT_ANYIP);
-		lNetConf.m_GroupAddr    = string_to_inetaddr(g_AppConfig.m_CastIP);
 
-		if (strstr(g_AppConfig.m_CastIP, "255") || strstr(g_AppConfig.m_CastIP, "192."))
+		int lTemp = atoi(g_AppConfig.m_CastIP);
+		if (lTemp >= 224 && lTemp <= 239)
 		{
-			lNetConf.m_IsBroadcast = 1;
+			group addres
+			lNetConf.m_Broadcast = ZNET_TYPE_UDP_MULTICAST;
+		}
+		else if (strstr(g_AppConfig.m_CastIP, "255"))
+		{
+			lNetConf.m_Broadcast = ZNET_TYPE_UDP_BROADCAST;
 			lNetConf.m_PeerAddr = string_to_inetaddr(g_AppConfig.m_CastIP);
-			//lNetConf.m_PeerAddr = htonl(INADDR_BROADCAST);
-			lNetConf.m_GroupAddr = 0;
+			uint32_t lPeerAddr0 = htonl(INADDR_BROADCAST);
+			uint32_t lPeerAddr1 = string_to_inetaddr("255.255.255.255");
+			if (lPeerAddr0 == lPeerAddr1)
+			{
+				int x = 0;
+			}
+		}
+		else
+		{
+			lNetConf.m_Broadcast = ZNET_TYPE_UDP_PEERCAST;
 		}
 
 		// add callback

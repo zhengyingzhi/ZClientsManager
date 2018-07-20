@@ -120,7 +120,7 @@ int ZUdpComm::Init(const ZNetConfig& aNetConf)
 
 	int rv;
 	char lMultiIP[32] = "";
-	inetaddr_to_string(lMultiIP, sizeof(lMultiIP), aNetConf.m_GroupAddr);
+	inetaddr_to_string(lMultiIP, sizeof(lMultiIP), aNetConf.m_PeerAddr);
 
 	// receiver
 	if (aNetConf.m_BindAddr > 0 || aNetConf.m_BindPort > 0)
@@ -144,16 +144,16 @@ int ZUdpComm::Init(const ZNetConfig& aNetConf)
 			return rv;
 		}
 		
-		if (aNetConf.m_GroupAddr > 0 && !aNetConf.m_IsBroadcast)
+		if (aNetConf.m_Broadcast == ZNET_TYPE_UDP_MULTICAST)
 		{
-			//enable_multicast_loopback(m_Recver, false);
-			//set_multicase_interface(m_Recver, ZNET_DEFAULT_ANYIP);
+			enable_multicast_loopback(m_Recver, false);
+			set_multicase_interface(m_Recver, ZNET_DEFAULT_ANYIP);
 
 #if 1
 			struct ip_mreq mreqInfo;
 			memset(&mreqInfo, 0, sizeof(mreqInfo));
 			mreqInfo.imr_interface.s_addr = aNetConf.m_BindAddr;
-			mreqInfo.imr_multiaddr.s_addr = aNetConf.m_GroupAddr;
+			mreqInfo.imr_multiaddr.s_addr = aNetConf.m_PeerAddr;
 			rv = setsockopt(m_Recver, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&mreqInfo, sizeof(mreqInfo));
 #else
 			rv = join_multicast(m_Recver, lMultiIP, ZNET_DEFAULT_ANYIP);
@@ -175,48 +175,40 @@ int ZUdpComm::Init(const ZNetConfig& aNetConf)
 	m_Sender = create_socket(SOCK_DGRAM);
 	set_snd_buffsize(m_Sender, ZCOMM_DEFAULT_SO_BUFSZ);
 
-	if (aNetConf.m_GroupAddr > 0)
+	if (aNetConf.m_Broadcast == ZNET_TYPE_UDP_MULTICAST)
 	{
-		if (aNetConf.m_IsBroadcast)
-		{
-			set_broadcast(m_Sender, true);
-			enable_multicast_loopback(m_Sender, false);
-			set_multicast_ttl(m_Sender, 4);
-		}
-		else
-		{
-			enable_multicast_loopback(m_Sender, false);
-			set_multicast_ttl(m_Sender, 4);
-			set_multicase_interface(m_Sender, ZNET_DEFAULT_ANYIP);
+		enable_multicast_loopback(m_Sender, false);
+		set_multicast_ttl(m_Sender, 4);
+		set_multicase_interface(m_Sender, ZNET_DEFAULT_ANYIP);
 
 #if 1
-			struct ip_mreq mreqInfo;
-			memset(&mreqInfo, 0, sizeof(mreqInfo));
-			mreqInfo.imr_interface.s_addr = aNetConf.m_BindAddr;
-			mreqInfo.imr_multiaddr.s_addr = aNetConf.m_GroupAddr;
-			rv = setsockopt(m_Sender, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&mreqInfo, sizeof(mreqInfo));
+		struct ip_mreq mreqInfo;
+		memset(&mreqInfo, 0, sizeof(mreqInfo));
+		mreqInfo.imr_interface.s_addr = aNetConf.m_BindAddr;
+		mreqInfo.imr_multiaddr.s_addr = aNetConf.m_PeerAddr;
+		rv = setsockopt(m_Sender, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&mreqInfo, sizeof(mreqInfo));
 #else
-			inetaddr_to_string(lMultiIP, sizeof(lMultiIP), aNetConf.m_GroupAddr);
-			rv = join_multicast(m_Sender, lMultiIP, ZNET_DEFAULT_ANYIP);
+		inetaddr_to_string(lMultiIP, sizeof(lMultiIP), aNetConf.m_GroupAddr);
+		rv = join_multicast(m_Sender, lMultiIP, ZNET_DEFAULT_ANYIP);
 #endif
-			if (0 != rv)
-			{
-				char lErrorMsg[512] = "";
-				sprintf(lErrorMsg, "sender join_multicast failed:%d", get_errno());
-				OutputDebugString(lErrorMsg);
+		if (0 != rv)
+		{
+			char lErrorMsg[512] = "";
+			sprintf(lErrorMsg, "sender join_multicast failed:%d", get_errno());
+			OutputDebugString(lErrorMsg);
 
-				close_socket(m_Sender);
-				m_Sender = INVALID_SOCKET;
-				return -2;
-			}
+			close_socket(m_Sender);
+			m_Sender = INVALID_SOCKET;
+			return -2;
 		}
 	}
-	else if (aNetConf.m_IsBroadcast)
+	else if (aNetConf.m_Broadcast == ZNET_TYPE_UDP_BROADCAST)
 	{
 		set_broadcast(m_Sender, true);
 		enable_multicast_loopback(m_Sender, false);
 		set_multicast_ttl(m_Sender, 4);
 	}
+
 
 	return 0;
 }
@@ -297,10 +289,7 @@ int ZUdpComm::DirectSend(const char* apRawData, uint32_t aRawSize)
 	struct sockaddr_in lToAddr = {};
 	lToAddr.sin_family = AF_INET;
 	lToAddr.sin_port = htons(m_NetConf.m_PeerPort);
-	if (m_NetConf.m_GroupAddr > 0)
-		lToAddr.sin_addr.s_addr = m_NetConf.m_GroupAddr;
-	else
-		lToAddr.sin_addr.s_addr = m_NetConf.m_PeerAddr;
+	lToAddr.sin_addr.s_addr = m_NetConf.m_PeerAddr;
 	return udp_send(m_Sender, apRawData, aRawSize, &lToAddr);
 }
 
