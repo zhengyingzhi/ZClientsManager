@@ -3,4 +3,5 @@ Password=MTExMTEx
 SavePasswd=1
 NetType=2
 MainPort=40594
-CastIP=255.255.255.0
+CastIP=224.5.9.4
+#CastIP=192.168.0.255

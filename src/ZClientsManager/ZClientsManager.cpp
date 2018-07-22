@@ -36,9 +36,9 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 	ZMsgDesc*   lpMsgHead;
 	void*       lpRawMessage;
 
-    if (g_pNetComm && !g_pNetComm->IsRunning()) {
-        return;
-    }
+	if (g_pNetComm && !g_pNetComm->IsRunning()) {
+		return;
+	}
 
 	ZNetProtocol::ExtractNetMessage(apMessage, &lpNetHead, &lpMsgHead, &lpRawMessage);
 
@@ -112,6 +112,9 @@ static void _ZOnNetMessage(void* apUserData, ZNetMessage* apMessage)
 			ZStudentInfo lStuInfo = {};
 			ZFixString2StuInfo(apMessage->GetRawBegin(), apMessage->Size(), ZNetProtocol::NetMessagePreSize(), &lStuInfo);
 			g_MemData.AddOrUpdateStuInfo(lpNetHead->m_Type, &lStuInfo, FALSE);
+
+			if (g_pMainFrame)
+				g_pMainFrame->UpdateStuToMainListView(&lStuInfo, TRUE);
 		}
 	}
 
@@ -395,7 +398,7 @@ BOOL CZClientsManagerApp::DoLoginDlg()
 		int lTemp = atoi(g_AppConfig.m_CastIP);
 		if (lTemp >= 224 && lTemp <= 239)
 		{
-			group addres
+			//group addres
 			lNetConf.m_Broadcast = ZNET_TYPE_UDP_MULTICAST;
 		}
 		else if (strstr(g_AppConfig.m_CastIP, "255"))
